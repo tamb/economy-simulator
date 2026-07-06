@@ -1,0 +1,36 @@
+{
+	"name": "economy-simulator-web",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"preview": "vite preview",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome check --write .",
+		"typecheck": "tsc -b --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest"
+	},
+	"dependencies": {
+		"@faker-js/faker": "^10.5.0",
+		"@tailwindcss/vite": "^4.3.2",
+		"@tanstack/react-virtual": "^3.14.5",
+		"facesjs": "^5.0.3",
+		"localforage": "^1.10.0",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"tailwindcss": "^4.3.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.3",
+		"typescript": "^6.0.3",
+		"vite": "^8.1.3",
+		"vitest": "^4.1.10"
+	}
+}

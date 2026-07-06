@@ -1,0 +1,20 @@
+{
+	"name": "economy-simulator-desktop",
+	"version": "1.0.0",
+	"private": true,
+	"description": "NeutralinoJS desktop app",
+	"scripts": {
+		"start": "neu run",
+		"build": "neu update && neu build",
+		"format": "bunx biome format --write .",
+		"lint": "bunx biome lint .",
+		"lint:fix": "bunx biome check --write ."
+	},
+	"dependencies": {
+		"@neutralinojs/lib": "^6.8.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.2",
+		"@neutralinojs/neu": "^11.7.2"
+	}
+}

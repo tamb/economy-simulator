@@ -1,0 +1,17 @@
+{
+	"name": "economy-simulator",
+	"private": true,
+	"version": "0.0.0",
+	"workspaces": ["packages/*"],
+	"scripts": {
+		"dev": "bun run --filter economy-simulator-web dev",
+		"build:web": "bun run --filter economy-simulator-web build",
+		"copy-web-to-desktop": "bun scripts/copy-web-to-desktop.ts",
+		"build:desktop": "bun run --filter economy-simulator-desktop build",
+		"build": "bun run build:web && bun run copy-web-to-desktop && bun run build:desktop",
+		"format": "bun run --filter './packages/*' --if-present format",
+		"lint": "bun run --filter './packages/*' --if-present lint",
+		"lint:fix": "bun run --filter './packages/*' --if-present lint:fix",
+		"typecheck": "bun run --filter './packages/*' --if-present typecheck"
+	}
+}

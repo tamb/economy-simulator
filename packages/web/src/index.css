@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+	/* Surfaces */
+	--color-surface: #f7f3eb;
+	--color-surface-muted: #ebe4d6;
+	--color-surface-shadow: #ddd4c4;
+
+	/* Neutrals */
+	--color-neutral-950: #000000;
+	--color-neutral-900: #0a0a0a;
+	--color-neutral-600: #3a3a3a;
+	--color-neutral-400: #909090;
+
+	/* Palette */
+	--color-cyan: #30e0c0;
+	--color-cyan-light: #30f0d0;
+	--color-cyan-dark: #109080;
+	--color-yellow: #ffff00;
+	--color-yellow-muted: #c9b800;
+	--color-red: #f00000;
+	--color-red-dark: #702020;
+	--color-green: #20d000;
+	--color-green-muted: #66834f;
+	--color-orange: #d05040;
+	--color-orange-light: #e0b090;
+	--color-blue: #0000ff;
+
+	/* Semantic */
+	--color-background: var(--color-surface);
+	--color-foreground: var(--color-neutral-900);
+	--color-primary: var(--color-cyan-dark);
+	--color-primary-foreground: #ffffff;
+	--color-secondary: var(--color-cyan);
+	--color-secondary-foreground: var(--color-neutral-900);
+	--color-accent: var(--color-red);
+	--color-accent-foreground: #ffffff;
+	--color-highlight: var(--color-yellow);
+	--color-muted: var(--color-surface-muted);
+	--color-muted-foreground: var(--color-neutral-600);
+	--color-border: var(--color-cyan-dark);
+	--color-ring: var(--color-cyan);
+	--color-destructive: var(--color-red);
+	--color-success: var(--color-green);
+	--color-warning: var(--color-yellow-muted);
+	--color-info: var(--color-blue);
+
+	/* Text on dark surfaces */
+	--color-on-dark: #f7f3eb;
+	--color-on-dark-muted: #c8d4d0;
+
+	--font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+	--font-display: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+	--font-heading: "Press Start 2P", ui-monospace, monospace;
+
+	--letter-spacing-label: 0.12em;
+	--letter-spacing-overline: 0.2em;
+}
+
+@layer base {
+	html {
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: var(--font-heading);
+		line-height: 1.4;
+		-webkit-font-smoothing: none;
+		-moz-osx-font-smoothing: unset;
+		text-rendering: optimizeSpeed;
+	}
+}
+
+@layer utilities {
+	.tracking-label {
+		letter-spacing: var(--letter-spacing-label);
+	}
+
+	.tracking-overline {
+		letter-spacing: var(--letter-spacing-overline);
+	}
+
+	.font-label {
+		font-family: var(--font-sans);
+		font-variant: all-small-caps;
+		letter-spacing: var(--letter-spacing-label);
+	}
+}
