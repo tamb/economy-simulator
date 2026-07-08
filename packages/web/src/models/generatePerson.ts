@@ -1,20 +1,30 @@
 import { en, Faker } from "@faker-js/faker";
-import { generate as generateFace } from "facesjs";
+import {
+	gameSettings,
+	getViableExtractiveSubSectorIds,
+} from "economy-simulator-data";
+import { assignJobSector, isWorkingAge } from "economy-simulator-simulation";
+import type { FaceId } from "../data/faces";
 import { personGenerationConfig } from "../data/person-generation";
-import { Person, type PersonalityTrait } from "./Person";
+import type { WorldRegion } from "../data/world";
+import { Person, type PersonalityTrait, type PersonSex } from "./Person";
 
-export type RandomFn = () => number;
+type RandomFn = () => number;
 
 function randomInt(min: number, max: number, random: RandomFn): number {
 	return Math.floor(random() * (max - min + 1)) + min;
 }
 
-function generateName(random: RandomFn): string {
+function generateSex(random: RandomFn): PersonSex {
+	return random() < 0.5 ? "M" : "F";
+}
+
+function generateName(random: RandomFn, sex: PersonSex): string {
 	const faker = new Faker({
 		locale: [en],
 		seed: randomInt(0, 2_147_483_647, random),
 	});
-	return faker.person.fullName();
+	return faker.person.fullName({ sex: sex === "M" ? "male" : "female" });
 }
 
 /** Split `total` into `count` non-negative integers that sum to `total`. */
@@ -44,27 +54,49 @@ function assignTraits(
 	points: number[],
 ): void {
 	for (let index = 0; index < traits.length; index++) {
-		person[traits[index]] = points[index];
+		person.setTrait(traits[index], points[index]);
 	}
 }
 
-export function generatePerson(
+/** The viable extractive sub-sectors a region's home terrain supports, or `undefined` (no filtering) if the region can't be found. */
+function getViableExtractiveSubSectorIdsForRegion(
+	regions: readonly WorldRegion[],
+	regionId: string | undefined,
+): string[] | undefined {
+	const region = regions.find((candidate) => candidate.id === regionId);
+	return region
+		? getViableExtractiveSubSectorIds(region.terrain, region.isCoastal)
+		: undefined;
+}
+
+function generatePerson(
+	faceIds: readonly FaceId[],
+	regions: readonly WorldRegion[],
 	config = personGenerationConfig,
 	random: RandomFn = Math.random,
 ): Person {
 	const person = new Person();
+	const sex = generateSex(random);
 
-	person.name = generateName(random);
-	person.face = generateFace();
-	person.overallHealth = randomInt(
-		config.health.min,
-		config.health.max,
-		random,
+	person.setSex(sex);
+	person.setName(generateName(random, sex));
+	person.setAge(
+		randomInt(
+			gameSettings.demographics.minAge,
+			gameSettings.demographics.maxAge,
+			random,
+		),
 	);
-	person.overallHappiness = randomInt(
-		config.happiness.min,
-		config.happiness.max,
-		random,
+	person.setIsAlive(true);
+	person.setFaceId(faceIds[randomInt(0, faceIds.length - 1, random)]);
+	if (regions.length > 0) {
+		person.setRegionId(regions[randomInt(0, regions.length - 1, random)]?.id);
+	}
+	person.setOverallHealth(
+		randomInt(config.health.min, config.health.max, random),
+	);
+	person.setOverallHappiness(
+		randomInt(config.happiness.min, config.happiness.max, random),
 	);
 
 	const traitPoints = splitPoints(
@@ -74,5 +106,21 @@ export function generatePerson(
 	);
 	assignTraits(person, config.traits, traitPoints);
 
+	if (isWorkingAge(person.getAge() ?? 0)) {
+		const job = assignJobSector(
+			random,
+			getViableExtractiveSubSectorIdsForRegion(regions, person.getRegionId()),
+		);
+		person.setCategoryId(job.categoryId);
+		person.setSubSectorId(job.subSectorId);
+	}
+
 	return person;
 }
+
+export {
+	generatePerson,
+	getViableExtractiveSubSectorIdsForRegion,
+	type RandomFn,
+	randomInt,
+};

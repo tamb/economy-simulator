@@ -11,6 +11,12 @@ Human- and AI-readable project charter. When product intent, architecture, or re
 | [_monorepo.md](./_monorepo.md) | Packages, ownership, common commands |
 | [_agent-rules.md](./_agent-rules.md) | How agents should work |
 
+## Design & research
+
+Simulation rules, sourcing, and model diagrams live in **[research/index.md](../research/index.md)**. For the island, biomes, resource ledger, and extraction economy, read **[resources-and-geography.md](../research/resources-and-geography.md)**.
+
+In-app player guidance: **Instructions** screen (`packages/web/src/pages/InstructionsPage.tsx`).
+
 ## Authority
 
 1. **Constitution** — product intent and monorepo shape.

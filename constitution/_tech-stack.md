@@ -13,8 +13,82 @@
 | Layer | Choice |
 | --- | --- |
 | UI | **React 19.2.7** |
+| Routing | **react-router** (`HashRouter`) — hash-based (not `BrowserRouter`) because the desktop build is served by Neutralino's static file server with no SPA fallback for arbitrary paths; every route still resolves to the same `index.html`. `AppShell` is the layout route (nav + header + footer + `<Outlet />`); `/atlas`, `/atlas/:categoryId`, and `/atlas/:categoryId/:sectorId` give the sector-atlas drill-down real back/forward support too |
 | Build | **Vite** |
 | Styling | **Tailwind CSS v4** (`@tailwindcss/vite` or PostCSS for Next.js) |
+| Storage | **localforage** (IndexedDB) |
+| Map | **honeycomb-grid** for hex coordinate math, hand-rolled SVG rendering (`CountryMap`) styled with the Tailwind theme tokens |
+| Charts | **chart.js** + **react-chartjs-2**, themed via `data/chart-theme.ts` (retro, no smoothing/animation) |
+| Heavy calculations | Dedicated Web Worker (`workers/population.worker.ts`, its own `tsconfig.worker.json` with the `WebWorker` lib) runs the daily cohort tick and annual population cycle off the main thread; progress renders in a reusable `CalculationModal` |
+| Component tests | **Vitest** `projects` split: `.test.ts` runs under `node`, `.test.tsx` runs under `jsdom` with `@testing-library/react` |
+| End-to-end tests | **Playwright** (`e2e/`, `tsconfig.e2e.json`, `bun run test:e2e`) drives the real production build (`vite build && vite preview`) rather than the dev server — see note below on why |
+| New game setup | Before any population exists, `NewGameSetupPage` gates the whole app (see `App.tsx`'s `needsSetup` check) and lets the player pick a starting size from `appConfig.population.sizeOptions` (default `appConfig.population.size`); `startGeneration` (from `PopulationContext`) then hands off to the normal app shell, which shows generation progress the same way the `VITE_POPULATION_SIZE` override does |
+| Code splitting | `DashboardsPage` and `CountryMapPage` are lazy-loaded (`React.lazy` + `Suspense` in `App.tsx`) so chart.js/react-chartjs-2 and honeycomb-grid live in their own chunks |
+
+### Gotcha: `resolve.dedupe` is load-bearing
+
+`vite.config.ts` sets `resolve.dedupe: ["react", "react-dom", "chart.js"]`.
+Without it, Rollup can duplicate one of these packages into more than one
+output chunk, and anything relying on that package's module-level singleton
+state breaks in a way that's easy to misdiagnose:
+
+- A duplicated **React** left `react-chartjs-2`'s copy with an uninitialized
+  hooks dispatcher — `Cannot read properties of null (reading 'useRef')`,
+  which crashes the whole app on first mount (no error boundary today).
+- A duplicated **chart.js** meant `ChartJS.register(...)` (in
+  `data/chart-theme.ts`) populated one copy's registry while chart rendering
+  read from another — `"linear" is not a registered scale`, etc.
+
+Both reproduced deterministically on a first, cold visit to the Dashboards
+page and were only caught by the Playwright suite driving a real production
+build in a fresh browser profile — Vitest/jsdom component tests don't bundle
+with Rollup so they never hit this class of bug. If a new chart/heavy
+dependency starts throwing similarly odd "module state wasn't initialized"
+errors only in the built app, suspect chunk duplication first and add it to
+`dedupe`.
+
+### Gotcha: `VITE_POPULATION_SIZE` is inlined at build time
+
+Most e2e specs run against a production build with `VITE_POPULATION_SIZE` set
+so population generation takes seconds instead of ~70s. Because Vite inlines
+`import.meta.env.*` at build time, that override is baked into the bundle —
+there's no way to test the real "no override" first-run path (the new-game
+setup screen) against that same build. `playwright.config.ts` therefore
+defines a second `webServer`/project pair (`chromium-new-game-setup`,
+`dist-e2e-setup/`) built with no override, used only by
+`new-game-setup.spec.ts`. If you need another env-var-dependent behavior
+tested at its real default, follow the same pattern rather than trying to
+reuse the main preview server.
+
+## Data (`packages/data`)
+
+Pure TypeScript, no framework. Holds `AppConfig`, `GameSettings`, and
+research-backed reference tables (demographics, sector affinities, economic
+systems + their extraction effects, and the biome/resource/resource-overlay/
+resource-requirement catalogs under `src/geography/`). No build step —
+consumed as source via the workspace. `packages/web/src/data/economic-systems.ts`
+and `packages/web/src/data/taxonomy.ts` are both thin re-export shims over
+this package (UI-only concerns like category accent colors are layered on
+top in the shim, not the shared data).
+
+## Geography (`packages/geography`)
+
+Pure, deterministic (seeded) world-generation engine: organic island shape,
+biome assignment, resource-overlay placement, coastal/adjacency detection.
+No React, no I/O, no randomness beyond an explicit seed — mirrors
+`packages/simulation`'s "pure engine" rule so world generation stays
+unit-testable and safe to run inside a Web Worker. Depends on `packages/data`
+for the biome/resource/overlay catalogs and `AppConfig.regions` sizing
+tunables; uses `honeycomb-grid` for hex adjacency math (same library
+`packages/web` uses for rendering). No build step.
+
+## Simulation (`packages/simulation`)
+
+Pure TypeScript calculation engine (quality-of-life, mortality/fertility/
+migration, resource extraction/depletion/environment/national ledger). No
+React, no storage, no DOM — takes plain data in, returns plain data out, so
+it's trivially unit-testable and safe to run inside a Web Worker. Depends on
+`packages/data` for reference data; no build step.
 
 ## Desktop (`packages/desktop`)
 

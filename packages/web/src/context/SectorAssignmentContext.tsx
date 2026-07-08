@@ -1,12 +1,12 @@
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
-	type ReactNode,
 } from "react";
 import type { EconomicSystemId } from "../data/economic-systems";
 import type { CategoryId } from "../data/taxonomy";
@@ -34,7 +34,7 @@ interface SectorAssignmentContextValue {
 const SectorAssignmentContext =
 	createContext<SectorAssignmentContextValue | null>(null);
 
-export function SectorAssignmentProvider({ children }: { children: ReactNode }) {
+function SectorAssignmentProvider({ children }: { children: ReactNode }) {
 	const [assignments, setAssignments] = useState<SectorAssignments>({});
 	const [isReady, setIsReady] = useState(false);
 	const assignmentsRef = useRef(assignments);
@@ -94,7 +94,7 @@ export function SectorAssignmentProvider({ children }: { children: ReactNode }) 
 	);
 }
 
-export function useSectorAssignments() {
+function useSectorAssignments() {
 	const context = useContext(SectorAssignmentContext);
 	if (!context) {
 		throw new Error(
@@ -103,3 +103,5 @@ export function useSectorAssignments() {
 	}
 	return context;
 }
+
+export { SectorAssignmentProvider, useSectorAssignments };

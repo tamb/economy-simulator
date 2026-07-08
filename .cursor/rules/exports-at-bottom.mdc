@@ -1,0 +1,40 @@
+---
+description: Place named exports in a single export block at the bottom of TS/TSX files
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Exports at the bottom
+
+In TypeScript files, define implementations first, then export from one block at the **bottom** of the file.
+
+```typescript
+// ❌ BAD — inline exports scattered through the file
+export function generatePerson() { ... }
+export type RandomFn = () => number;
+
+// ✅ GOOD — local definitions, exports at the bottom
+function generatePerson() { ... }
+
+type RandomFn = () => number;
+
+export { generatePerson, type RandomFn };
+```
+
+## Rules
+
+- Prefer a single `export { ... }` block as the last statement in the file.
+- Use `export { type Foo }` (or a separate `export type { ... }` block) for types.
+- Keep helpers and constants unexported unless they are part of the module’s public API.
+- When adding new public symbols, add them to the bottom export block instead of adding new inline `export` keywords above.
+
+## Exceptions
+
+- **Default exports** only when a framework requires them (e.g. some config entry points). Still prefer named exports + bottom block when possible.
+- **Barrel/re-export files** (`index.ts`) may use `export { X } from "./x"`; keep those re-exports grouped at the bottom too.
+- **Generated files** — do not hand-edit; follow the generator’s format.
+
+## When editing existing files
+
+- Match the file’s current export style if the change is a one-line fix.
+- When doing substantive edits to a file, migrate its exports to the bottom-of-file pattern.

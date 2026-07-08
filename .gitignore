@@ -19,6 +19,12 @@ build/
 # Test coverage
 coverage/
 
+# Playwright
+/packages/web/test-results/
+/packages/web/playwright-report/
+/packages/web/blob-report/
+/packages/web/dist-e2e-setup/
+
 # Environment & secrets
 .env
 .env.*
@@ -49,7 +55,7 @@ ehthumbs.db
 packages/desktop/resources/
 packages/desktop/renderer/
 packages/desktop/dist/
-packages/desktop/.bin/
+packages/desktop/bin/
 
 # Misc caches
 .cache/

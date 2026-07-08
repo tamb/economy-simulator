@@ -1,7 +1,10 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
-	"extends": ["//biome.json"],
+	"extends": ["../../biome.json"],
+	"vcs": {
+		"enabled": false
+	},
 	"files": {
-		"includes": ["src/**", "app/**"]
+		"includes": ["src/**", "app/**", "e2e/**", "playwright.config.ts"]
 	}
 }

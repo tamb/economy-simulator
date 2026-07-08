@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-	categories,
-	getCategory,
-	getSubSector,
-	sectorKey,
-} from "./taxonomy";
+import { categories, getCategory, getSubSector, sectorKey } from "./taxonomy";
 
 describe("taxonomy", () => {
 	it("defines five top-level categories", () => {

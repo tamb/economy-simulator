@@ -1,4 +1,4 @@
-export function CreditsPage() {
+function CreditsPage() {
 	return (
 		<div className="space-y-6">
 			<header className="space-y-2">
@@ -37,3 +37,5 @@ export function CreditsPage() {
 		</div>
 	);
 }
+
+export { CreditsPage };

@@ -1,0 +1,45 @@
+---
+description: Follow the project constitution when intent, architecture, or layout is unclear
+alwaysApply: true
+---
+
+# Follow the Constitution
+
+When product intent, architecture, repo layout, or conventions are unclear, read the constitution before guessing from code alone.
+
+**Start here:** [constitution/index.md](../../constitution/index.md)
+
+| Topic | File |
+| --- | --- |
+| Product intent | [constitution/_intent.md](../../constitution/_intent.md) |
+| Tech stack | [constitution/_tech-stack.md](../../constitution/_tech-stack.md) |
+| Monorepo layout | [constitution/_monorepo.md](../../constitution/_monorepo.md) |
+| Agent workflow | [constitution/_agent-rules.md](../../constitution/_agent-rules.md) |
+
+## Authority
+
+1. **Constitution** — product intent and monorepo shape.
+2. **Code** — source of truth for behavior; update constitution when decisions change.
+
+## When to apply
+
+- Starting ambiguous or cross-package work
+- Choosing architecture, tooling, or new patterns
+- Changing product behavior or repo layout
+- Unsure whether a change fits desktop-first / web-builds-first flow
+
+## Agent expectations
+
+- Read the index and relevant `_*.md` topic before introducing new patterns.
+- Match existing package conventions; minimize scope.
+- Do not hand-edit generated assets under `packages/desktop/resources/` — run `copy-web-to-desktop` after web builds.
+- Update constitution docs when product or architecture decisions change.
+
+## Quality gates
+
+Before finishing substantive changes:
+
+```bash
+bun run lint:fix
+bun run typecheck
+```

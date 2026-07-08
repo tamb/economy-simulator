@@ -1,6 +1,13 @@
+import { gameSettings } from "economy-simulator-data";
 import type { PersonalityTrait } from "../models/Person";
 
-export const personGenerationConfig = {
+/**
+ * Balance numbers (`traitPointBudget`, `happiness`, `health`) are sourced
+ * from `gameSettings.personGeneration`, the single tunable source of truth
+ * shared with `packages/data`/`packages/simulation`. The `traits` list stays
+ * here because it's tied to the web-only `Person` class's OCEAN fields.
+ */
+const personGenerationConfig = {
 	traits: [
 		"openness",
 		"conscientiousness",
@@ -9,18 +16,12 @@ export const personGenerationConfig = {
 		"neuroticism",
 	] as const satisfies readonly PersonalityTrait[],
 
-	/** Total personality points split across all traits. */
-	traitPointBudget: 22,
-
-	happiness: {
-		min: 0,
-		max: 100,
-	},
-
-	health: {
-		min: 0,
-		max: 100,
-	},
+	traitPointBudget: gameSettings.personGeneration.traitPointBudget,
+	happiness: gameSettings.personGeneration.happiness,
+	health: gameSettings.personGeneration.health,
 } as const;
 
-export type PersonGenerationConfig = typeof personGenerationConfig;
+type PersonGenerationConfig = typeof personGenerationConfig;
+
+export type { PersonGenerationConfig };
+export { personGenerationConfig };

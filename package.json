@@ -12,6 +12,7 @@
 		"format": "bun run --filter './packages/*' --if-present format",
 		"lint": "bun run --filter './packages/*' --if-present lint",
 		"lint:fix": "bun run --filter './packages/*' --if-present lint:fix",
-		"typecheck": "bun run --filter './packages/*' --if-present typecheck"
+		"typecheck": "bun run --filter './packages/*' --if-present typecheck",
+		"test": "bun run --filter './packages/*' --if-present test"
 	}
 }

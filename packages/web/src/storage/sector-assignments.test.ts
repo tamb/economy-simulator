@@ -29,7 +29,12 @@ describe("sector-assignments", () => {
 	});
 
 	it("persists and loads sector assignments", async () => {
-		const next = await setSectorAssignment({}, "services", "healthcare", "socialism");
+		const next = await setSectorAssignment(
+			{},
+			"services",
+			"healthcare",
+			"socialism",
+		);
 
 		expect(next).toEqual({ "services/healthcare": "socialism" });
 		await expect(loadSectorAssignments()).resolves.toEqual({
@@ -55,12 +60,16 @@ describe("sector-assignments", () => {
 	});
 
 	it("reads assignments from an in-memory map", () => {
-		const assignments = { "knowledge/information-technology": "mixed-economy" as const };
+		const assignments = {
+			"knowledge/information-technology": "mixed-economy" as const,
+		};
 
 		expect(
 			getSectorAssignment(assignments, "knowledge", "information-technology"),
 		).toBe("mixed-economy");
-		expect(getSectorAssignment(assignments, "knowledge", "biotechnology")).toBeNull();
+		expect(
+			getSectorAssignment(assignments, "knowledge", "biotechnology"),
+		).toBeNull();
 	});
 
 	it("ignores invalid values when loading from storage", async () => {

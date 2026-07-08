@@ -1,0 +1,64 @@
+export type { AppConfig } from "./config/app-config";
+export { appConfig } from "./config/app-config";
+export type { GameSettings } from "./config/game-settings";
+export { gameSettings } from "./config/game-settings";
+export type { LifeTableRow, Sex } from "./demographics/life-tables";
+export {
+	femaleLifeTable,
+	GLOBAL_BASELINE_TOTAL_FERTILITY_RATE,
+	getAnnualMortalityProbability,
+	getLifeTable,
+	getRemainingLifeExpectancy,
+	maleLifeTable,
+	REPLACEMENT_TOTAL_FERTILITY_RATE,
+} from "./demographics/life-tables";
+export type { EconomicSystemEffect } from "./economy/economic-system-effects";
+export {
+	economicSystemEffects,
+	getEconomicSystemEffect,
+} from "./economy/economic-system-effects";
+export type {
+	EconomicSystem,
+	EconomicSystemId,
+} from "./economy/economic-systems";
+export {
+	economicSystems,
+	getEconomicSystem,
+	isEconomicSystemId,
+} from "./economy/economic-systems";
+export type {
+	Category,
+	CategoryId,
+	SubSector,
+	WeightedSubSector,
+} from "./economy/taxonomy";
+export {
+	categories,
+	getAllSubSectorEmploymentShares,
+	getCategory,
+	getSubSector,
+	sectorKey,
+} from "./economy/taxonomy";
+export type { BiomeDefinition, BiomeId, Terrain } from "./geography/biomes";
+export { biomes, getBiome, isLand } from "./geography/biomes";
+export type {
+	ResourceOverlayDefinition,
+	ResourceOverlayId,
+} from "./geography/resource-overlays";
+export {
+	getEligibleOverlaysForBiome,
+	getResourceOverlay,
+	resourceOverlays,
+} from "./geography/resource-overlays";
+export type { ResourceRequirement } from "./geography/resource-requirements";
+export {
+	getResourceRequirement,
+	resourceRequirements,
+} from "./geography/resource-requirements";
+export type { ResourceDefinition, ResourceId } from "./geography/resources";
+export {
+	getResource,
+	getResourceForSubSector,
+	resources,
+} from "./geography/resources";
+export { getViableExtractiveSubSectorIds } from "./geography/viable-sub-sectors";

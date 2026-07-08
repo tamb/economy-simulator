@@ -3,16 +3,16 @@ import type { EconomicSystemId } from "../data/economic-systems";
 import { isEconomicSystemId } from "../data/economic-systems";
 import { type CategoryId, sectorKey } from "../data/taxonomy";
 
-const STORAGE_KEY = "sector-assignments";
+type SectorAssignments = Record<string, EconomicSystemId>;
 
-export type SectorAssignments = Record<string, EconomicSystemId>;
+const STORAGE_KEY = "sector-assignments";
 
 const store = localforage.createInstance({
 	name: "economy-simulator",
 	storeName: "sector-data",
 });
 
-export async function loadSectorAssignments(): Promise<SectorAssignments> {
+async function loadSectorAssignments(): Promise<SectorAssignments> {
 	const saved = await store.getItem<unknown>(STORAGE_KEY);
 	if (!saved || typeof saved !== "object") return {};
 
@@ -25,13 +25,13 @@ export async function loadSectorAssignments(): Promise<SectorAssignments> {
 	return assignments;
 }
 
-export async function saveSectorAssignments(
+async function saveSectorAssignments(
 	assignments: SectorAssignments,
 ): Promise<void> {
 	await store.setItem(STORAGE_KEY, assignments);
 }
 
-export async function setSectorAssignment(
+async function setSectorAssignment(
 	assignments: SectorAssignments,
 	categoryId: CategoryId,
 	sectorId: string,
@@ -50,10 +50,18 @@ export async function setSectorAssignment(
 	return next;
 }
 
-export function getSectorAssignment(
+function getSectorAssignment(
 	assignments: SectorAssignments,
 	categoryId: CategoryId,
 	sectorId: string,
 ): EconomicSystemId | null {
 	return assignments[sectorKey(categoryId, sectorId)] ?? null;
 }
+
+export type { SectorAssignments };
+export {
+	getSectorAssignment,
+	loadSectorAssignments,
+	saveSectorAssignments,
+	setSectorAssignment,
+};

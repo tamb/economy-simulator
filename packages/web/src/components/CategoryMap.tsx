@@ -7,7 +7,7 @@ interface CategoryMapProps {
 
 const pyramidWidths = ["w-full", "w-[92%]", "w-[84%]", "w-[76%]", "w-[68%]"];
 
-export function CategoryMap({ onSelect }: CategoryMapProps) {
+function CategoryMap({ onSelect }: CategoryMapProps) {
 	const ordered = [...categories].sort((a, b) => a.tier - b.tier);
 
 	return (
@@ -46,3 +46,5 @@ export function CategoryMap({ onSelect }: CategoryMapProps) {
 		</div>
 	);
 }
+
+export { CategoryMap };

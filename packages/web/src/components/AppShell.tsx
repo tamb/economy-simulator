@@ -1,33 +1,56 @@
-import type { ReactNode } from "react";
+import { NavLink, Outlet, useLocation } from "react-router";
+import { usePopulation } from "../context/PopulationContext";
+import { appVersion } from "../data/app-version";
+import { CalculationModal } from "./CalculationModal";
 
-export type AppPage = "atlas" | "population" | "credits";
-
-const pages: { id: AppPage; label: string; subtitle: string }[] = [
+const pages: { path: string; label: string; subtitle: string }[] = [
 	{
-		id: "atlas",
+		path: "/atlas",
 		label: "Sector Atlas",
 		subtitle: "Economic Sector Atlas",
 	},
 	{
-		id: "population",
+		path: "/population",
 		label: "Population",
 		subtitle: "Population Registry",
 	},
 	{
-		id: "credits",
+		path: "/map",
+		label: "Country Map",
+		subtitle: "Regional Atlas",
+	},
+	{
+		path: "/dashboards",
+		label: "Dashboards",
+		subtitle: "Charts & Reports",
+	},
+	{
+		path: "/instructions",
+		label: "Instructions",
+		subtitle: "How to Play",
+	},
+	{
+		path: "/credits",
 		label: "Credits",
 		subtitle: "Credits & Attribution",
 	},
 ];
 
-interface AppShellProps {
-	page: AppPage;
-	onPageChange: (page: AppPage) => void;
-	children: ReactNode;
-}
+const PHASE_LABELS: Record<"daily" | "annual", string> = {
+	daily: "Updating today's cohort",
+	annual: "Running the annual population cycle",
+};
 
-export function AppShell({ page, onPageChange, children }: AppShellProps) {
-	const activePage = pages.find((item) => item.id === page) ?? pages[0];
+/**
+ * Persistent chrome (nav, header, footer) around every routed page, plus the
+ * day-advance progress overlay — both live here since they're independent of
+ * which page is currently active.
+ */
+function AppShell() {
+	const location = useLocation();
+	const { isAdvancingDay, dayAdvanceProgress } = usePopulation();
+	const activePage =
+		pages.find((item) => location.pathname.startsWith(item.path)) ?? pages[0];
 
 	return (
 		<main className="min-h-screen bg-surface p-4 font-sans sm:p-6">
@@ -37,32 +60,32 @@ export function AppShell({ page, onPageChange, children }: AppShellProps) {
 					aria-label="Main navigation"
 				>
 					<div className="border-b-2 border-primary bg-neutral-950 px-4 py-4 text-on-dark">
-						<p className="font-label text-[10px] tracking-overline">Navigation</p>
+						<p className="font-label text-[10px] tracking-overline">
+							Navigation
+						</p>
 						<p className="mt-1 text-[10px] leading-relaxed sm:text-xs">
 							economy-simulator
 						</p>
 					</div>
 					<ul className="p-2">
-						{pages.map((item) => {
-							const isActive = item.id === page;
-							return (
-								<li key={item.id}>
-									<button
-										type="button"
-										onClick={() => onPageChange(item.id)}
-										className={`w-full cursor-pointer border-2 px-3 py-2 text-left transition-colors ${
+						{pages.map((item) => (
+							<li key={item.path}>
+								<NavLink
+									to={item.path}
+									className={({ isActive }) =>
+										`block w-full cursor-pointer border-2 px-3 py-2 text-left transition-colors ${
 											isActive
 												? "border-primary bg-primary text-primary-foreground"
 												: "border-transparent bg-surface text-foreground hover:border-primary/30"
-										}`}
-									>
-										<span className="font-label text-[10px] tracking-overline">
-											{item.label}
-										</span>
-									</button>
-								</li>
-							);
-						})}
+										}`
+									}
+								>
+									<span className="font-label text-[10px] tracking-overline">
+										{item.label}
+									</span>
+								</NavLink>
+							</li>
+						))}
 					</ul>
 				</nav>
 
@@ -81,15 +104,38 @@ export function AppShell({ page, onPageChange, children }: AppShellProps) {
 
 					<div className="border-b border-primary px-6 py-1 sm:px-8" />
 
-					<section className="px-6 py-8 sm:px-8">{children}</section>
+					<section className="px-6 py-8 sm:px-8">
+						<Outlet />
+					</section>
 
 					<footer className="border-t-2 border-primary bg-surface-muted px-6 py-3 sm:px-8">
 						<p className="font-label text-center text-xs text-muted-foreground tracking-overline">
 							Reference: economic-sectors.md · {new Date().getFullYear()}
 						</p>
+						<p className="mt-1 text-center text-[10px] text-muted-foreground/70">
+							v{appVersion}
+						</p>
 					</footer>
 				</div>
 			</div>
+
+			<CalculationModal
+				isOpen={isAdvancingDay}
+				title={
+					dayAdvanceProgress
+						? PHASE_LABELS[dayAdvanceProgress.phase]
+						: "Advancing the game day"
+				}
+				subtitle={
+					dayAdvanceProgress?.phase === "annual"
+						? "Recalculating births, deaths, emigration, and immigration across the whole population — this can take a moment for large populations."
+						: undefined
+				}
+				processed={dayAdvanceProgress?.processed ?? 0}
+				total={dayAdvanceProgress?.total ?? 0}
+			/>
 		</main>
 	);
 }
+
+export { AppShell };

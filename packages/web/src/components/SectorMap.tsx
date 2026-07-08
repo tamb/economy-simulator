@@ -1,4 +1,5 @@
 import type { ChangeEvent } from "react";
+import { useSectorAssignments } from "../context/SectorAssignmentContext";
 import {
 	type EconomicSystemId,
 	economicSystems,
@@ -7,7 +8,6 @@ import {
 } from "../data/economic-systems";
 import type { Category, SubSector } from "../data/taxonomy";
 import { categoryColorClasses } from "../data/taxonomy";
-import { useSectorAssignments } from "../context/SectorAssignmentContext";
 
 interface SectorMapProps {
 	category: Category;
@@ -15,11 +15,7 @@ interface SectorMapProps {
 	onSelect: (sectorId: string) => void;
 }
 
-export function SectorMap({
-	category,
-	selectedSectorId,
-	onSelect,
-}: SectorMapProps) {
+function SectorMap({ category, selectedSectorId, onSelect }: SectorMapProps) {
 	const { getAssignment } = useSectorAssignments();
 	const colors = categoryColorClasses[category.color];
 	const selected = category.subSectors.find(
@@ -121,8 +117,7 @@ function SectorDetail({
 
 	const handleSystemChange = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
-		const systemId =
-			value === "" || !isEconomicSystemId(value) ? null : value;
+		const systemId = value === "" || !isEconomicSystemId(value) ? null : value;
 		void setAssignment(category.id, sector.id, systemId);
 	};
 
@@ -175,3 +170,5 @@ function SectorDetail({
 		</aside>
 	);
 }
+
+export { SectorMap };
