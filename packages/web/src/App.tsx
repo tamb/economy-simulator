@@ -9,6 +9,7 @@ import { EconomicAtlasPage } from "./pages/EconomicAtlasPage";
 import { InstructionsPage } from "./pages/InstructionsPage";
 import { NewGameSetupPage } from "./pages/NewGameSetupPage";
 import { PopulationPage } from "./pages/PopulationPage";
+import { RecordsPage } from "./pages/RecordsPage";
 
 // Lazy-loaded into their own chunks: both pull in sizeable third-party
 // dependencies (chart.js/react-chartjs-2, honeycomb-grid) that were
@@ -71,6 +72,7 @@ function App() {
 					}
 				/>
 				<Route path="instructions" element={<InstructionsPage />} />
+				<Route path="records" element={<RecordsPage />} />
 				<Route path="credits" element={<CreditsPage />} />
 				<Route path="*" element={<Navigate to="/atlas" replace />} />
 			</Route>

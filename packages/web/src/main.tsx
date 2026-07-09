@@ -1,3 +1,8 @@
+import { appConfig } from "economy-simulator-data";
+import {
+	createStorageDriver,
+	setStorageDriver,
+} from "economy-simulator-persistence";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter } from "react-router";
@@ -10,6 +15,8 @@ import { registerChartTheme } from "./data/chart-theme";
 import "./index.css";
 
 registerChartTheme();
+
+setStorageDriver(createStorageDriver(appConfig.storage));
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element #root not found");

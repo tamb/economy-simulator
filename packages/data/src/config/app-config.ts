@@ -29,6 +29,11 @@ const appConfig = {
 		size: 100,
 	},
 
+	storage: {
+		/** Active persistence backend — swap to `postgres` when that driver ships. */
+		driver: "indexeddb" as "indexeddb" | "postgres",
+	},
+
 	regions: {
 		/**
 		 * Radius of the bounding hex grid the island is grown within (a

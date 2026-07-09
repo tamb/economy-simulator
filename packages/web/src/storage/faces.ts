@@ -1,6 +1,10 @@
+import {
+	clearFacesStore,
+	loadFace as loadFaceRaw,
+	saveFace as saveFaceRaw,
+} from "economy-simulator-persistence";
 import type { FaceConfig } from "facesjs";
 import { generate as generateFace } from "facesjs";
-import localforage from "localforage";
 import {
 	FACE_POOL_SIZE,
 	type FaceId,
@@ -8,22 +12,16 @@ import {
 	getFacePoolIds,
 } from "../data/faces";
 
-const store = localforage.createInstance({
-	name: "economy-simulator",
-	storeName: "faces",
-});
-
 async function loadFace(id: FaceId): Promise<FaceConfig | null> {
-	const saved = await store.getItem<unknown>(id);
+	const saved = await loadFaceRaw(id);
 	if (!saved || typeof saved !== "object") {
 		return null;
 	}
-
 	return saved as FaceConfig;
 }
 
 async function saveFace(id: FaceId, config: FaceConfig): Promise<void> {
-	await store.setItem(id, config);
+	await saveFaceRaw(id, config);
 }
 
 async function ensureFacePool(): Promise<FaceId[]> {
@@ -56,7 +54,7 @@ async function loadFacePool(): Promise<Map<FaceId, FaceConfig>> {
 }
 
 async function clearFacePool(): Promise<void> {
-	await Promise.all(getFacePoolIds().map((id) => store.removeItem(id)));
+	await clearFacesStore();
 }
 
 export { clearFacePool, ensureFacePool, loadFace, loadFacePool, saveFace };

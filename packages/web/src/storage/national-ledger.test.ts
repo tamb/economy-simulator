@@ -1,22 +1,6 @@
 import type { NationalLedger } from "economy-simulator-simulation";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const memory = new Map<string, unknown>();
-
-vi.mock("localforage", () => ({
-	default: {
-		createInstance: vi.fn(() => ({
-			getItem: vi.fn(async (key: string) => memory.get(key) ?? null),
-			setItem: vi.fn(async (key: string, value: unknown) => {
-				memory.set(key, value);
-			}),
-			removeItem: vi.fn(async (key: string) => {
-				memory.delete(key);
-			}),
-		})),
-	},
-}));
-
+import { beforeEach, describe, expect, it } from "vitest";
+import { setupMemoryStorage } from "../test/storage-driver";
 import {
 	clearNationalLedger,
 	loadNationalLedger,
@@ -32,7 +16,7 @@ const sampleLedger: NationalLedger = {
 
 describe("national ledger storage", () => {
 	beforeEach(() => {
-		memory.clear();
+		setupMemoryStorage();
 	});
 
 	it("returns null when no ledger has been saved yet", async () => {

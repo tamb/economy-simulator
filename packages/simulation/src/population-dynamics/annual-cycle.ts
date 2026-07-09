@@ -13,6 +13,10 @@ interface AnnualCitizenInput {
 	happiness: number;
 	/** 0-100 overall health. */
 	health: number;
+	/** Extra absolute annual mortality probability from active calamities. */
+	calamityMortalityBump?: number;
+	/** Extra absolute annual emigration probability from active calamities. */
+	calamityEmigrationBump?: number;
 }
 
 interface AnnualCitizenOutcome {
@@ -33,12 +37,16 @@ function computeAnnualOutcomeForCitizen(
 	random: RandomFn = Math.random,
 	settings: GameSettings = gameSettings,
 ): AnnualCitizenOutcome {
-	const died = rollMortality(input, random);
+	const died =
+		rollMortality(input, random) ||
+		random() < Math.max(0, input.calamityMortalityBump ?? 0);
 	if (died) {
 		return { died: true, emigrated: false, gaveBirth: false };
 	}
 
-	const emigrated = rollEmigration(input, random, settings);
+	const emigrated =
+		rollEmigration(input, random, settings) ||
+		random() < Math.max(0, input.calamityEmigrationBump ?? 0);
 	if (emigrated) {
 		return { died: false, emigrated: true, gaveBirth: false };
 	}

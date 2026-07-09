@@ -6,6 +6,8 @@ interface ExtractionYieldInput {
 	reserveOrCapacityYieldMultiplier: number;
 	/** From `economy-simulator-data`'s `getEconomicSystemEffect(...).efficiencyMultiplier`; 1 = no change. */
 	economicSystemEfficiencyMultiplier?: number;
+	/** From active calamity mid/long-term modifiers; 1 = no change. */
+	calamityEfficiencyMultiplier?: number;
 }
 
 /**
@@ -21,7 +23,8 @@ function computeExtractionYield(input: ExtractionYieldInput): number {
 		input.baseYieldPerWorker *
 		input.workers *
 		Math.max(0, input.reserveOrCapacityYieldMultiplier) *
-		(input.economicSystemEfficiencyMultiplier ?? 1)
+		(input.economicSystemEfficiencyMultiplier ?? 1) *
+		(input.calamityEfficiencyMultiplier ?? 1)
 	);
 }
 

@@ -1,20 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const memory = new Map<string, unknown>();
-
-vi.mock("localforage", () => ({
-	default: {
-		createInstance: vi.fn(() => ({
-			getItem: vi.fn(async (key: string) => memory.get(key) ?? null),
-			setItem: vi.fn(async (key: string, value: unknown) => {
-				memory.set(key, value);
-			}),
-			removeItem: vi.fn(async (key: string) => {
-				memory.delete(key);
-			}),
-		})),
-	},
-}));
+import { setupMemoryStorage } from "../test/storage-driver";
 
 const mockFaces = Array.from({ length: 100 }, (_, index) => ({
 	body: { id: `body-${index}` },
@@ -41,7 +26,7 @@ import {
 
 describe("face storage", () => {
 	beforeEach(() => {
-		memory.clear();
+		setupMemoryStorage();
 		generateCount = 0;
 	});
 

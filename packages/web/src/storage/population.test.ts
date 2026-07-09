@@ -1,20 +1,6 @@
+import { loadPopulationChunkRaw } from "economy-simulator-persistence";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const memory = vi.hoisted(() => new Map<string, unknown>());
-
-vi.mock("localforage", () => ({
-	default: {
-		createInstance: vi.fn(() => ({
-			getItem: vi.fn(async (key: string) => memory.get(key) ?? null),
-			setItem: vi.fn(async (key: string, value: unknown) => {
-				memory.set(key, value);
-			}),
-			removeItem: vi.fn(async (key: string) => {
-				memory.delete(key);
-			}),
-		})),
-	},
-}));
+import { setupMemoryStorage } from "../test/storage-driver";
 
 vi.mock("economy-simulator-simulation", async (importOriginal) => {
 	const actual =
@@ -58,7 +44,7 @@ const testRegions = buildWorldRegions(42_001);
 const TEST_SIZE = 14;
 
 beforeEach(() => {
-	memory.clear();
+	setupMemoryStorage();
 	vi.clearAllMocks();
 });
 
@@ -93,7 +79,7 @@ describe("population storage", () => {
 		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
 
 		const chunkKey = formatChunkKey(0, 0);
-		const storedChunk = memory.get(chunkKey);
+		const storedChunk = await loadPopulationChunkRaw(chunkKey);
 		expect(Array.isArray(storedChunk)).toBe(true);
 		expect(storedChunk?.[0]).not.toHaveProperty("getAge");
 
@@ -135,8 +121,10 @@ describe("population storage", () => {
 
 		const people = await loadEntirePopulationForTests(
 			async (cohort, chunkIndex) => {
-				const saved = memory.get(formatChunkKey(cohort, chunkIndex));
-				if (!Array.isArray(saved)) return null;
+				const saved = await loadPopulationChunkRaw(
+					formatChunkKey(cohort, chunkIndex),
+				);
+				if (!saved) return null;
 
 				return saved.map((item) => Person.fromSnapshot(item as PersonSnapshot));
 			},

@@ -42,6 +42,11 @@ interface QualityOfLifeInput extends QualityOfLifeState {
 	 * Defaults to 0 (no effect).
 	 */
 	resourceShortfallHappinessPenalty?: number;
+	/**
+	 * Daily happiness penalty from active calamity debuffs affecting the
+	 * citizen's region (or nation-scoped calamities). Defaults to 0.
+	 */
+	calamityHappinessPenalty?: number;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -80,7 +85,8 @@ function computeDailyQualityOfLifeUpdate(
 			affinityDelta +
 			noise +
 			(input.environmentalQualityModifier ?? 0) -
-			(input.resourceShortfallHappinessPenalty ?? 0),
+			(input.resourceShortfallHappinessPenalty ?? 0) -
+			(input.calamityHappinessPenalty ?? 0),
 		0,
 		100,
 	);

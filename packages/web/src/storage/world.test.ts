@@ -1,23 +1,6 @@
 import { isLand } from "economy-simulator-data";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const memory = new Map<string, unknown>();
-
-vi.mock("localforage", () => ({
-	default: {
-		createInstance: vi.fn(() => ({
-			getItem: vi.fn(async (key: string) => memory.get(key) ?? null),
-			setItem: vi.fn(async (key: string, value: unknown) => {
-				memory.set(key, value);
-				return value;
-			}),
-			removeItem: vi.fn(async (key: string) => {
-				memory.delete(key);
-			}),
-		})),
-	},
-}));
-
+import { beforeEach, describe, expect, it } from "vitest";
+import { setupMemoryStorage } from "../test/storage-driver";
 import {
 	clearWorld,
 	ensureRegionResourceStates,
@@ -29,7 +12,7 @@ import {
 
 describe("ensureWorld", () => {
 	beforeEach(() => {
-		memory.clear();
+		setupMemoryStorage();
 	});
 
 	it("generates and persists a world on first call", async () => {
@@ -66,7 +49,7 @@ describe("ensureWorld", () => {
 
 describe("ensureRegionResourceStates", () => {
 	beforeEach(() => {
-		memory.clear();
+		setupMemoryStorage();
 	});
 
 	it("initializes a resource state for every land region with a viable resource", async () => {

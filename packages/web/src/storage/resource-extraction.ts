@@ -42,6 +42,8 @@ interface RunAnnualResourceExtractionInput {
 	industrialWorkersBySubSector: Record<string, number>;
 	sectorAssignments: SectorAssignments;
 	settings?: GameSettings;
+	/** Optional calamity extraction efficiency lookup (regionId, subSectorId) -> multiplier. */
+	getCalamityEfficiency?: (regionId: RegionId, subSectorId: string) => number;
 }
 
 interface RunAnnualResourceExtractionResult {
@@ -67,6 +69,7 @@ function runAnnualResourceExtraction({
 	industrialWorkersBySubSector,
 	sectorAssignments,
 	settings = gameSettings,
+	getCalamityEfficiency,
 }: RunAnnualResourceExtractionInput): RunAnnualResourceExtractionResult {
 	const nextRegions: WorldRegion[] = [];
 	const nextResourceStates: Record<RegionId, RegionResourceState> = {};
@@ -121,6 +124,10 @@ function runAnnualResourceExtraction({
 				workers,
 				reserveOrCapacityYieldMultiplier,
 				economicSystemEfficiencyMultiplier: effect?.efficiencyMultiplier,
+				calamityEfficiencyMultiplier: getCalamityEfficiency?.(
+					region.id,
+					subSectorId,
+				),
 			});
 			if (amount > 0) {
 				production.push({ resourceId: resource.id, amount });

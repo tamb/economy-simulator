@@ -1,19 +1,16 @@
-import localforage from "localforage";
+import {
+	clearSectorAssignmentsStore,
+	loadSectorAssignmentsRaw,
+	saveSectorAssignmentsRaw,
+} from "economy-simulator-persistence";
 import type { EconomicSystemId } from "../data/economic-systems";
 import { isEconomicSystemId } from "../data/economic-systems";
 import { type CategoryId, sectorKey } from "../data/taxonomy";
 
 type SectorAssignments = Record<string, EconomicSystemId>;
 
-const STORAGE_KEY = "sector-assignments";
-
-const store = localforage.createInstance({
-	name: "economy-simulator",
-	storeName: "sector-data",
-});
-
 async function loadSectorAssignments(): Promise<SectorAssignments> {
-	const saved = await store.getItem<unknown>(STORAGE_KEY);
+	const saved = await loadSectorAssignmentsRaw();
 	if (!saved || typeof saved !== "object") return {};
 
 	const assignments: SectorAssignments = {};
@@ -28,7 +25,7 @@ async function loadSectorAssignments(): Promise<SectorAssignments> {
 async function saveSectorAssignments(
 	assignments: SectorAssignments,
 ): Promise<void> {
-	await store.setItem(STORAGE_KEY, assignments);
+	await saveSectorAssignmentsRaw(assignments);
 }
 
 async function setSectorAssignment(
@@ -58,8 +55,13 @@ function getSectorAssignment(
 	return assignments[sectorKey(categoryId, sectorId)] ?? null;
 }
 
+async function clearSectorAssignments(): Promise<void> {
+	await clearSectorAssignmentsStore();
+}
+
 export type { SectorAssignments };
 export {
+	clearSectorAssignments,
 	getSectorAssignment,
 	loadSectorAssignments,
 	saveSectorAssignments,

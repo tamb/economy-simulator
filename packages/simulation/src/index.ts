@@ -1,3 +1,22 @@
+export type {
+	ActiveCalamityState,
+	CalamityHistoryEntryState,
+	CalamityOnsetResult,
+	CalamityRegionInput,
+	CalamityRunSlice,
+	MidTermModifiers,
+	ProcessCalamitiesResult,
+	RegionResourceMutation,
+} from "./calamities/calamity-engine";
+export {
+	daysRemainingOnMidTerm,
+	getCalamityExtractionEfficiency,
+	getCalamityModifiersForCitizen,
+	getVisibleActiveCalamities,
+	processCalamitiesForDay,
+	regionMatchesFilter,
+	selectTargetRegions,
+} from "./calamities/calamity-engine";
 export type { JobAssignment, RandomFn } from "./employment/job-assignment";
 export { assignJobSector, isWorkingAge } from "./employment/job-assignment";
 export type {
@@ -24,6 +43,26 @@ export {
 	getQualityOfLifeMortalityMultiplier,
 	rollMortality,
 } from "./population-dynamics/mortality";
+export type {
+	CareerBadgeContext,
+	RunBadgeYearContext,
+} from "./progression/badge-evaluator";
+export {
+	evaluateCareerBadges,
+	evaluateEndRunBadges,
+	evaluateRunBadges,
+} from "./progression/badge-evaluator";
+export type {
+	NationScoreBreakdown,
+	NationScoreInput,
+} from "./progression/nation-score";
+export { computeNationScore } from "./progression/nation-score";
+export type {
+	WinLoseEvaluation,
+	WinLoseStreaks,
+	WinLoseYearContext,
+} from "./progression/win-lose";
+export { evaluateWinLose } from "./progression/win-lose";
 export type {
 	QualityOfLifeInput,
 	QualityOfLifeState,

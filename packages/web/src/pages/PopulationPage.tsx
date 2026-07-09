@@ -18,6 +18,8 @@ function PopulationPage() {
 		gameDay,
 		advanceDay,
 		getPersonRange,
+		isGameActive,
+		gameRun,
 	} = usePopulation();
 	const [personCache, setPersonCache] = useState<Map<number, Person>>(
 		new Map(),
@@ -128,12 +130,17 @@ function PopulationPage() {
 						Game day {gameDay.toLocaleString()} · updating cohort {gameDay % 7}{" "}
 						today
 					</p>
+					{!isGameActive && gameRun && (
+						<p className="font-label text-[10px] tracking-overline text-destructive">
+							Run ended — {gameRun.status}
+						</p>
+					)}
 					<button
 						type="button"
 						onClick={() => {
 							advanceDay().catch(() => undefined);
 						}}
-						disabled={isAdvancingDay}
+						disabled={isAdvancingDay || !isGameActive}
 						className="border-2 border-primary bg-surface px-3 py-1.5 text-xs disabled:opacity-50"
 					>
 						{isAdvancingDay ? "Advancing day…" : "Advance day"}

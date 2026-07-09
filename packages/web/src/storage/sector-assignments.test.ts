@@ -1,18 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const memory = new Map<string, unknown>();
-
-vi.mock("localforage", () => ({
-	default: {
-		createInstance: vi.fn(() => ({
-			getItem: vi.fn(async (key: string) => memory.get(key) ?? null),
-			setItem: vi.fn(async (key: string, value: unknown) => {
-				memory.set(key, value);
-			}),
-		})),
-	},
-}));
-
+import { saveSectorAssignmentsRaw } from "economy-simulator-persistence";
+import { beforeEach, describe, expect, it } from "vitest";
+import { setupMemoryStorage } from "../test/storage-driver";
 import {
 	getSectorAssignment,
 	loadSectorAssignments,
@@ -21,7 +9,7 @@ import {
 
 describe("sector-assignments", () => {
 	beforeEach(() => {
-		memory.clear();
+		setupMemoryStorage();
 	});
 
 	it("returns an empty object when nothing is stored", async () => {
@@ -73,7 +61,7 @@ describe("sector-assignments", () => {
 	});
 
 	it("ignores invalid values when loading from storage", async () => {
-		memory.set("sector-assignments", {
+		await saveSectorAssignmentsRaw({
 			"services/healthcare": "socialism",
 			"services/education": "invalid-system",
 			"not-a-sector": 42,

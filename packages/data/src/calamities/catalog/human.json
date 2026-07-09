@@ -1,0 +1,829 @@
+[
+	{
+		"id": "accidental_fire",
+		"name": "Accidental Fire",
+		"description": "A careless blaze guts workshops and homes before brigades contain it.",
+		"category": "human",
+		"tier": "v1",
+		"weight": 14,
+		"severityWeights": {
+			"minor": 65,
+			"moderate": 28,
+			"severe": 7
+		},
+		"target": {
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [10, 21],
+			"moderate": [14, 30],
+			"severe": [21, 40]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 7,
+			"severe": 14
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -2,
+				"moderate": -5,
+				"severe": -9
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.95,
+				"moderate": 0.88,
+				"severe": 0.78
+			},
+			"affectedSubSectors": [
+				"light-manufacturing",
+				"construction",
+				"wholesale-retail"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 1,
+				"severe": 0.98
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0.1
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "factory_fire",
+		"name": "Factory Fire",
+		"description": "Industrial plant burns, idling lines and scattering ash over the yard.",
+		"category": "human",
+		"tier": "v1",
+		"weight": 10,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [21, 40],
+			"moderate": [40, 70],
+			"severe": [60, 100]
+		},
+		"longTermExtraDays": {
+			"minor": 14,
+			"moderate": 40,
+			"severe": 70
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -4,
+				"moderate": -9,
+				"severe": -15
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.78,
+				"severe": 0.6
+			},
+			"affectedSubSectors": [
+				"light-manufacturing",
+				"food-processing",
+				"heavy-industry"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.5
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.9
+			},
+			"affectedSubSectors": ["light-manufacturing"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "warehouse_fire",
+		"name": "Warehouse Fire",
+		"description": "Stored goods go up in smoke, jolting trade and local supply.",
+		"category": "human",
+		"tier": "v1.5",
+		"weight": 9,
+		"severityWeights": {
+			"minor": 60,
+			"moderate": 30,
+			"severe": 10
+		},
+		"target": {
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [14, 28],
+			"moderate": [21, 40],
+			"severe": [30, 55]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 14,
+			"severe": 30
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -2,
+				"moderate": -5,
+				"severe": -8
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.95,
+				"moderate": 0.9,
+				"severe": 0.82
+			},
+			"affectedSubSectors": ["wholesale-retail", "transport-logistics"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 1,
+				"severe": 0.98
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0.1
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "oil_spill",
+		"name": "Oil Spill",
+		"description": "Fuel slicks the coast, killing fish and staining the shoreline for seasons.",
+		"category": "human",
+		"tier": "v1",
+		"weight": 5,
+		"severityWeights": {
+			"minor": 40,
+			"moderate": 40,
+			"severe": 20
+		},
+		"target": {
+			"requireCoastal": true,
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [100, 150],
+			"moderate": [150, 220],
+			"severe": [200, 280]
+		},
+		"longTermExtraDays": {
+			"minor": 140,
+			"moderate": 220,
+			"severe": 340
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"fish": {
+					"minor": 0.7,
+					"moderate": 0.4,
+					"severe": 0.2
+				}
+			},
+			"environmentDelta": {
+				"minor": -16,
+				"moderate": -30,
+				"severe": -45
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.8,
+				"moderate": 0.6,
+				"severe": 0.4
+			},
+			"affectedSubSectors": ["fishing", "energy", "transport-logistics"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.6,
+				"moderate": 1.3,
+				"severe": 2.1
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.8,
+				"severe": 0.7
+			},
+			"affectedSubSectors": ["fishing", "energy"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.25,
+				"moderate": 0.5,
+				"severe": 0.8
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "chemical_spill",
+		"name": "Chemical Spill",
+		"description": "Industrial toxins leak into soil and water near plant yards.",
+		"category": "human",
+		"tier": "v1.5",
+		"weight": 6,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [60, 100],
+			"moderate": [100, 150],
+			"severe": [140, 200]
+		},
+		"longTermExtraDays": {
+			"minor": 90,
+			"moderate": 160,
+			"severe": 240
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -12,
+				"moderate": -24,
+				"severe": -36
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0.005,
+				"moderate": 0.015,
+				"severe": 0.04
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.88,
+				"moderate": 0.75,
+				"severe": 0.58
+			},
+			"affectedSubSectors": ["heavy-industry", "pharmaceuticals", "utilities"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.5,
+				"moderate": 1.2,
+				"severe": 2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.94,
+				"moderate": 0.88,
+				"severe": 0.8
+			},
+			"affectedSubSectors": ["heavy-industry"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.15,
+				"moderate": 0.35,
+				"severe": 0.55
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "dam_failure",
+		"name": "Dam Failure",
+		"description": "A reservoir wall fails, flooding valleys and wrecking water works.",
+		"category": "human",
+		"tier": "v2",
+		"weight": 3,
+		"severityWeights": {
+			"minor": 35,
+			"moderate": 40,
+			"severe": 25
+		},
+		"target": {
+			"terrains": ["plains", "wetland", "hills"],
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [75, 120],
+			"moderate": [120, 180],
+			"severe": [160, 230]
+		},
+		"longTermExtraDays": {
+			"minor": 100,
+			"moderate": 180,
+			"severe": 280
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.7,
+					"moderate": 0.4,
+					"severe": 0.2
+				},
+				"livestock": {
+					"minor": 0.8,
+					"moderate": 0.55,
+					"severe": 0.35
+				}
+			},
+			"environmentDelta": {
+				"minor": -14,
+				"moderate": -26,
+				"severe": -38
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0.002,
+				"moderate": 0.008,
+				"severe": 0.02
+			},
+			"emigrationBump": {
+				"minor": 0.01,
+				"moderate": 0.03,
+				"severe": 0.06
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.8,
+				"moderate": 0.6,
+				"severe": 0.4
+			},
+			"affectedSubSectors": [
+				"agriculture",
+				"livestock",
+				"utilities",
+				"construction"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.7,
+				"moderate": 1.4,
+				"severe": 2.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.8,
+				"severe": 0.7
+			},
+			"affectedSubSectors": ["agriculture", "utilities"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.2,
+				"moderate": 0.4,
+				"severe": 0.65
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "power_outage",
+		"name": "Power Outage",
+		"description": "The grid falters. Factories idle and services stumble in the dark.",
+		"category": "human",
+		"tier": "v1.5",
+		"weight": 11,
+		"severityWeights": {
+			"minor": 60,
+			"moderate": 30,
+			"severe": 10
+		},
+		"target": {
+			"maxRegions": 3
+		},
+		"midTermDurationDays": {
+			"minor": [7, 18],
+			"moderate": [14, 35],
+			"severe": [28, 50]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 7,
+			"severe": 14
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": 0,
+				"moderate": -1,
+				"severe": -3
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.92,
+				"moderate": 0.82,
+				"severe": 0.7
+			},
+			"affectedSubSectors": [
+				"utilities",
+				"heavy-industry",
+				"light-manufacturing",
+				"electronics-machinery",
+				"financial-services"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.5
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 1,
+				"severe": 0.98
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0.1
+			},
+			"scope": "national"
+		}
+	},
+	{
+		"id": "bridge_collapse",
+		"name": "Bridge Collapse",
+		"description": "A key crossing fails, snarling freight and regional travel.",
+		"category": "human",
+		"tier": "v2",
+		"weight": 4,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [45, 75],
+			"moderate": [75, 120],
+			"severe": [110, 160]
+		},
+		"longTermExtraDays": {
+			"minor": 30,
+			"moderate": 60,
+			"severe": 100
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -1,
+				"moderate": -3,
+				"severe": -5
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.8,
+				"severe": 0.65
+			},
+			"affectedSubSectors": [
+				"transport-logistics",
+				"construction",
+				"wholesale-retail"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.9
+			},
+			"affectedSubSectors": ["transport-logistics"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "mining_accident",
+		"name": "Mining Accident",
+		"description": "A shaft disaster halts production and shakes mining communities.",
+		"category": "human",
+		"tier": "v1",
+		"weight": 8,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"terrains": ["mountains", "hills"],
+			"requireResources": ["metalOre", "fossilFuels"],
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [21, 40],
+			"moderate": [40, 70],
+			"severe": [60, 100]
+		},
+		"longTermExtraDays": {
+			"minor": 14,
+			"moderate": 40,
+			"severe": 70
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"metalOre": {
+					"minor": 0.95,
+					"moderate": 0.88,
+					"severe": 0.75
+				},
+				"fossilFuels": {
+					"minor": 0.95,
+					"moderate": 0.88,
+					"severe": 0.75
+				}
+			},
+			"environmentDelta": {
+				"minor": -3,
+				"moderate": -7,
+				"severe": -12
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0.001,
+				"moderate": 0.004,
+				"severe": 0.01
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.88,
+				"moderate": 0.75,
+				"severe": 0.58
+			},
+			"affectedSubSectors": ["mining", "energy"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.5
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.9
+			},
+			"affectedSubSectors": ["mining"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "overfishing_scandal",
+		"name": "Overfishing Scandal",
+		"description": "Public outrage forces a hard throttle on coastal fleets.",
+		"category": "human",
+		"tier": "v2",
+		"weight": 4,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"requireCoastal": true,
+			"requireResources": ["fish"],
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [45, 75],
+			"moderate": [75, 110],
+			"severe": [100, 150]
+		},
+		"longTermExtraDays": {
+			"minor": 30,
+			"moderate": 60,
+			"severe": 100
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"fish": {
+					"minor": 0.9,
+					"moderate": 0.8,
+					"severe": 0.65
+				}
+			},
+			"environmentDelta": {
+				"minor": 0,
+				"moderate": 2,
+				"severe": 4
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0.005,
+				"severe": 0.015
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.7,
+				"moderate": 0.5,
+				"severe": 0.35
+			},
+			"affectedSubSectors": ["fishing"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.92,
+				"moderate": 0.85,
+				"severe": 0.78
+			},
+			"affectedSubSectors": ["fishing"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.2,
+				"severe": 0.35
+			},
+			"scope": "regional"
+		}
+	}
+]

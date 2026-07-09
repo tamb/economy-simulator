@@ -148,6 +148,59 @@ const gameSettings = {
 			sufficiencyThreshold: 1.0,
 		},
 	},
+
+	/**
+	 * Calamity (nation debuff) tunables. Catalog definitions live in
+	 * `packages/data/src/calamities/catalog/*.json`; this block only
+	 * controls frequency, stacking, and which tiers are eligible to roll.
+	 */
+	calamities: {
+		/** Average expected calamity onsets per game year (before cooldowns/caps). */
+		expectedPerYear: 1.1,
+		/** Soft cooldown in days after any onset before another primary roll. */
+		cooldownDaysAfterOnset: 28,
+		/** Extra cooldown after a severe onset. */
+		cooldownDaysAfterSevere: 60,
+		/** Max concurrent mid-term (visible) debuffs. */
+		maxActiveMidTerm: 4,
+		/** Inclusive tiers eligible for primary rolls (cascades may still fire). */
+		enabledTiers: ["v1", "v1.5", "v2"] as const,
+		/** Cap cascade spawns from a single primary onset. */
+		maxCascadesPerOnset: 2,
+	},
+
+	/** Nation scoring, win/lose thresholds, and badge-related balance. */
+	progression: {
+		scoreWeights: {
+			qualityOfLife: 0.3,
+			populationGrowth: 0.25,
+			netMigration: 0.15,
+			resourceSufficiency: 0.2,
+			environmentHealth: 0.1,
+		},
+		lose: {
+			populationCollapseRatio: 0.1,
+			populationCollapseYears: 3,
+			massExodusRate: 0.05,
+			massExodusYears: 3,
+			qolCrisisThreshold: 30,
+			qolCrisisYears: 5,
+			resourceFamineSufficiency: 50,
+			resourceFamineYears: 3,
+			environmentRuinThreshold: 25,
+			environmentRuinYears: 3,
+		},
+		win: {
+			prosperityQol: 65,
+			prosperityYears: 10,
+			growthPopulationRatio: 2,
+			growthQol: 55,
+			growthYears: 3,
+			highScoreThreshold: 75,
+			highScoreYears: 5,
+			longReignYears: 50,
+		},
+	},
 } as const;
 
 type GameSettings = typeof gameSettings;

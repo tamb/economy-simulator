@@ -1,3 +1,22 @@
+export type {
+	CalamityCascadeRule,
+	CalamityCategory,
+	CalamityDefinition,
+	CalamityImmediateEffects,
+	CalamityPhaseModifiers,
+	CalamityScope,
+	CalamitySeverity,
+	CalamityTargetFilter,
+	CalamityTier,
+	SeverityNumberMap,
+	SeverityRangeMap,
+	SeverityResourceFactorMap,
+} from "./calamities";
+export {
+	calamityDefinitions,
+	getCalamityDefinition,
+	getCalamityDefinitions,
+} from "./calamities";
 export type { AppConfig } from "./config/app-config";
 export { appConfig } from "./config/app-config";
 export type { GameSettings } from "./config/game-settings";
@@ -62,3 +81,5 @@ export {
 	resources,
 } from "./geography/resources";
 export { getViableExtractiveSubSectorIds } from "./geography/viable-sub-sectors";
+export type { BadgeDefinition, BadgeScope } from "./progression/badges";
+export { badgeDefinitions, getBadgeDefinition } from "./progression/badges";

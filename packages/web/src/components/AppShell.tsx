@@ -1,7 +1,10 @@
+import { appConfig } from "economy-simulator-data";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { usePopulation } from "../context/PopulationContext";
 import { appVersion } from "../data/app-version";
+import { CalamityDebuffStrip } from "./CalamityDebuffStrip";
 import { CalculationModal } from "./CalculationModal";
+import { GameEndModal } from "./GameEndModal";
 
 const pages: { path: string; label: string; subtitle: string }[] = [
 	{
@@ -23,6 +26,11 @@ const pages: { path: string; label: string; subtitle: string }[] = [
 		path: "/dashboards",
 		label: "Dashboards",
 		subtitle: "Charts & Reports",
+	},
+	{
+		path: "/records",
+		label: "Records",
+		subtitle: "Scores & Badges",
 	},
 	{
 		path: "/instructions",
@@ -48,9 +56,12 @@ const PHASE_LABELS: Record<"daily" | "annual", string> = {
  */
 function AppShell() {
 	const location = useLocation();
-	const { isAdvancingDay, dayAdvanceProgress } = usePopulation();
+	const { isAdvancingDay, dayAdvanceProgress, gameRun, restartNation, total } =
+		usePopulation();
 	const activePage =
 		pages.find((item) => location.pathname.startsWith(item.path)) ?? pages[0];
+	const showGameEndModal =
+		gameRun != null && (gameRun.status === "won" || gameRun.status === "lost");
 
 	return (
 		<main className="min-h-screen bg-surface p-4 font-sans sm:p-6">
@@ -104,6 +115,8 @@ function AppShell() {
 
 					<div className="border-b border-primary px-6 py-1 sm:px-8" />
 
+					<CalamityDebuffStrip />
+
 					<section className="px-6 py-8 sm:px-8">
 						<Outlet />
 					</section>
@@ -134,6 +147,18 @@ function AppShell() {
 				processed={dayAdvanceProgress?.processed ?? 0}
 				total={dayAdvanceProgress?.total ?? 0}
 			/>
+
+			{showGameEndModal && gameRun && (
+				<GameEndModal
+					gameRun={gameRun}
+					onStartNewNation={() => {
+						const nextSize =
+							appConfig.population.sizeOptions.find((size) => size === total) ??
+							gameRun.startingPopulation;
+						restartNation(nextSize).catch(() => undefined);
+					}}
+				/>
+			)}
 		</main>
 	);
 }

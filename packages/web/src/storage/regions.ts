@@ -1,5 +1,10 @@
 import { en, Faker } from "@faker-js/faker";
-import localforage from "localforage";
+import {
+	clearRegionNamesStore,
+	loadRegionName as loadRegionNameRepo,
+	removeRegionName,
+	saveRegionName as saveRegionNameRepo,
+} from "economy-simulator-persistence";
 import type { RegionId } from "../data/regions";
 import type { WorldRegion } from "../data/world";
 import { randomInt } from "../models/generatePerson";
@@ -17,12 +22,6 @@ interface Region extends WorldRegion {
 	resourceState: RegionResourceState;
 }
 
-const store = localforage.createInstance({
-	name: "economy-simulator",
-	storeName: "regions",
-});
-
-/** Retro-flavored "province" name, generated once per region and persisted. */
 function generateRegionName(random: RandomFn = Math.random): string {
 	const faker = new Faker({
 		locale: [en],
@@ -32,15 +31,13 @@ function generateRegionName(random: RandomFn = Math.random): string {
 }
 
 async function loadRegionName(id: RegionId): Promise<string | null> {
-	const saved = await store.getItem<unknown>(id);
-	return typeof saved === "string" ? saved : null;
+	return loadRegionNameRepo(id);
 }
 
 async function saveRegionName(id: RegionId, name: string): Promise<void> {
-	await store.setItem(id, name);
+	await saveRegionNameRepo(id, name);
 }
 
-/** Generate any missing region names, then return the full, persisted region list (terrain + name + resource state). */
 async function ensureRegionPool(
 	random: RandomFn = Math.random,
 ): Promise<Region[]> {
@@ -67,7 +64,6 @@ async function ensureRegionPool(
 	return regions;
 }
 
-/** Only returns regions that already have a persisted world and a stored name — does not generate either. */
 async function loadRegionPool(): Promise<Region[]> {
 	const worldRegions = (await loadWorldRegions()) ?? [];
 	if (worldRegions.length === 0) {
@@ -96,7 +92,8 @@ async function loadRegionPool(): Promise<Region[]> {
 
 async function clearRegionPool(): Promise<void> {
 	const worldRegions = (await loadWorldRegions()) ?? [];
-	await Promise.all(worldRegions.map((region) => store.removeItem(region.id)));
+	await Promise.all(worldRegions.map((region) => removeRegionName(region.id)));
+	await clearRegionNamesStore();
 }
 
 export type { Region };

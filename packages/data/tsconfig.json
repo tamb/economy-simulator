@@ -14,8 +14,9 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true
+		"noUncheckedSideEffectImports": true,
+		"resolveJsonModule": true
 	},
 	"include": ["src"],
-	"exclude": ["src/**/*.test.ts"]
+	"exclude": ["src/**/*.test.ts", "src/**/generate-catalog.ts"]
 }

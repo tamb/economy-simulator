@@ -1,22 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const memory = new Map<string, unknown>();
-
-vi.mock("localforage", () => ({
-	default: {
-		createInstance: vi.fn(() => ({
-			getItem: vi.fn(async (key: string) => memory.get(key) ?? null),
-			setItem: vi.fn(async (key: string, value: unknown) => {
-				memory.set(key, value);
-			}),
-			removeItem: vi.fn(async (key: string) => {
-				memory.delete(key);
-			}),
-		})),
-	},
-}));
-
+import { beforeEach, describe, expect, it } from "vitest";
 import { getRegionCount, getRegionIds } from "../data/regions";
+import { setupMemoryStorage } from "../test/storage-driver";
 import {
 	clearRegionPool,
 	ensureRegionPool,
@@ -33,7 +17,7 @@ function sequenceRandom(values: number[]): () => number {
 
 describe("region storage", () => {
 	beforeEach(() => {
-		memory.clear();
+		setupMemoryStorage();
 	});
 
 	it("generates and persists a name, terrain, and resource state for every region on first startup", async () => {

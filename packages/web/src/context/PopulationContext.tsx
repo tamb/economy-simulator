@@ -1,3 +1,5 @@
+import type { GameRunState } from "economy-simulator-persistence";
+import { loadGameRunState } from "economy-simulator-persistence";
 import {
 	createContext,
 	type ReactNode,
@@ -11,6 +13,7 @@ import {
 	getPopulationSize,
 	getPopulationSizeOverride,
 } from "../data/runtime-config";
+import { startNewNation } from "../game/new-game";
 import { generateAndSavePopulation } from "../models/generatePopulation";
 import type { Person } from "../models/Person";
 import {
@@ -26,9 +29,7 @@ import type {
 import { useFacePool } from "./FacePoolContext";
 import { useRegions } from "./RegionContext";
 
-/** Progress of the day-advance calculation currently running in the population worker. */
 interface DayAdvanceProgress {
-	/** `daily` = today's cohort QoL tick; `annual` = the once-a-year population-dynamics cycle. */
 	phase: "daily" | "annual";
 	processed: number;
 	total: number;
@@ -38,22 +39,18 @@ interface PopulationContextValue {
 	total: number;
 	isReady: boolean;
 	isGenerating: boolean;
-	/**
-	 * True when no population exists yet and the player must choose a
-	 * starting size on the new-game setup screen before generation begins.
-	 * Clears as soon as `startGeneration` is called; generation progress
-	 * from then on is reflected via `isGenerating`/`loadProgress` in the
-	 * normal app UI (see `PopulationPage`).
-	 */
 	needsSetup: boolean;
-	/** Kicks off generation for a brand-new population at the chosen size. */
 	startGeneration: (size: number) => Promise<void>;
+	restartNation: (size: number) => Promise<void>;
 	isAdvancingDay: boolean;
 	dayAdvanceProgress: DayAdvanceProgress | null;
 	loadProgress: number;
 	gameDay: number;
+	gameRun: GameRunState | null;
+	isGameActive: boolean;
 	advanceDay: () => Promise<void>;
 	getPersonRange: (start: number, count: number) => Promise<Person[]>;
+	refreshGameRun: () => Promise<void>;
 }
 
 const PopulationContext = createContext<PopulationContextValue | null>(null);
@@ -70,7 +67,13 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const [loadProgress, setLoadProgress] = useState(0);
 	const [gameDay, setGameDay] = useState(0);
 	const [total, setTotal] = useState<number>(getPopulationSize());
+	const [gameRun, setGameRun] = useState<GameRunState | null>(null);
 	const workerRef = useRef<Worker | null>(null);
+
+	const refreshGameRun = useCallback(async () => {
+		const run = await loadGameRunState();
+		setGameRun(run);
+	}, []);
 
 	const getWorker = useCallback((): Worker => {
 		if (!workerRef.current) {
@@ -103,13 +106,14 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			if (isCancelled()) return;
 
 			const meta = await loadPopulationMeta();
+			await refreshGameRun();
 			setGameDay(meta?.gameDay ?? 0);
 			setTotal(meta?.size ?? size);
 			setLoadProgress(size);
 			setIsGenerating(false);
 			setIsReady(true);
 		},
-		[faceIds, regions],
+		[faceIds, regions, refreshGameRun],
 	);
 
 	useEffect(() => {
@@ -124,6 +128,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			if (exists) {
 				const populationSize = getPopulationSize();
 				const meta = await loadPopulationMeta();
+				await refreshGameRun();
 				if (!cancelled) {
 					setGameDay(meta?.gameDay ?? 0);
 					setTotal(meta?.size ?? populationSize);
@@ -133,8 +138,6 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				return;
 			}
 
-			// A configured override (e2e tests, local debugging) skips the
-			// new-game setup screen entirely and generates immediately.
 			const override = getPopulationSizeOverride();
 			if (override != null) {
 				await runGeneration(override, isCancelled);
@@ -155,7 +158,14 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [faceIds, isFacePoolReady, regions, isRegionsReady, runGeneration]);
+	}, [
+		faceIds,
+		isFacePoolReady,
+		regions,
+		isRegionsReady,
+		runGeneration,
+		refreshGameRun,
+	]);
 
 	const startGeneration = useCallback(
 		async (size: number) => {
@@ -165,8 +175,18 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		[runGeneration],
 	);
 
+	const restartNation = useCallback(
+		async (size: number) => {
+			await startNewNation(size);
+			setGameRun(null);
+			setNeedsSetup(false);
+			await runGeneration(size, () => false);
+		},
+		[runGeneration],
+	);
+
 	const advanceDay = useCallback(async () => {
-		if (isAdvancingDay) return;
+		if (isAdvancingDay || (gameRun && gameRun.status !== "active")) return;
 
 		setIsAdvancingDay(true);
 		setDayAdvanceProgress({ phase: "daily", processed: 0, total: 0 });
@@ -210,15 +230,18 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				setGameDay(meta.gameDay);
 				setTotal(meta.size);
 			}
+			await refreshGameRun();
 		} finally {
 			setIsAdvancingDay(false);
 			setDayAdvanceProgress(null);
 		}
-	}, [isAdvancingDay, getWorker]);
+	}, [gameRun, isAdvancingDay, getWorker, refreshGameRun]);
 
 	const getPersonRange = useCallback(async (start: number, count: number) => {
 		return getPersonRangeBatched(start, count);
 	}, []);
+
+	const isGameActive = !gameRun || gameRun.status === "active";
 
 	return (
 		<PopulationContext.Provider
@@ -228,12 +251,16 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				isGenerating,
 				needsSetup,
 				startGeneration,
+				restartNation,
 				isAdvancingDay,
 				dayAdvanceProgress,
 				loadProgress,
 				gameDay,
+				gameRun,
+				isGameActive,
 				advanceDay,
 				getPersonRange,
+				refreshGameRun,
 			}}
 		>
 			{children}

@@ -1,0 +1,1177 @@
+[
+	{
+		"id": "forest_fire",
+		"name": "Forest Fire",
+		"description": "Wildfire sweeps through woodland, burning timber stands and fouling the air.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 12,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"terrains": ["forest"],
+			"requireResources": ["timber"],
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [45, 75],
+			"moderate": [75, 110],
+			"severe": [100, 140]
+		},
+		"longTermExtraDays": {
+			"minor": 60,
+			"moderate": 120,
+			"severe": 200
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"timber": {
+					"minor": 0.85,
+					"moderate": 0.65,
+					"severe": 0.4
+				}
+			},
+			"environmentDelta": {
+				"minor": -8,
+				"moderate": -18,
+				"severe": -30
+			},
+			"degradeTerrainChance": {
+				"minor": 0.05,
+				"moderate": 0.2,
+				"severe": 0.45
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.75,
+				"severe": 0.55
+			},
+			"affectedSubSectors": ["forestry"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.6
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.95,
+				"moderate": 0.88,
+				"severe": 0.8
+			},
+			"affectedSubSectors": ["forestry"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.25,
+				"severe": 0.4
+			},
+			"scope": "regional"
+		},
+		"cascades": [
+			{
+				"calamityId": "wildfire_smoke",
+				"chance": 0.55,
+				"minSeverity": "moderate"
+			},
+			{
+				"calamityId": "accidental_fire",
+				"chance": 0.2,
+				"minSeverity": "severe"
+			}
+		]
+	},
+	{
+		"id": "wildfire_smoke",
+		"name": "Wildfire Smoke",
+		"description": "Smoke from nearby fires blankets the region, irritating lungs and lowering morale.",
+		"category": "weather",
+		"tier": "v1.5",
+		"weight": 6,
+		"severityWeights": {
+			"minor": 60,
+			"moderate": 30,
+			"severe": 10
+		},
+		"target": {
+			"terrains": ["forest", "plains", "hills", "pasture"],
+			"maxRegions": 3
+		},
+		"midTermDurationDays": {
+			"minor": [21, 35],
+			"moderate": [35, 55],
+			"severe": [50, 70]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 14,
+			"severe": 30
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -3,
+				"moderate": -7,
+				"severe": -12
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 0.97,
+				"severe": 0.94
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.6,
+				"severe": 1
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 1,
+				"severe": 1
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "national"
+		}
+	},
+	{
+		"id": "drought",
+		"name": "Drought",
+		"description": "Rain fails for weeks. Crops wilt and pastures brown under a hard sky.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 11,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"terrains": ["plains", "pasture", "desert", "clearedLand"],
+			"requireResources": ["crops", "livestock"],
+			"maxRegions": 3
+		},
+		"midTermDurationDays": {
+			"minor": [60, 90],
+			"moderate": [90, 140],
+			"severe": [140, 200]
+		},
+		"longTermExtraDays": {
+			"minor": 90,
+			"moderate": 160,
+			"severe": 280
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.8,
+					"moderate": 0.55,
+					"severe": 0.35
+				},
+				"livestock": {
+					"minor": 0.9,
+					"moderate": 0.7,
+					"severe": 0.5
+				}
+			},
+			"environmentDelta": {
+				"minor": -6,
+				"moderate": -14,
+				"severe": -24
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.88,
+				"moderate": 0.7,
+				"severe": 0.5
+			},
+			"affectedSubSectors": ["agriculture", "livestock"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.5,
+				"moderate": 1,
+				"severe": 1.8
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.94,
+				"moderate": 0.85,
+				"severe": 0.75
+			},
+			"affectedSubSectors": ["agriculture", "livestock"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.15,
+				"moderate": 0.35,
+				"severe": 0.6
+			},
+			"scope": "regional"
+		},
+		"cascades": [
+			{
+				"calamityId": "crop_blight",
+				"chance": 0.25,
+				"minSeverity": "moderate"
+			},
+			{
+				"calamityId": "livestock_plague",
+				"chance": 0.15,
+				"minSeverity": "severe"
+			},
+			{
+				"calamityId": "heatwave",
+				"chance": 0.35,
+				"minSeverity": "moderate"
+			}
+		]
+	},
+	{
+		"id": "heatwave",
+		"name": "Heatwave",
+		"description": "Oppressive heat saps workers and livestock across open country.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 10,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"terrains": ["plains", "pasture", "desert", "clearedLand"],
+			"maxRegions": 4
+		},
+		"midTermDurationDays": {
+			"minor": [14, 28],
+			"moderate": [21, 40],
+			"severe": [30, 50]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 7,
+			"severe": 14
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -2,
+				"moderate": -5,
+				"severe": -9
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.95,
+				"moderate": 0.9,
+				"severe": 0.82
+			},
+			"affectedSubSectors": [
+				"agriculture",
+				"livestock",
+				"construction",
+				"utilities"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.8,
+				"severe": 1.4
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 1,
+				"severe": 0.98
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0.1
+			},
+			"scope": "national"
+		}
+	},
+	{
+		"id": "flood",
+		"name": "Flood",
+		"description": "Rivers burst their banks, drowning fields and fouling low ground.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 10,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"terrains": ["plains", "wetland", "pasture"],
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [30, 60],
+			"moderate": [60, 100],
+			"severe": [90, 140]
+		},
+		"longTermExtraDays": {
+			"minor": 45,
+			"moderate": 90,
+			"severe": 150
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.75,
+					"moderate": 0.5,
+					"severe": 0.3
+				},
+				"livestock": {
+					"minor": 0.85,
+					"moderate": 0.65,
+					"severe": 0.45
+				}
+			},
+			"environmentDelta": {
+				"minor": -10,
+				"moderate": -20,
+				"severe": -32
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.85,
+				"moderate": 0.68,
+				"severe": 0.5
+			},
+			"affectedSubSectors": ["agriculture", "livestock", "transport-logistics"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.5,
+				"moderate": 1.1,
+				"severe": 1.8
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.93,
+				"moderate": 0.85,
+				"severe": 0.75
+			},
+			"affectedSubSectors": ["agriculture", "livestock"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.3,
+				"severe": 0.5
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "flash_flood",
+		"name": "Flash Flood",
+		"description": "Sudden mountain runoff scours valleys and buries roads in debris.",
+		"category": "weather",
+		"tier": "v1.5",
+		"weight": 7,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"terrains": ["mountains", "hills", "plains"],
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [10, 21],
+			"moderate": [14, 30],
+			"severe": [21, 40]
+		},
+		"longTermExtraDays": {
+			"minor": 7,
+			"moderate": 21,
+			"severe": 40
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.9,
+					"moderate": 0.75,
+					"severe": 0.55
+				},
+				"stone": {
+					"minor": 0.95,
+					"moderate": 0.85,
+					"severe": 0.7
+				}
+			},
+			"environmentDelta": {
+				"minor": -5,
+				"moderate": -12,
+				"severe": -20
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.92,
+				"moderate": 0.8,
+				"severe": 0.65
+			},
+			"affectedSubSectors": ["agriculture", "quarrying", "transport-logistics"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.9
+			},
+			"affectedSubSectors": ["agriculture"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "hurricane",
+		"name": "Hurricane",
+		"description": "A spinning storm hammers the coast with wind, rain, and surge.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 8,
+		"severityWeights": {
+			"minor": 40,
+			"moderate": 40,
+			"severe": 20
+		},
+		"target": {
+			"requireCoastal": true,
+			"maxRegions": 4
+		},
+		"midTermDurationDays": {
+			"minor": [45, 75],
+			"moderate": [75, 110],
+			"severe": [100, 150]
+		},
+		"longTermExtraDays": {
+			"minor": 60,
+			"moderate": 120,
+			"severe": 200
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"fish": {
+					"minor": 0.8,
+					"moderate": 0.55,
+					"severe": 0.35
+				},
+				"crops": {
+					"minor": 0.85,
+					"moderate": 0.65,
+					"severe": 0.45
+				},
+				"timber": {
+					"minor": 0.9,
+					"moderate": 0.75,
+					"severe": 0.55
+				}
+			},
+			"environmentDelta": {
+				"minor": -12,
+				"moderate": -22,
+				"severe": -35
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0.002,
+				"severe": 0.008
+			},
+			"emigrationBump": {
+				"minor": 0.005,
+				"moderate": 0.015,
+				"severe": 0.04
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.85,
+				"moderate": 0.7,
+				"severe": 0.5
+			},
+			"affectedSubSectors": [
+				"fishing",
+				"agriculture",
+				"transport-logistics",
+				"construction"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.6,
+				"moderate": 1.2,
+				"severe": 2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.94,
+				"moderate": 0.86,
+				"severe": 0.78
+			},
+			"affectedSubSectors": ["fishing", "agriculture"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.15,
+				"moderate": 0.35,
+				"severe": 0.55
+			},
+			"scope": "regional"
+		},
+		"cascades": [
+			{
+				"calamityId": "flood",
+				"chance": 0.4,
+				"minSeverity": "moderate"
+			},
+			{
+				"calamityId": "oil_spill",
+				"chance": 0.12,
+				"minSeverity": "severe"
+			}
+		]
+	},
+	{
+		"id": "tropical_storm",
+		"name": "Tropical Storm",
+		"description": "A lesser coastal storm lashes harbors and fishing fleets.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 11,
+		"severityWeights": {
+			"minor": 60,
+			"moderate": 30,
+			"severe": 10
+		},
+		"target": {
+			"requireCoastal": true,
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [21, 40],
+			"moderate": [35, 55],
+			"severe": [50, 75]
+		},
+		"longTermExtraDays": {
+			"minor": 14,
+			"moderate": 30,
+			"severe": 60
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"fish": {
+					"minor": 0.9,
+					"moderate": 0.75,
+					"severe": 0.55
+				}
+			},
+			"environmentDelta": {
+				"minor": -5,
+				"moderate": -10,
+				"severe": -16
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.92,
+				"moderate": 0.82,
+				"severe": 0.7
+			},
+			"affectedSubSectors": ["fishing", "transport-logistics"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.9
+			},
+			"affectedSubSectors": ["fishing"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "tornado",
+		"name": "Tornado",
+		"description": "A narrow funnel tears through farmland and light structures.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 9,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"terrains": ["plains", "pasture", "clearedLand"],
+			"forbidCoastal": true,
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [14, 28],
+			"moderate": [21, 40],
+			"severe": [30, 50]
+		},
+		"longTermExtraDays": {
+			"minor": 7,
+			"moderate": 21,
+			"severe": 40
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.85,
+					"moderate": 0.65,
+					"severe": 0.4
+				}
+			},
+			"environmentDelta": {
+				"minor": -4,
+				"moderate": -9,
+				"severe": -15
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.78,
+				"severe": 0.6
+			},
+			"affectedSubSectors": [
+				"agriculture",
+				"construction",
+				"light-manufacturing"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.5
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.88
+			},
+			"affectedSubSectors": ["agriculture"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.25
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "blizzard",
+		"name": "Blizzard",
+		"description": "Heavy snow and wind shut mountain passes and freeze quarry work.",
+		"category": "weather",
+		"tier": "v1.5",
+		"weight": 7,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"terrains": ["mountains", "hills"],
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [10, 21],
+			"moderate": [14, 30],
+			"severe": [21, 40]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 7,
+			"severe": 14
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -2,
+				"moderate": -5,
+				"severe": -8
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.88,
+				"moderate": 0.75,
+				"severe": 0.6
+			},
+			"affectedSubSectors": [
+				"mining",
+				"quarrying",
+				"energy",
+				"transport-logistics"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 1,
+				"severe": 0.98
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0.1
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "hailstorm",
+		"name": "Hailstorm",
+		"description": "Ice stones shred standing crops across open plains.",
+		"category": "weather",
+		"tier": "v1.5",
+		"weight": 8,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"terrains": ["plains", "pasture"],
+			"requireResources": ["crops"],
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [21, 40],
+			"moderate": [35, 55],
+			"severe": [45, 70]
+		},
+		"longTermExtraDays": {
+			"minor": 7,
+			"moderate": 21,
+			"severe": 40
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.8,
+					"moderate": 0.55,
+					"severe": 0.35
+				}
+			},
+			"environmentDelta": {
+				"minor": -2,
+				"moderate": -5,
+				"severe": -8
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.9,
+				"moderate": 0.75,
+				"severe": 0.58
+			},
+			"affectedSubSectors": ["agriculture"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.94,
+				"severe": 0.9
+			},
+			"affectedSubSectors": ["agriculture"],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "landslide",
+		"name": "Landslide",
+		"description": "A slope gives way, burying roads, timber stands, and mine mouths.",
+		"category": "weather",
+		"tier": "v1",
+		"weight": 8,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"terrains": ["mountains", "hills", "forest"],
+			"maxRegions": 1
+		},
+		"midTermDurationDays": {
+			"minor": [30, 55],
+			"moderate": [55, 90],
+			"severe": [80, 120]
+		},
+		"longTermExtraDays": {
+			"minor": 40,
+			"moderate": 80,
+			"severe": 140
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"timber": {
+					"minor": 0.9,
+					"moderate": 0.7,
+					"severe": 0.5
+				},
+				"metalOre": {
+					"minor": 0.9,
+					"moderate": 0.7,
+					"severe": 0.5
+				},
+				"stone": {
+					"minor": 0.85,
+					"moderate": 0.65,
+					"severe": 0.45
+				}
+			},
+			"environmentDelta": {
+				"minor": -8,
+				"moderate": -16,
+				"severe": -26
+			},
+			"degradeTerrainChance": {
+				"minor": 0.05,
+				"moderate": 0.15,
+				"severe": 0.35
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.85,
+				"moderate": 0.7,
+				"severe": 0.5
+			},
+			"affectedSubSectors": [
+				"forestry",
+				"mining",
+				"quarrying",
+				"transport-logistics"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.5
+			},
+			"scope": "regional"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.94,
+				"moderate": 0.86,
+				"severe": 0.78
+			},
+			"affectedSubSectors": ["forestry", "mining", "quarrying"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.25,
+				"severe": 0.4
+			},
+			"scope": "regional"
+		}
+	},
+	{
+		"id": "volcanic_ash",
+		"name": "Volcanic Ash",
+		"description": "Ash falls from a distant eruption, smothering crops and clogging lungs.",
+		"category": "weather",
+		"tier": "v2",
+		"weight": 3,
+		"severityWeights": {
+			"minor": 40,
+			"moderate": 40,
+			"severe": 20
+		},
+		"target": {
+			"terrains": ["mountains", "hills", "plains"],
+			"maxRegions": 3
+		},
+		"midTermDurationDays": {
+			"minor": [60, 100],
+			"moderate": [100, 150],
+			"severe": [140, 200]
+		},
+		"longTermExtraDays": {
+			"minor": 90,
+			"moderate": 160,
+			"severe": 250
+		},
+		"immediate": {
+			"resourceCapacityFactors": {
+				"crops": {
+					"minor": 0.7,
+					"moderate": 0.45,
+					"severe": 0.25
+				}
+			},
+			"environmentDelta": {
+				"minor": -10,
+				"moderate": -20,
+				"severe": -32
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.85,
+				"moderate": 0.68,
+				"severe": 0.48
+			},
+			"affectedSubSectors": ["agriculture", "transport-logistics", "livestock"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.5,
+				"moderate": 1.1,
+				"severe": 1.8
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.96,
+				"moderate": 0.9,
+				"severe": 0.85
+			},
+			"affectedSubSectors": ["agriculture"],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.2,
+				"severe": 0.35
+			},
+			"scope": "regional"
+		}
+	}
+]

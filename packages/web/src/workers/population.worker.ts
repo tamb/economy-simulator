@@ -1,12 +1,19 @@
 /// <reference lib="webworker" />
 
-import { advanceGameDay } from "../storage/population";
+import { appConfig } from "economy-simulator-data";
+import {
+	createStorageDriver,
+	setStorageDriver,
+} from "economy-simulator-persistence";
+import { advanceGameDay } from "../game/population-cycle";
 import type {
 	PopulationWorkerRequest,
 	PopulationWorkerResponse,
 } from "./population-worker-protocol";
 
 declare const self: DedicatedWorkerGlobalScope;
+
+setStorageDriver(createStorageDriver(appConfig.storage));
 
 function post(message: PopulationWorkerResponse): void {
 	self.postMessage(message);

@@ -16,6 +16,8 @@ interface UpdatePersonStatsContext {
 	environmentalQualityModifier?: number;
 	/** The national ledger's `shortfallHappinessPenaltyBySubSector` entry for the person's sub-sector, if it's an industrial one with unmet resource demand. */
 	resourceShortfallHappinessPenalty?: number;
+	/** Daily happiness penalty from active calamity debuffs. */
+	calamityHappinessPenalty?: number;
 }
 
 function getWeeklyHoursForPerson(person: Person): number | undefined {
@@ -57,6 +59,7 @@ function updatePersonStats(
 			environmentalQualityModifier: context.environmentalQualityModifier,
 			resourceShortfallHappinessPenalty:
 				context.resourceShortfallHappinessPenalty,
+			calamityHappinessPenalty: context.calamityHappinessPenalty,
 		},
 		random,
 		settings,

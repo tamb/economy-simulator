@@ -1,0 +1,320 @@
+[
+	{
+		"id": "labor_strike",
+		"name": "Labor Strike",
+		"description": "Workers walk out of a key sector, freezing output until tempers cool.",
+		"category": "social",
+		"tier": "v2",
+		"weight": 7,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [14, 30],
+			"moderate": [21, 45],
+			"severe": [35, 60]
+		},
+		"longTermExtraDays": {
+			"minor": 0,
+			"moderate": 14,
+			"severe": 30
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.7,
+				"moderate": 0.45,
+				"severe": 0.25
+			},
+			"affectedSubSectors": [
+				"heavy-industry",
+				"transport-logistics",
+				"mining",
+				"construction",
+				"utilities"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.4,
+				"moderate": 0.9,
+				"severe": 1.5
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 0.98,
+				"severe": 0.95
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0,
+				"moderate": 0.1,
+				"severe": 0.2
+			},
+			"scope": "national"
+		}
+	},
+	{
+		"id": "food_riot",
+		"name": "Food Riot",
+		"description": "Hunger and anger spill into the streets after shortages bite.",
+		"category": "social",
+		"tier": "v2",
+		"weight": 5,
+		"severityWeights": {
+			"minor": 45,
+			"moderate": 40,
+			"severe": 15
+		},
+		"target": {
+			"maxRegions": 3
+		},
+		"midTermDurationDays": {
+			"minor": [14, 30],
+			"moderate": [21, 45],
+			"severe": [35, 60]
+		},
+		"longTermExtraDays": {
+			"minor": 14,
+			"moderate": 30,
+			"severe": 50
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": -1,
+				"moderate": -3,
+				"severe": -5
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0.01,
+				"moderate": 0.03,
+				"severe": 0.06
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.95,
+				"moderate": 0.9,
+				"severe": 0.82
+			},
+			"affectedSubSectors": [
+				"wholesale-retail",
+				"food-processing",
+				"agriculture"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.8,
+				"moderate": 1.6,
+				"severe": 2.4
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 0.98,
+				"severe": 0.95
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0.2,
+				"moderate": 0.4,
+				"severe": 0.7
+			},
+			"scope": "national"
+		}
+	},
+	{
+		"id": "bank_panic",
+		"name": "Bank Panic",
+		"description": "Depositors rush the banks; credit freezes and services seize up.",
+		"category": "social",
+		"tier": "v2",
+		"weight": 4,
+		"severityWeights": {
+			"minor": 50,
+			"moderate": 35,
+			"severe": 15
+		},
+		"target": {
+			"maxRegions": 2
+		},
+		"midTermDurationDays": {
+			"minor": [21, 40],
+			"moderate": [40, 70],
+			"severe": [60, 100]
+		},
+		"longTermExtraDays": {
+			"minor": 21,
+			"moderate": 45,
+			"severe": 80
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.95,
+				"moderate": 0.9,
+				"severe": 0.82
+			},
+			"affectedSubSectors": [
+				"financial-services",
+				"real-estate",
+				"wholesale-retail"
+			],
+			"happinessPenaltyPerDay": {
+				"minor": 0.5,
+				"moderate": 1.1,
+				"severe": 1.8
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 1,
+				"moderate": 0.98,
+				"severe": 0.95
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.25,
+				"severe": 0.4
+			},
+			"scope": "national"
+		}
+	},
+	{
+		"id": "plague_of_corruption",
+		"name": "Plague of Corruption",
+		"description": "Graft and favoritism sap administration and public trust.",
+		"category": "social",
+		"tier": "v2",
+		"weight": 4,
+		"severityWeights": {
+			"minor": 55,
+			"moderate": 35,
+			"severe": 10
+		},
+		"target": {
+			"maxRegions": 4
+		},
+		"midTermDurationDays": {
+			"minor": [60, 100],
+			"moderate": [100, 150],
+			"severe": [140, 200]
+		},
+		"longTermExtraDays": {
+			"minor": 60,
+			"moderate": 120,
+			"severe": 180
+		},
+		"immediate": {
+			"environmentDelta": {
+				"minor": 0,
+				"moderate": -1,
+				"severe": -2
+			},
+			"degradeTerrainChance": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"mortalityBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			},
+			"emigrationBump": {
+				"minor": 0,
+				"moderate": 0,
+				"severe": 0
+			}
+		},
+		"midTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.94,
+				"moderate": 0.88,
+				"severe": 0.8
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0.3,
+				"moderate": 0.7,
+				"severe": 1.2
+			},
+			"scope": "national"
+		},
+		"longTerm": {
+			"extractionEfficiencyFactor": {
+				"minor": 0.98,
+				"moderate": 0.95,
+				"severe": 0.9
+			},
+			"affectedSubSectors": [],
+			"happinessPenaltyPerDay": {
+				"minor": 0.1,
+				"moderate": 0.25,
+				"severe": 0.4
+			},
+			"scope": "national"
+		}
+	}
+]

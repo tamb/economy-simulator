@@ -2,18 +2,29 @@ import { useState } from "react";
 import { CountryDashboard } from "../components/dashboards/CountryDashboard";
 import { PopulationDashboard } from "../components/dashboards/PopulationDashboard";
 import { ResourceLedgerDashboard } from "../components/dashboards/ResourceLedgerDashboard";
+import { ScoreDashboard } from "../components/dashboards/ScoreDashboard";
 import { SectorDashboard } from "../components/dashboards/SectorDashboard";
+import { usePopulation } from "../context/PopulationContext";
 
-type DashboardTab = "population" | "sectors" | "country" | "resources";
+type DashboardTab =
+	| "population"
+	| "sectors"
+	| "country"
+	| "resources"
+	| "score";
 
 const TABS: { id: DashboardTab; label: string }[] = [
 	{ id: "population", label: "Population" },
 	{ id: "sectors", label: "Economic Sectors" },
 	{ id: "country", label: "Country Overview" },
 	{ id: "resources", label: "Resource Ledger" },
+	{ id: "score", label: "Nation Score" },
 ];
 
-function renderTab(tab: DashboardTab) {
+function renderTab(
+	tab: DashboardTab,
+	gameRun: ReturnType<typeof usePopulation>["gameRun"],
+) {
 	switch (tab) {
 		case "population":
 			return <PopulationDashboard />;
@@ -23,11 +34,14 @@ function renderTab(tab: DashboardTab) {
 			return <CountryDashboard />;
 		case "resources":
 			return <ResourceLedgerDashboard />;
+		case "score":
+			return <ScoreDashboard gameRun={gameRun} />;
 	}
 }
 
 function DashboardsPage() {
 	const [tab, setTab] = useState<DashboardTab>("population");
+	const { gameRun } = usePopulation();
 
 	return (
 		<div className="space-y-6">
@@ -59,7 +73,7 @@ function DashboardsPage() {
 				))}
 			</nav>
 
-			{renderTab(tab)}
+			{renderTab(tab, gameRun)}
 		</div>
 	);
 }

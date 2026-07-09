@@ -77,6 +77,46 @@ function InstructionsPage() {
 					</li>
 				</ul>
 			</section>
+			<section className="space-y-2 border-2 border-primary/30 bg-surface-muted p-5">
+				<h3 className="text-[10px] sm:text-xs">Calamities</h3>
+				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+					<li>
+						Fires, storms, quakes, disease, and other shocks can strike regions
+						during a run. Active ones appear as <strong>nation debuffs</strong>{" "}
+						under the header with days remaining.
+					</li>
+					<li>
+						Each calamity has an immediate hit (reserves, environment), a
+						mid-term drag on production and happiness, and a quieter long-term
+						scar after the banner clears.
+					</li>
+					<li>
+						Score still comes from QoL, growth, resources, and environment —
+						calamities pressure those channels rather than subtracting arbitrary
+						industry points.
+					</li>
+				</ul>
+			</section>
+
+			<section className="space-y-2 border-2 border-primary/30 bg-surface-muted p-5">
+				<h3 className="text-[10px] sm:text-xs">Win, lose, and records</h3>
+				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+					<li>
+						Every nation run ends in <strong>victory</strong> or{" "}
+						<strong>defeat</strong> — grow population, keep quality of life
+						high, balance the resource ledger, and protect the environment.
+					</li>
+					<li>
+						Each completed game year updates your <strong>nation score</strong>{" "}
+						(Dashboards → Nation Score) from QoL, growth, migration, resources,
+						and environment health.
+					</li>
+					<li>
+						<strong>Records</strong> tracks career wins/losses, best score,
+						badge unlocks, and run history across every nation you found.
+					</li>
+				</ul>
+			</section>
 		</div>
 	);
 }
