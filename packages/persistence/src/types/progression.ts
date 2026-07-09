@@ -2,6 +2,7 @@ import type { ActiveCalamity, CalamityHistoryEntry } from "./calamities";
 import { createEmptyCalamityState } from "./calamities";
 
 type GameRunStatus = "active" | "won" | "lost" | "abandoned";
+type GameRunPhase = "setup" | "active";
 
 interface YearlyNationScore {
 	year: number;
@@ -27,6 +28,7 @@ interface WinLoseStreaks {
 
 interface GameRunState {
 	status: GameRunStatus;
+	phase: GameRunPhase;
 	startingPopulation: number;
 	startedAt: number;
 	endedAt?: number;
@@ -57,6 +59,7 @@ function createInitialWinLoseStreaks(): WinLoseStreaks {
 function createInitialGameRunState(startingPopulation: number): GameRunState {
 	return {
 		status: "active",
+		phase: "setup",
 		startingPopulation,
 		startedAt: Date.now(),
 		scoreHistory: [],
@@ -66,5 +69,11 @@ function createInitialGameRunState(startingPopulation: number): GameRunState {
 	};
 }
 
-export type { GameRunState, GameRunStatus, WinLoseStreaks, YearlyNationScore };
+export type {
+	GameRunPhase,
+	GameRunState,
+	GameRunStatus,
+	WinLoseStreaks,
+	YearlyNationScore,
+};
 export { createInitialGameRunState, createInitialWinLoseStreaks };

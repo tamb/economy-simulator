@@ -17,9 +17,14 @@ function InstructionsPage() {
 						Pick a starting population size (10k / 100k / 1M) on first launch.
 					</li>
 					<li>
+						Configure every sub-sector's economic system and role mix on the
+						Nation Setup screen (or use Auto-assign all), then press Start game.
+					</li>
+					<li>
 						The game generates a unique island (biomes, resource deposits,
-						ocean) and assigns every citizen a home region. Working-age citizens
-						(18–65) also get a job; children and retirees do not.
+						ocean) and assigns every citizen a home region, job, and economic
+						role. Working-age citizens (18–65) are employed; children and
+						retirees are not.
 					</li>
 				</ul>
 			</section>
@@ -28,15 +33,19 @@ function InstructionsPage() {
 				<h3 className="text-[10px] sm:text-xs">Your levers</h3>
 				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
 					<li>
-						<strong>Sector Atlas</strong> — assign an economic system to each
-						sub-sector. This now affects extraction efficiency, environmental
-						impact, and worker morale.
+						<strong>Sector Atlas</strong> — assign an economic system and role
+						mix to each sub-sector. Systems affect extraction efficiency,
+						environmental impact, and worker morale; roles further modulate QoL
+						and labor effectiveness.
 					</li>
 					<li>
-						<strong>Population</strong> — advance one in-game day at a time.
-						Each day updates one cohort's quality of life; once a full year
-						passes, the annual cycle runs (births, deaths, migration, resource
-						extraction, national ledger).
+						<strong>Population</strong> — after founding your nation, assign an
+						economic system and role mix to every sub-sector on the{" "}
+						<strong>Nation Setup</strong> screen and in the{" "}
+						<strong>Sector Atlas</strong>, then press{" "}
+						<strong>Start game</strong>. Each day updates one cohort's quality
+						of life; once a full year passes, the annual cycle runs (births,
+						deaths, migration, resource extraction, national ledger).
 					</li>
 				</ul>
 			</section>

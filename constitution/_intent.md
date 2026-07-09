@@ -9,8 +9,8 @@ A **desktop-first** application: a React web UI (vite) wrapped for native distri
 You are the monarch of an island nation. You control a large population (up to
 1,000,000 simulated citizens) — moving people between economic sectors,
 orchestrating the national resource ledger through per-sub-sector economic
-system choices, and watching your choices play out over in-game years. People are born, age, and die; they flee a struggling nation and
-immigrate to a thriving one. Occasional **calamities** (fires, storms, quakes,
+system choices and role structures, and watching your choices play out over in-game years. People are born, age, and die; they flee a struggling nation and
+immigrate to a thriving one. Before the simulation begins, the monarch must assign an economic system and role quotas to every sub-sector; citizens then receive a `roleId` (e.g. feudal serf = 65) that affects quality of life and extraction efficiency. Occasional **calamities** (fires, storms, quakes,
 disease, and more) strike regions as timed nation debuffs with immediate,
 mid-term, and long-term economic scars. All of this is driven by each citizen's
 **quality of life**, which is a function of their happiness (work hours,

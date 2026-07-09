@@ -5,5 +5,6 @@ export type {
 export {
 	economicSystems,
 	getEconomicSystem,
+	getRolesForSystem,
 	isEconomicSystemId,
 } from "economy-simulator-data";

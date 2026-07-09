@@ -25,8 +25,8 @@ createRoot(root).render(
 	<StrictMode>
 		<FacePoolProvider>
 			<RegionProvider>
-				<PopulationProvider>
-					<SectorAssignmentProvider>
+				<SectorAssignmentProvider>
+					<PopulationProvider>
 						{/*
 						 * HashRouter (not BrowserRouter): the desktop build is served by
 						 * Neutralino's static file server, which has no SPA fallback for
@@ -36,8 +36,8 @@ createRoot(root).render(
 						<HashRouter>
 							<App />
 						</HashRouter>
-					</SectorAssignmentProvider>
-				</PopulationProvider>
+					</PopulationProvider>
+				</SectorAssignmentProvider>
 			</RegionProvider>
 		</FacePoolProvider>
 	</StrictMode>,

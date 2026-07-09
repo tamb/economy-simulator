@@ -89,7 +89,7 @@ function NewGameSetupPage({ onStart }: NewGameSetupPageProps) {
 						type="submit"
 						className="w-full border-2 border-primary bg-primary px-4 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-90"
 					>
-						Begin
+						Continue to nation setup
 					</button>
 				</form>
 			</div>

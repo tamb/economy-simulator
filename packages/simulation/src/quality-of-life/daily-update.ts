@@ -33,6 +33,12 @@ interface QualityOfLifeInput extends QualityOfLifeState {
 	 */
 	economicSystemMoraleMultiplier?: number;
 	/**
+	 * Multiplier on the personality-sector affinity delta from the citizen's
+	 * economic role (see `economy-simulator-data`'s `getRoleEffect(...).moraleMultiplier`).
+	 * Stacks multiplicatively with `economicSystemMoraleMultiplier`. Defaults to 1.
+	 */
+	roleMoraleMultiplier?: number;
+	/**
 	 * Daily happiness delta from the citizen's home region's environmental
 	 * quality (see `../resources/environment.ts`'s
 	 * `getEnvironmentalQualityModifier`). Defaults to 0 (no effect).
@@ -79,7 +85,8 @@ function computeDailyQualityOfLifeUpdate(
 	const affinityDelta =
 		affinity *
 		settings.work.sectorAffinityMaxDailyDelta *
-		(input.economicSystemMoraleMultiplier ?? 1);
+		(input.economicSystemMoraleMultiplier ?? 1) *
+		(input.roleMoraleMultiplier ?? 1);
 
 	const noise = (random() * 2 - 1) * settings.work.dailyHappinessNoise;
 

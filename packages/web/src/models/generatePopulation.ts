@@ -9,6 +9,7 @@ import {
 	hasPopulation,
 	savePopulationChunk,
 } from "../storage/population";
+import type { SectorRoleConfigs } from "../storage/sector-role-config";
 
 const { cohortCount, chunkSize, batchSize } = appConfig.population;
 
@@ -17,6 +18,7 @@ async function generateAndSavePopulation(
 	regions: readonly WorldRegion[],
 	size: number = appConfig.population.size,
 	onProgress?: (loaded: number, total: number) => void,
+	roleConfigs?: SectorRoleConfigs,
 ): Promise<void> {
 	if (await hasPopulation()) {
 		return;
@@ -39,7 +41,13 @@ async function generateAndSavePopulation(
 
 	for (let globalIndex = 0; globalIndex < size; globalIndex++) {
 		const cohort = globalIndex % cohortCount;
-		const person = generatePerson(faceIds, regions);
+		const person = generatePerson(
+			faceIds,
+			regions,
+			undefined,
+			Math.random,
+			roleConfigs,
+		);
 		person.setIndex(globalIndex);
 		cohortBuffers[cohort]?.push(person);
 

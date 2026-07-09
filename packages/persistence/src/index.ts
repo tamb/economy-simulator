@@ -55,6 +55,11 @@ export {
 	saveSectorAssignmentsRaw,
 } from "./repositories/sector-assignments";
 export {
+	clearSectorRoleConfigStore,
+	loadSectorRoleConfigRaw,
+	saveSectorRoleConfigRaw,
+} from "./repositories/sector-role-config";
+export {
 	clearWorldStore,
 	loadRegionResourceStates,
 	loadWorldMeta,
@@ -81,6 +86,7 @@ export {
 } from "./types/player-profile";
 export type { AnnualCycleStats, PopulationMeta } from "./types/population";
 export type {
+	GameRunPhase,
 	GameRunState,
 	GameRunStatus,
 	WinLoseStreaks,
@@ -90,6 +96,11 @@ export {
 	createInitialGameRunState,
 	createInitialWinLoseStreaks,
 } from "./types/progression";
+export type { SectorRoleConfigs } from "./types/sector-role-config";
+export {
+	isSectorRoleConfig,
+	isSectorRoleConfigs,
+} from "./types/sector-role-config";
 export type {
 	RegionResourceState,
 	StoredWorldRegion,

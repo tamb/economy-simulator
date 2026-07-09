@@ -3,7 +3,10 @@ import {
 	gameSettings,
 	getSubSector,
 } from "economy-simulator-data";
-import { computeDailyQualityOfLifeUpdate } from "economy-simulator-simulation";
+import {
+	computeDailyQualityOfLifeUpdate,
+	getRoleModifiersForCitizen,
+} from "economy-simulator-simulation";
 import type { Person } from "./Person";
 
 type RandomFn = () => number;
@@ -21,6 +24,11 @@ interface UpdatePersonStatsContext {
 }
 
 function getWeeklyHoursForPerson(person: Person): number | undefined {
+	const roleModifiers = getRoleModifiersForCitizen(person.getRoleId());
+	if (roleModifiers.weeklyHoursOverride != null) {
+		return roleModifiers.weeklyHoursOverride;
+	}
+
 	const categoryId = person.getCategoryId();
 	const subSectorId = person.getSubSectorId();
 	if (!categoryId || !subSectorId) return undefined;
@@ -61,6 +69,8 @@ function updatePersonStats(
 			resourceShortfallHappinessPenalty:
 				context.resourceShortfallHappinessPenalty,
 			calamityHappinessPenalty: context.calamityHappinessPenalty,
+			roleMoraleMultiplier: getRoleModifiersForCitizen(person.getRoleId())
+				.moraleMultiplier,
 		},
 		random,
 		settings,

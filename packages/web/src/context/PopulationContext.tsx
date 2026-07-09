@@ -14,8 +14,12 @@ import {
 	getPopulationSize,
 	getPopulationSizeOverride,
 } from "../data/runtime-config";
+import {
+	autoAssignAllSectors,
+	beginNationFounding,
+	startGame,
+} from "../game/nation-setup";
 import { startNewNation } from "../game/new-game";
-import { generateAndSavePopulation } from "../models/generatePopulation";
 import type { Person } from "../models/Person";
 import {
 	buildPopulationDirectory,
@@ -25,6 +29,7 @@ import {
 	loadPopulationMeta,
 	type PopulationMeta,
 } from "../storage/population";
+import { ensureWorld } from "../storage/world";
 import type {
 	PopulationWorkerRequest,
 	PopulationWorkerResponse,
@@ -43,8 +48,11 @@ interface PopulationContextValue {
 	isReady: boolean;
 	isGenerating: boolean;
 	needsSetup: boolean;
+	needsConfiguration: boolean;
 	startGeneration: (size: number) => Promise<void>;
 	restartNation: (size: number) => Promise<void>;
+	autoAssignAll: () => Promise<void>;
+	startConfiguredGame: () => Promise<void>;
 	isAdvancingDay: boolean;
 	dayAdvanceProgress: DayAdvanceProgress | null;
 	loadProgress: number;
@@ -57,7 +65,7 @@ interface PopulationContextValue {
 	buildDirectory: (
 		onProgress?: (processed: number, total: number) => void,
 	) => Promise<PopulationDirectoryEntry[]>;
-	refreshGameRun: () => Promise<void>;
+	refreshGameRun: () => Promise<GameRunState | null>;
 }
 
 const PopulationContext = createContext<PopulationContextValue | null>(null);
@@ -68,6 +76,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const [isReady, setIsReady] = useState(false);
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [needsSetup, setNeedsSetup] = useState(false);
+	const [needsConfiguration, setNeedsConfiguration] = useState(false);
 	const [isAdvancingDay, setIsAdvancingDay] = useState(false);
 	const [dayAdvanceProgress, setDayAdvanceProgress] =
 		useState<DayAdvanceProgress | null>(null);
@@ -80,6 +89,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const refreshGameRun = useCallback(async () => {
 		const run = await loadGameRunState();
 		setGameRun(run);
+		return run;
 	}, []);
 
 	const getWorker = useCallback((): Worker => {
@@ -99,28 +109,17 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		};
 	}, []);
 
-	const runGeneration = useCallback(
-		async (size: number, isCancelled: () => boolean) => {
-			setIsGenerating(true);
-			setIsReady(false);
-			setLoadProgress(0);
-			setTotal(size);
-
-			await generateAndSavePopulation(faceIds, regions, size, (loaded) => {
-				if (!isCancelled()) setLoadProgress(loaded);
-			});
-
-			if (isCancelled()) return;
-
-			const meta = await loadPopulationMeta();
+	const enterConfigurationPhase = useCallback(
+		async (size: number) => {
+			await beginNationFounding(size);
+			await ensureWorld();
 			await refreshGameRun();
-			setGameDay(meta?.gameDay ?? 0);
-			setTotal(meta?.size ?? size);
-			setLoadProgress(size);
-			setIsGenerating(false);
+			setTotal(size);
+			setNeedsSetup(false);
+			setNeedsConfiguration(true);
 			setIsReady(true);
 		},
-		[faceIds, regions, refreshGameRun],
+		[refreshGameRun],
 	);
 
 	useEffect(() => {
@@ -128,18 +127,32 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		if (!isRegionsReady || regions.length === 0) return;
 
 		let cancelled = false;
-		const isCancelled = () => cancelled;
 
 		async function initializePopulation() {
 			const exists = await hasPopulation();
-			if (exists) {
+			const run = await loadGameRunState();
+
+			if (exists && run?.phase === "active") {
 				const populationSize = getPopulationSize();
 				const meta = await loadPopulationMeta();
-				await refreshGameRun();
 				if (!cancelled) {
+					setGameRun(run);
 					setGameDay(meta?.gameDay ?? 0);
 					setTotal(meta?.size ?? populationSize);
-					setLoadProgress(populationSize);
+					setLoadProgress(meta?.size ?? populationSize);
+					setNeedsSetup(false);
+					setNeedsConfiguration(false);
+					setIsReady(true);
+				}
+				return;
+			}
+
+			if (run?.phase === "setup") {
+				if (!cancelled) {
+					setGameRun(run);
+					setTotal(run.startingPopulation);
+					setNeedsSetup(false);
+					setNeedsConfiguration(true);
 					setIsReady(true);
 				}
 				return;
@@ -147,7 +160,22 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 
 			const override = getPopulationSizeOverride();
 			if (override != null) {
-				await runGeneration(override, isCancelled);
+				await enterConfigurationPhase(override);
+				await autoAssignAllSectors();
+				const worldRegions = await ensureWorld();
+				await startGame(override, faceIds, worldRegions, (loaded) => {
+					if (!cancelled) setLoadProgress(loaded);
+				});
+				const meta = await loadPopulationMeta();
+				const activeRun = await refreshGameRun();
+				if (!cancelled) {
+					setGameDay(meta?.gameDay ?? 0);
+					setTotal(meta?.size ?? override);
+					setLoadProgress(meta?.size ?? override);
+					setNeedsConfiguration(false);
+					setIsReady(true);
+					setGameRun(activeRun);
+				}
 				return;
 			}
 
@@ -158,6 +186,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			if (!cancelled) {
 				setIsGenerating(false);
 				setNeedsSetup(false);
+				setNeedsConfiguration(false);
 				setIsReady(true);
 			}
 		});
@@ -170,16 +199,20 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		isFacePoolReady,
 		regions,
 		isRegionsReady,
-		runGeneration,
+		enterConfigurationPhase,
 		refreshGameRun,
 	]);
 
 	const startGeneration = useCallback(
 		async (size: number) => {
-			setNeedsSetup(false);
-			await runGeneration(size, () => false);
+			setIsGenerating(true);
+			try {
+				await enterConfigurationPhase(size);
+			} finally {
+				setIsGenerating(false);
+			}
 		},
-		[runGeneration],
+		[enterConfigurationPhase],
 	);
 
 	const restartNation = useCallback(
@@ -187,13 +220,43 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			await startNewNation(size);
 			setGameRun(null);
 			setNeedsSetup(false);
-			await runGeneration(size, () => false);
+			await enterConfigurationPhase(size);
 		},
-		[runGeneration],
+		[enterConfigurationPhase],
 	);
+
+	const autoAssignAll = useCallback(async () => {
+		await autoAssignAllSectors();
+	}, []);
+
+	const startConfiguredGame = useCallback(async () => {
+		setIsGenerating(true);
+		setLoadProgress(0);
+
+		try {
+			const worldRegions = await ensureWorld();
+			await startGame(total, faceIds, worldRegions, (loaded, size) => {
+				setLoadProgress(loaded);
+				setTotal(size);
+			});
+			const meta = await loadPopulationMeta();
+			const run = await refreshGameRun();
+			setGameDay(meta?.gameDay ?? 0);
+			setTotal(meta?.size ?? total);
+			setLoadProgress(meta?.size ?? total);
+			setNeedsConfiguration(false);
+			setIsReady(true);
+			if (run?.phase !== "active") {
+				throw new Error("Game failed to enter active phase");
+			}
+		} finally {
+			setIsGenerating(false);
+		}
+	}, [faceIds, total, refreshGameRun]);
 
 	const advanceDay = useCallback(async () => {
 		if (isAdvancingDay || (gameRun && gameRun.status !== "active")) return;
+		if (gameRun && gameRun.phase !== "active") return;
 
 		setIsAdvancingDay(true);
 		setDayAdvanceProgress({ phase: "daily", processed: 0, total: 0 });
@@ -259,7 +322,8 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		[],
 	);
 
-	const isGameActive = !gameRun || gameRun.status === "active";
+	const isGameActive =
+		gameRun?.status === "active" && gameRun.phase === "active";
 
 	return (
 		<PopulationContext.Provider
@@ -268,8 +332,11 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				isReady,
 				isGenerating,
 				needsSetup,
+				needsConfiguration,
 				startGeneration,
 				restartNation,
+				autoAssignAll,
+				startConfiguredGame,
 				isAdvancingDay,
 				dayAdvanceProgress,
 				loadProgress,

@@ -23,6 +23,11 @@ export {
 	isWorkingAge,
 	syncEmploymentWithAge,
 } from "./employment/job-assignment";
+export {
+	assignRoleForCitizen,
+	getRoleModifiersForCitizen,
+	syncRoleWithAge,
+} from "./employment/role-assignment";
 export type {
 	AnnualCitizenInput,
 	AnnualCitizenOutcome,

@@ -3,6 +3,7 @@ import {
 	type GameSettings,
 	gameSettings,
 	getEconomicSystemEffect,
+	sectorKey,
 } from "economy-simulator-data";
 import {
 	type AnnualCycleStats,
@@ -26,8 +27,11 @@ import {
 	getCalamityExtractionEfficiency,
 	getCalamityModifiersForCitizen,
 	getEnvironmentalQualityModifier,
+	getRoleModifiersForCitizen,
+	isWorkingAge,
 	processCalamitiesForDay,
 	syncEmploymentWithAge,
+	syncRoleWithAge,
 } from "economy-simulator-simulation";
 import { getFacePoolIds, isFaceId } from "../data/faces";
 import {
@@ -67,6 +71,7 @@ import {
 	getSectorAssignment,
 	loadSectorAssignments,
 } from "../storage/sector-assignments";
+import { loadSectorRoleConfigs } from "../storage/sector-role-config";
 import {
 	ensureRegionResourceStates,
 	ensureWorld,
@@ -290,11 +295,14 @@ async function runAnnualCycle(
 	if (!meta) return null;
 
 	const gameRun = await loadGameRunState();
-	if (gameRun && gameRun.status !== "active") return null;
+	if (gameRun && (gameRun.status !== "active" || gameRun.phase !== "active")) {
+		return null;
+	}
 
 	const regions = await ensureWorld(random);
 	const resourceStates = await ensureRegionResourceStates(regions);
 	const sectorAssignments = await loadSectorAssignments();
+	const sectorRoleConfigs = await loadSectorRoleConfigs();
 	const yearEndDay = meta.gameDay;
 	const yearStartDay = yearEndDay - settings.calendar.daysPerYear;
 	const yearBumps = gameRun
@@ -320,6 +328,11 @@ async function runAnnualCycle(
 		const subSectorId = person.getSubSectorId();
 		if (!subSectorId) return;
 
+		const roleModifiers = getRoleModifiersForCitizen(person.getRoleId());
+		if (!roleModifiers.countsAsWorker) return;
+
+		const weight = roleModifiers.efficiencyMultiplier;
+
 		if (categoryId === "extractive") {
 			const regionId = person.getRegionId();
 			if (!regionId) return;
@@ -327,7 +340,7 @@ async function runAnnualCycle(
 				extractiveWorkersByRegionAndSubSector[regionId] = {};
 			}
 			const bySubSector = extractiveWorkersByRegionAndSubSector[regionId];
-			bySubSector[subSectorId] = (bySubSector[subSectorId] ?? 0) + 1;
+			bySubSector[subSectorId] = (bySubSector[subSectorId] ?? 0) + weight;
 		} else if (categoryId === "industrial") {
 			industrialWorkersBySubSector[subSectorId] =
 				(industrialWorkersBySubSector[subSectorId] ?? 0) + 1;
@@ -368,6 +381,23 @@ async function runAnnualCycle(
 				);
 				person.setCategoryId(employment.categoryId);
 				person.setSubSectorId(employment.subSectorId);
+
+				if (employment.categoryId && employment.subSectorId) {
+					const quotas =
+						sectorRoleConfigs[
+							sectorKey(employment.categoryId, employment.subSectorId)
+						]?.quotas ?? [];
+					const roleId = syncRoleWithAge(
+						isWorkingAge(age, settings),
+						person.getRoleId(),
+						quotas,
+						random,
+					);
+					person.setRoleId(roleId);
+				} else {
+					person.setRoleId(undefined);
+				}
+
 				trackWorker(person);
 
 				const sex = person.getSex() ?? "F";
@@ -421,7 +451,13 @@ async function runAnnualCycle(
 		generateNewbornPerson(faceIds, regions, undefined, random),
 	);
 	const immigrants = Array.from({ length: immigrations }, () =>
-		generateImmigrantPerson(faceIds, regions, undefined, random),
+		generateImmigrantPerson(
+			faceIds,
+			regions,
+			undefined,
+			random,
+			sectorRoleConfigs,
+		),
 	);
 
 	const finalPopulation = [...survivors, ...newborns, ...immigrants];
@@ -495,7 +531,9 @@ async function advanceGameDay(
 	if (!meta) return null;
 
 	let gameRun = await loadGameRunState();
-	if (gameRun && gameRun.status !== "active") return meta;
+	if (gameRun && (gameRun.status !== "active" || gameRun.phase !== "active")) {
+		return meta;
+	}
 
 	const regions = await ensureWorld(random);
 	let resourceStates = await ensureRegionResourceStates(regions);
@@ -806,7 +844,6 @@ async function finalizePopulationMeta(
 	};
 	await saveMeta(meta);
 	await clearLegacyPopulationKey();
-	await ensureGameRunState(size);
 	return meta;
 }
 

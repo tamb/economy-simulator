@@ -153,6 +153,42 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		expect(result.health).toBeGreaterThan(70);
 	});
 
+	it("stacks role morale multiplier with economic system morale", () => {
+		const extraverted = {
+			openness: 0,
+			conscientiousness: 0,
+			extraversion: 11,
+			agreeableness: 11,
+			neuroticism: 0,
+		};
+
+		const baseline = computeDailyQualityOfLifeUpdate(
+			{
+				happiness: 50,
+				health: 50,
+				age: 30,
+				personality: extraverted,
+				weeklyHours: 38,
+				categoryId: "services",
+			},
+			noRandomNoise,
+		);
+		const withRole = computeDailyQualityOfLifeUpdate(
+			{
+				happiness: 50,
+				health: 50,
+				age: 30,
+				personality: extraverted,
+				weeklyHours: 38,
+				categoryId: "services",
+				roleMoraleMultiplier: 0.75,
+			},
+			noRandomNoise,
+		);
+
+		expect(withRole.happiness).toBeLessThan(baseline.happiness);
+	});
+
 	it("scales the personality-affinity delta by economicSystemMoraleMultiplier", () => {
 		const extraverted = {
 			openness: 0,

@@ -10,6 +10,7 @@ import { clearNationalLedger } from "../storage/national-ledger";
 import { clearPopulation } from "../storage/population";
 import { clearRegionPool } from "../storage/regions";
 import { clearSectorAssignments } from "../storage/sector-assignments";
+import { clearSectorRoleConfigs } from "../storage/sector-role-config";
 import { clearWorld } from "../storage/world";
 import { archiveRunToProfile } from "./progression";
 
@@ -18,6 +19,7 @@ async function resetNationStores(): Promise<void> {
 	await clearWorld();
 	await clearNationalLedger();
 	await clearSectorAssignments();
+	await clearSectorRoleConfigs();
 	await clearRegionPool();
 }
 
