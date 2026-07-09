@@ -63,12 +63,31 @@
 		font-size: 17px;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+		/* Warm wood fallback behind the rotated texture layer */
+		background-color: #c4a574;
+		min-height: 100%;
+	}
+
+	/* Wood desk behind parchment; rotated 90deg CW so grain runs horizontal */
+	html::before {
+		content: "";
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		z-index: -1;
+		width: 100vmax;
+		height: 100vmax;
+		pointer-events: none;
+		background-image: url("/wood-texture.jpg");
+		background-size: 512px 512px;
+		background-repeat: repeat;
+		transform: translate(-50%, -50%) rotate(90deg);
 	}
 
 	body {
 		@apply text-foreground;
-		/* Fallback while the image paints; panels keep --color-surface* */
-		background-color: #c9b896;
+		/* Transparent so wood shows through parchment alpha / edges */
+		background-color: transparent;
 		background-image: url("/parchment-bg.png");
 		background-size: cover;
 		background-position: center;

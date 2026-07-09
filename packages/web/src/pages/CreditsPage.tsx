@@ -34,6 +34,60 @@ function CreditsPage() {
 					</a>
 				</p>
 			</section>
+
+			<section className="space-y-3 border-2 border-primary/30 bg-surface-muted p-5">
+				<h3 className="text-[10px] sm:text-xs">Old Parchment Paper</h3>
+				<p className="text-sm leading-relaxed">
+					The parchment background texture is{" "}
+					<a
+						href="https://opengameart.org/content/old-parchment-paper"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-primary underline underline-offset-2 hover:text-cyan-dark"
+					>
+						Old Parchment Paper
+					</a>{" "}
+					by cron, from OpenGameArt.org.
+				</p>
+				<p className="font-label text-[10px] tracking-overline text-muted-foreground">
+					License: CC0 ·{" "}
+					<a
+						href="https://opengameart.org/content/old-parchment-paper"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline underline-offset-2 hover:text-foreground"
+					>
+						opengameart.org/content/old-parchment-paper
+					</a>
+				</p>
+			</section>
+
+			<section className="space-y-3 border-2 border-primary/30 bg-surface-muted p-5">
+				<h3 className="text-[10px] sm:text-xs">Wood Texture Tiles</h3>
+				<p className="text-sm leading-relaxed">
+					The wood desk background texture is from{" "}
+					<a
+						href="https://opengameart.org/content/wood-texture-tiles"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-primary underline underline-offset-2 hover:text-cyan-dark"
+					>
+						Wood Texture Tiles
+					</a>{" "}
+					by JCW, from OpenGameArt.org.
+				</p>
+				<p className="font-label text-[10px] tracking-overline text-muted-foreground">
+					License: CC0 ·{" "}
+					<a
+						href="https://opengameart.org/content/wood-texture-tiles"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline underline-offset-2 hover:text-foreground"
+					>
+						opengameart.org/content/wood-texture-tiles
+					</a>
+				</p>
+			</section>
 		</div>
 	);
 }
