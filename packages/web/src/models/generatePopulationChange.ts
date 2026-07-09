@@ -1,8 +1,13 @@
-import { gameSettings } from "economy-simulator-data";
-import { assignJobSector, isWorkingAge } from "economy-simulator-simulation";
+import { gameSettings, sectorKey } from "economy-simulator-data";
+import {
+	assignJobSector,
+	assignRoleForCitizen,
+	isWorkingAge,
+} from "economy-simulator-simulation";
 import type { FaceId } from "../data/faces";
 import { personGenerationConfig } from "../data/person-generation";
 import type { WorldRegion } from "../data/world";
+import type { SectorRoleConfigs } from "../storage/sector-role-config";
 import {
 	generatePerson,
 	getViableExtractiveSubSectorIdsForRegion,
@@ -35,8 +40,15 @@ function generateImmigrantPerson(
 	regions: readonly WorldRegion[],
 	config = personGenerationConfig,
 	random: RandomFn = Math.random,
+	roleConfigs?: SectorRoleConfigs,
 ): Person {
-	const immigrant = generatePerson(faceIds, regions, config, random);
+	const immigrant = generatePerson(
+		faceIds,
+		regions,
+		config,
+		random,
+		roleConfigs,
+	);
 	const age = randomInt(
 		gameSettings.demographics.workingAgeMin,
 		gameSettings.demographics.workingAgeMax,
@@ -54,6 +66,15 @@ function generateImmigrantPerson(
 		);
 		immigrant.setCategoryId(job.categoryId);
 		immigrant.setSubSectorId(job.subSectorId);
+
+		if (roleConfigs) {
+			const key = sectorKey(job.categoryId, job.subSectorId);
+			const quotas = roleConfigs[key]?.quotas;
+			if (quotas?.length) {
+				const roleId = assignRoleForCitizen(quotas, random);
+				if (roleId != null) immigrant.setRoleId(roleId);
+			}
+		}
 	} else {
 		immigrant.setCategoryId(undefined);
 		immigrant.setSubSectorId(undefined);

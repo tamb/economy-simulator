@@ -43,6 +43,21 @@ describe("computeExtractionYield", () => {
 		expect(boosted).toBeCloseTo(baseline * 1.15, 10);
 	});
 
+	it("applies the role efficiency multiplier", () => {
+		const baseline = computeExtractionYield({
+			baseYieldPerWorker: 1,
+			workers: 10,
+			reserveOrCapacityYieldMultiplier: 1,
+		});
+		const boosted = computeExtractionYield({
+			baseYieldPerWorker: 1,
+			workers: 10,
+			reserveOrCapacityYieldMultiplier: 1,
+			roleEfficiencyMultiplier: 1.2,
+		});
+		expect(boosted).toBeCloseTo(baseline * 1.2, 10);
+	});
+
 	it("returns 0 when there are no workers", () => {
 		expect(
 			computeExtractionYield({

@@ -27,7 +27,9 @@ describe("NewGameSetupPage", () => {
 		});
 		expect(defaultOption).toBeChecked();
 
-		fireEvent.click(screen.getByRole("button", { name: "Begin" }));
+		fireEvent.click(
+			screen.getByRole("button", { name: "Continue to nation setup" }),
+		);
 
 		expect(onStart).toHaveBeenCalledWith(appConfig.population.size);
 	});
@@ -46,7 +48,9 @@ describe("NewGameSetupPage", () => {
 				name: new RegExp(`${nonDefaultSize?.toLocaleString()} citizens`),
 			}),
 		);
-		fireEvent.click(screen.getByRole("button", { name: "Begin" }));
+		fireEvent.click(
+			screen.getByRole("button", { name: "Continue to nation setup" }),
+		);
 
 		expect(onStart).toHaveBeenCalledWith(nonDefaultSize);
 	});

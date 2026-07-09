@@ -31,6 +31,24 @@ export {
 	maleLifeTable,
 	REPLACEMENT_TOTAL_FERTILITY_RATE,
 } from "./demographics/life-tables";
+export {
+	defaultSystemBySubSector,
+	getAllSubSectorKeys,
+	getDefaultSystemForSubSector,
+} from "./economy/default-sector-systems";
+export type {
+	EconomicRole,
+	RoleEligibility,
+	RoleQuota,
+} from "./economy/economic-roles";
+export {
+	defaultRoleQuotasBySystem,
+	economicRoles,
+	getDefaultRoleQuotasForSystem,
+	getEconomicRole,
+	getRolesForSystem,
+	isEconomicRoleId,
+} from "./economy/economic-roles";
 export type { EconomicSystemEffect } from "./economy/economic-system-effects";
 export {
 	economicSystemEffects,
@@ -45,6 +63,27 @@ export {
 	getEconomicSystem,
 	isEconomicSystemId,
 } from "./economy/economic-systems";
+export type {
+	NationSetupValidationIssue,
+	NationSetupValidationResult,
+	SectorRoleConfig,
+	SectorRoleConfigs,
+} from "./economy/nation-setup-validation";
+export {
+	buildAutoAssignments,
+	buildAutoRoleConfigs,
+	isSectorFullyConfigured,
+	isSectorRoleConfigValid,
+	quotasSumToOne,
+	validateNationSetup,
+} from "./economy/nation-setup-validation";
+export type { RoleEffect } from "./economy/role-effects";
+export {
+	getRoleEffect,
+	getRoleEffectOrDefault,
+	roleBelongsToSystem,
+	roleEffects,
+} from "./economy/role-effects";
 export type {
 	Category,
 	CategoryId,

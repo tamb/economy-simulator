@@ -4,25 +4,25 @@ overview: "Require the monarch to assign an economic system and role structure t
 todos:
   - id: phase-1
     content: "Research doc (economic-roles.md) + role catalogs, effects, and default quotas in packages/data"
-    status: pending
+    status: completed
   - id: phase-2
     content: "Simulation hooks — assignRoleForCitizen, getRoleEffect, extend QoL and extraction inputs + unit tests"
-    status: pending
+    status: completed
   - id: phase-3
     content: "Persistence — sector-role-config repository, GameRunState.phase (setup | active), validateNationReady(), legacy save migration"
-    status: pending
+    status: completed
   - id: phase-4
     content: "Setup flow & gating — NationSetupPage, split population generation from size selection, route gates, block advanceDay until active"
-    status: pending
+    status: completed
   - id: phase-5
     content: "Atlas UI for roles — role quota editor in SectorDetail, per-category and per-sector auto-assign, remove Unassigned during setup"
-    status: pending
+    status: completed
   - id: phase-6
     content: "Population generation & sim wiring — Person.roleId, generatePerson assigns roles, wire population-cycle, updatePersonStats, resource-extraction"
-    status: pending
+    status: completed
   - id: phase-7
     content: "Docs, e2e, polish — Instructions, constitution, research index, Playwright specs, lint + typecheck"
-    status: pending
+    status: completed
 isProject: false
 ---
 

@@ -32,6 +32,7 @@ interface PersonSnapshot {
 	overallHealth?: number;
 	categoryId?: CategoryId;
 	subSectorId?: string;
+	roleId?: number;
 	regionId?: RegionId;
 }
 
@@ -51,6 +52,7 @@ class Person {
 	#overallHealth?: number;
 	#categoryId?: CategoryId;
 	#subSectorId?: string;
+	#roleId?: number;
 	#regionId?: RegionId;
 
 	static fromSnapshot(snapshot: PersonSnapshot): Person {
@@ -70,6 +72,7 @@ class Person {
 		person.setOverallHealth(snapshot.overallHealth);
 		person.setCategoryId(snapshot.categoryId);
 		person.setSubSectorId(snapshot.subSectorId);
+		person.setRoleId(snapshot.roleId);
 		person.setRegionId(snapshot.regionId);
 		return person;
 	}
@@ -91,6 +94,7 @@ class Person {
 			overallHealth: this.#overallHealth,
 			categoryId: this.#categoryId,
 			subSectorId: this.#subSectorId,
+			roleId: this.#roleId,
 			regionId: this.#regionId,
 		};
 	}
@@ -217,6 +221,14 @@ class Person {
 
 	setSubSectorId(value: string | undefined): void {
 		this.#subSectorId = value;
+	}
+
+	getRoleId(): number | undefined {
+		return this.#roleId;
+	}
+
+	setRoleId(value: number | undefined): void {
+		this.#roleId = value;
 	}
 
 	getRegionId(): RegionId | undefined {

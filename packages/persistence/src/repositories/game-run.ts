@@ -10,12 +10,20 @@ function isGameRunState(value: unknown): value is GameRunState {
 	const state = value as GameRunState;
 	return (
 		typeof state.status === "string" &&
+		(typeof state.phase === "string" || state.phase === undefined) &&
 		typeof state.startingPopulation === "number" &&
 		typeof state.startedAt === "number" &&
 		Array.isArray(state.scoreHistory) &&
 		Array.isArray(state.unlockedThisRun) &&
 		typeof state.streaks === "object"
 	);
+}
+
+function withDefaults(state: GameRunState): GameRunState {
+	return {
+		...withCalamityDefaults(state),
+		phase: state.phase ?? "active",
+	};
 }
 
 function withCalamityDefaults(state: GameRunState): GameRunState {
@@ -31,7 +39,7 @@ function withCalamityDefaults(state: GameRunState): GameRunState {
 
 async function loadGameRunState(): Promise<GameRunState | null> {
 	const saved = await getStorageDriver().get<unknown>(STORE, GAME_RUN_KEY);
-	return isGameRunState(saved) ? withCalamityDefaults(saved) : null;
+	return isGameRunState(saved) ? withDefaults(saved) : null;
 }
 
 async function saveGameRunState(state: GameRunState): Promise<void> {

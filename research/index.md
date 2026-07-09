@@ -10,6 +10,7 @@ here — and the typed, code-consumable versions of these tables live in
 | [life-and-demographics.md](./life-and-demographics.md) | Life-expectancy-by-age-and-sex tables, baseline fertility rate, and how quality of life modulates mortality, fertility, emigration, and immigration |
 | [quality-of-life-rules.md](./quality-of-life-rules.md) | Work-hours happiness penalty curve, OCEAN personality-to-sector affinity model, and the happiness→health lag |
 | [resources-and-geography.md](./resources-and-geography.md) | Island/biome/resource-overlay generation, extraction/depletion/environment model, the national resource ledger, and economic-system effects on extraction |
+| [economic-roles.md](./economic-roles.md) | Per-system economic roles, role quotas at nation setup, roleId on citizens, and role effects on QoL and extraction |
 
 ## Authority
 

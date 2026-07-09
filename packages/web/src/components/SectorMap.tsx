@@ -1,13 +1,16 @@
 import type { ChangeEvent } from "react";
+import { usePopulation } from "../context/PopulationContext";
 import { useSectorAssignments } from "../context/SectorAssignmentContext";
 import {
 	type EconomicSystemId,
 	economicSystems,
 	getEconomicSystem,
+	getRolesForSystem,
 	isEconomicSystemId,
 } from "../data/economic-systems";
 import type { Category, SubSector } from "../data/taxonomy";
 import { categoryColorClasses } from "../data/taxonomy";
+import { autoAssignCategory, autoAssignSector } from "../game/nation-setup";
 
 interface SectorMapProps {
 	category: Category;
@@ -16,7 +19,8 @@ interface SectorMapProps {
 }
 
 function SectorMap({ category, selectedSectorId, onSelect }: SectorMapProps) {
-	const { getAssignment } = useSectorAssignments();
+	const { needsConfiguration } = usePopulation();
+	const { getAssignment, refresh } = useSectorAssignments();
 	const colors = categoryColorClasses[category.color];
 	const selected = category.subSectors.find(
 		(sector) => sector.id === selectedSectorId,
@@ -24,14 +28,29 @@ function SectorMap({ category, selectedSectorId, onSelect }: SectorMapProps) {
 
 	return (
 		<div className="space-y-6">
-			<div className="border-2 border-primary bg-surface-muted px-4 py-3">
-				<p className="font-label text-[10px] text-muted-foreground tracking-overline">
-					Tier {category.tier} · {category.tierName}
-				</p>
-				<h2 className="mt-1 text-xs sm:text-sm">{category.label}</h2>
-				<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-					{category.description}
-				</p>
+			<div className="flex flex-wrap items-center justify-between gap-3 border-2 border-primary bg-surface-muted px-4 py-3">
+				<div>
+					<p className="font-label text-[10px] text-muted-foreground tracking-overline">
+						Tier {category.tier} · {category.tierName}
+					</p>
+					<h2 className="mt-1 text-xs sm:text-sm">{category.label}</h2>
+					<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+						{category.description}
+					</p>
+				</div>
+				{needsConfiguration && (
+					<button
+						type="button"
+						onClick={() => {
+							autoAssignCategory(category.id)
+								.then(() => refresh())
+								.catch(() => undefined);
+						}}
+						className="border-2 border-primary bg-surface px-3 py-1.5 text-xs"
+					>
+						Auto-assign category
+					</button>
+				)}
 			</div>
 
 			<div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -48,7 +67,17 @@ function SectorMap({ category, selectedSectorId, onSelect }: SectorMapProps) {
 			</div>
 
 			{selected && (
-				<SectorDetail sector={selected} category={category} colors={colors} />
+				<SectorDetail
+					sector={selected}
+					category={category}
+					colors={colors}
+					requireAssignment={needsConfiguration}
+					onAutoAssignSector={() => {
+						autoAssignSector(category.id, selected.id)
+							.then(() => refresh())
+							.catch(() => undefined);
+					}}
+				/>
 			)}
 		</div>
 	);
@@ -104,16 +133,28 @@ function SectorDetail({
 	sector,
 	category,
 	colors,
+	requireAssignment,
+	onAutoAssignSector,
 }: {
 	sector: SubSector;
 	category: Category;
 	colors: (typeof categoryColorClasses)[string];
+	requireAssignment: boolean;
+	onAutoAssignSector: () => void;
 }) {
-	const { getAssignment, setAssignment, isReady } = useSectorAssignments();
+	const {
+		getAssignment,
+		getRoleConfig,
+		setAssignment,
+		setRoleConfig,
+		isReady,
+	} = useSectorAssignments();
 	const assignedSystemId = getAssignment(category.id, sector.id);
 	const assignedSystem = assignedSystemId
 		? getEconomicSystem(assignedSystemId)
 		: null;
+	const roleConfig = getRoleConfig(category.id, sector.id);
+	const roles = assignedSystemId ? getRolesForSystem(assignedSystemId) : [];
 
 	const handleSystemChange = (event: ChangeEvent<HTMLSelectElement>) => {
 		const value = event.target.value;
@@ -121,9 +162,29 @@ function SectorDetail({
 		void setAssignment(category.id, sector.id, systemId);
 	};
 
+	const handleRoleShareChange = (roleId: number, sharePercent: number) => {
+		if (!assignedSystemId) return;
+		const share = Math.max(0, sharePercent) / 100;
+		const existing = roleConfig?.quotas ?? [];
+		const others = existing.filter((quota) => quota.roleId !== roleId);
+		const nextQuotas = [...others, { roleId, share }];
+		const total = nextQuotas.reduce((sum, quota) => sum + quota.share, 0);
+		if (total <= 0) return;
+		const normalized = nextQuotas.map((quota) => ({
+			roleId: quota.roleId,
+			share: quota.share / total,
+		}));
+		void setRoleConfig(category.id, sector.id, { quotas: normalized });
+	};
+
 	const simulationPath = assignedSystemId
 		? `sectors/${category.id}/${sector.id}/${assignedSystemId}`
 		: `sectors/${category.id}/${sector.id}/`;
+
+	const quotaTotal = (roleConfig?.quotas ?? []).reduce(
+		(sum, quota) => sum + quota.share,
+		0,
+	);
 
 	return (
 		<aside
@@ -150,7 +211,10 @@ function SectorDetail({
 					disabled={!isReady}
 					className="w-full border-2 border-primary bg-surface px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-highlight disabled:opacity-60"
 				>
-					<option value="">Unassigned</option>
+					{!requireAssignment && <option value="">Unassigned</option>}
+					{requireAssignment && !assignedSystemId && (
+						<option value="">Select a system…</option>
+					)}
 					{economicSystems.map((system) => (
 						<option key={system.id} value={system.id}>
 							{system.label}
@@ -163,6 +227,51 @@ function SectorDetail({
 					</p>
 				)}
 			</div>
+
+			{assignedSystemId && (
+				<div className="mt-5 space-y-3">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<p className="font-label text-[10px] tracking-overline opacity-80">
+							Role mix
+						</p>
+						{requireAssignment && (
+							<button
+								type="button"
+								onClick={onAutoAssignSector}
+								className="border border-primary bg-surface px-2 py-1 text-[10px]"
+							>
+								Auto-assign roles
+							</button>
+						)}
+					</div>
+					{roles.map((role) => {
+						const quota = roleConfig?.quotas.find(
+							(entry) => entry.roleId === role.id,
+						);
+						const percent = Math.round((quota?.share ?? 0) * 100);
+						return (
+							<label key={role.id} className="block space-y-1">
+								<span className="text-xs">
+									{role.label} ({role.id})
+								</span>
+								<input
+									type="number"
+									min={0}
+									max={100}
+									value={percent}
+									onChange={(event) => {
+										handleRoleShareChange(role.id, Number(event.target.value));
+									}}
+									className="w-full border-2 border-primary bg-surface px-2 py-1 text-sm"
+								/>
+							</label>
+						);
+					})}
+					<p className="text-xs opacity-80">
+						Total: {Math.round(quotaTotal * 100)}%
+					</p>
+				</div>
+			)}
 
 			<p className="mt-4 font-label text-[10px] tracking-overline opacity-70">
 				Path: {simulationPath}

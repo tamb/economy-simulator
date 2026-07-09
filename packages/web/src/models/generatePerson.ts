@@ -3,14 +3,19 @@ import {
 	gameSettings,
 	getViableExtractiveSubSectorIds,
 	isLand,
+	type SectorRoleConfigs,
+	sectorKey,
 } from "economy-simulator-data";
-import { assignJobSector, isWorkingAge } from "economy-simulator-simulation";
+import {
+	assignJobSector,
+	assignRoleForCitizen,
+	isWorkingAge,
+} from "economy-simulator-simulation";
 import type { FaceId } from "../data/faces";
 import { personGenerationConfig } from "../data/person-generation";
 import type { WorldRegion } from "../data/world";
 import { Person, type PersonalityTrait, type PersonSex } from "./Person";
 
-/** Citizens live on land only — ocean tiles are geography, not homes. */
 function landRegions(regions: readonly WorldRegion[]): WorldRegion[] {
 	return regions.filter((region) => isLand(region.terrain));
 }
@@ -80,6 +85,7 @@ function generatePerson(
 	regions: readonly WorldRegion[],
 	config = personGenerationConfig,
 	random: RandomFn = Math.random,
+	roleConfigs?: SectorRoleConfigs,
 ): Person {
 	const person = new Person();
 	const sex = generateSex(random);
@@ -120,6 +126,15 @@ function generatePerson(
 		);
 		person.setCategoryId(job.categoryId);
 		person.setSubSectorId(job.subSectorId);
+
+		if (roleConfigs) {
+			const key = sectorKey(job.categoryId, job.subSectorId);
+			const quotas = roleConfigs[key]?.quotas;
+			if (quotas?.length) {
+				const roleId = assignRoleForCitizen(quotas, random);
+				if (roleId != null) person.setRoleId(roleId);
+			}
+		}
 	}
 
 	return person;

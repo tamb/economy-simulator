@@ -6,6 +6,8 @@ interface ExtractionYieldInput {
 	reserveOrCapacityYieldMultiplier: number;
 	/** From `economy-simulator-data`'s `getEconomicSystemEffect(...).efficiencyMultiplier`; 1 = no change. */
 	economicSystemEfficiencyMultiplier?: number;
+	/** Average role efficiency across workers in this tile/sub-sector; 1 = no change. */
+	roleEfficiencyMultiplier?: number;
 	/** From active calamity mid/long-term modifiers; 1 = no change. */
 	calamityEfficiencyMultiplier?: number;
 }
@@ -24,6 +26,7 @@ function computeExtractionYield(input: ExtractionYieldInput): number {
 		input.workers *
 		Math.max(0, input.reserveOrCapacityYieldMultiplier) *
 		(input.economicSystemEfficiencyMultiplier ?? 1) *
+		(input.roleEfficiencyMultiplier ?? 1) *
 		(input.calamityEfficiencyMultiplier ?? 1)
 	);
 }
