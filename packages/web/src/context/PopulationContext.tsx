@@ -9,6 +9,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import type { PopulationDirectoryEntry } from "../data/population-directory";
 import {
 	getPopulationSize,
 	getPopulationSizeOverride,
@@ -17,6 +18,8 @@ import { startNewNation } from "../game/new-game";
 import { generateAndSavePopulation } from "../models/generatePopulation";
 import type { Person } from "../models/Person";
 import {
+	buildPopulationDirectory,
+	getPeopleByIndices,
 	getPersonRangeBatched,
 	hasPopulation,
 	loadPopulationMeta,
@@ -50,6 +53,10 @@ interface PopulationContextValue {
 	isGameActive: boolean;
 	advanceDay: () => Promise<void>;
 	getPersonRange: (start: number, count: number) => Promise<Person[]>;
+	getPeopleByIndices: (indices: number[]) => Promise<(Person | null)[]>;
+	buildDirectory: (
+		onProgress?: (processed: number, total: number) => void,
+	) => Promise<PopulationDirectoryEntry[]>;
 	refreshGameRun: () => Promise<void>;
 }
 
@@ -241,6 +248,17 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		return getPersonRangeBatched(start, count);
 	}, []);
 
+	const getPeopleByIndicesFn = useCallback(async (indices: number[]) => {
+		return getPeopleByIndices(indices);
+	}, []);
+
+	const buildDirectory = useCallback(
+		async (onProgress?: (processed: number, total: number) => void) => {
+			return buildPopulationDirectory(onProgress);
+		},
+		[],
+	);
+
 	const isGameActive = !gameRun || gameRun.status === "active";
 
 	return (
@@ -260,6 +278,8 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				isGameActive,
 				advanceDay,
 				getPersonRange,
+				getPeopleByIndices: getPeopleByIndicesFn,
+				buildDirectory,
 				refreshGameRun,
 			}}
 		>

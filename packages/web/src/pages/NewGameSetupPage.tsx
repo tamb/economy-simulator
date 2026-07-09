@@ -18,7 +18,7 @@ function NewGameSetupPage({ onStart }: NewGameSetupPageProps) {
 	const legendId = useId();
 
 	return (
-		<main className="flex min-h-screen items-center justify-center bg-surface p-4 font-sans sm:p-6">
+		<main className="flex min-h-screen items-center justify-center p-4 font-sans sm:p-6">
 			<div className="w-full max-w-md border-2 border-primary bg-surface shadow-lg shadow-surface-shadow">
 				<header className="border-b-4 border-accent bg-neutral-950 px-6 py-5 text-center text-on-dark sm:px-8">
 					<p className="font-label text-sm text-on-dark-muted tracking-overline">

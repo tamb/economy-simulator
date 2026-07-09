@@ -4,7 +4,11 @@ import {
 	getSubSector,
 } from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
-import { assignJobSector, isWorkingAge } from "./job-assignment";
+import {
+	assignJobSector,
+	isWorkingAge,
+	syncEmploymentWithAge,
+} from "./job-assignment";
 
 describe("assignJobSector", () => {
 	it("always returns a valid category/sub-sector pair", () => {
@@ -90,5 +94,44 @@ describe("isWorkingAge", () => {
 		expect(isWorkingAge(gameSettings.demographics.workingAgeMax + 1)).toBe(
 			false,
 		);
+	});
+});
+
+describe("syncEmploymentWithAge", () => {
+	it("clears a job for a child below working age", () => {
+		const next = syncEmploymentWithAge(
+			gameSettings.demographics.workingAgeMin - 1,
+			{ categoryId: "services", subSectorId: "healthcare" },
+			() => 0,
+		);
+		expect(next).toEqual({ categoryId: undefined, subSectorId: undefined });
+	});
+
+	it("clears a job for a retiree above working age", () => {
+		const next = syncEmploymentWithAge(
+			gameSettings.demographics.workingAgeMax + 1,
+			{ categoryId: "services", subSectorId: "healthcare" },
+			() => 0,
+		);
+		expect(next).toEqual({ categoryId: undefined, subSectorId: undefined });
+	});
+
+	it("assigns a job when entering working age without one", () => {
+		const next = syncEmploymentWithAge(
+			gameSettings.demographics.workingAgeMin,
+			{ categoryId: undefined, subSectorId: undefined },
+			() => 0,
+		);
+		expect(next.categoryId).toBe("extractive");
+		expect(next.subSectorId).toBeTypeOf("string");
+	});
+
+	it("preserves an existing job while still working age", () => {
+		const current = {
+			categoryId: "services" as const,
+			subSectorId: "healthcare",
+		};
+		const next = syncEmploymentWithAge(40, current, () => 0);
+		expect(next).toEqual(current);
 	});
 });

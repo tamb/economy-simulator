@@ -1,12 +1,37 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { isLand } from "economy-simulator-data";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PersonCard } from "../components/PersonCard";
+import { StatGlossaryModal } from "../components/StatGlossaryModal";
 import { usePopulation } from "../context/PopulationContext";
+import { useRegions } from "../context/RegionContext";
+import {
+	type LivingStatusFilter,
+	type PopulationDirectoryEntry,
+	type PopulationSortKey,
+	queryDirectory,
+	type SortDirection,
+} from "../data/population-directory";
 import type { Person } from "../models/Person";
 
 const ROW_HEIGHT = 176;
 const COLUMNS = 2;
 const PAGE_SIZE = 100;
+const SEARCH_DEBOUNCE_MS = 200;
+
+const SORT_OPTIONS: { id: PopulationSortKey; label: string }[] = [
+	{ id: "index", label: "Index" },
+	{ id: "name", label: "Name" },
+	{ id: "age", label: "Age" },
+	{ id: "health", label: "Health" },
+	{ id: "happiness", label: "Happiness" },
+];
+
+const LIVING_OPTIONS: { id: LivingStatusFilter; label: string }[] = [
+	{ id: "all", label: "All" },
+	{ id: "living", label: "Living" },
+	{ id: "deceased", label: "Deceased" },
+];
 
 function PopulationPage() {
 	const {
@@ -17,17 +42,92 @@ function PopulationPage() {
 		loadProgress,
 		gameDay,
 		advanceDay,
-		getPersonRange,
+		getPeopleByIndices,
+		buildDirectory,
 		isGameActive,
 		gameRun,
 	} = usePopulation();
+	const { regions } = useRegions();
+
+	const [directory, setDirectory] = useState<PopulationDirectoryEntry[]>([]);
+	const [directoryReady, setDirectoryReady] = useState(false);
+	const [directoryProgress, setDirectoryProgress] = useState(0);
 	const [personCache, setPersonCache] = useState<Map<number, Person>>(
 		new Map(),
 	);
-	const [loadedRange, setLoadedRange] = useState({ start: -1, end: -1 });
-	const listRef = useRef<HTMLDivElement>(null);
 
-	const rowCount = Math.ceil(total / COLUMNS);
+	const [searchInput, setSearchInput] = useState("");
+	const [debouncedQuery, setDebouncedQuery] = useState("");
+	const [sortKey, setSortKey] = useState<PopulationSortKey>("index");
+	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+	const [livingStatus, setLivingStatus] = useState<LivingStatusFilter>("all");
+	const [regionId, setRegionId] = useState("");
+	const [glossaryOpen, setGlossaryOpen] = useState(false);
+
+	const listRef = useRef<HTMLDivElement>(null);
+	const loadedMatchRangeRef = useRef({ start: -1, end: -1 });
+
+	const landRegions = useMemo(
+		() =>
+			regions
+				.filter((region) => isLand(region.terrain))
+				.slice()
+				.sort((a, b) => a.name.localeCompare(b.name)),
+		[regions],
+	);
+
+	useEffect(() => {
+		const timer = window.setTimeout(() => {
+			setDebouncedQuery(searchInput);
+		}, SEARCH_DEBOUNCE_MS);
+		return () => window.clearTimeout(timer);
+	}, [searchInput]);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: rebuild directory when gameDay advances
+	useEffect(() => {
+		if (!isReady) return;
+
+		let cancelled = false;
+		setDirectoryReady(false);
+		setDirectoryProgress(0);
+		setPersonCache(new Map());
+		loadedMatchRangeRef.current = { start: -1, end: -1 };
+
+		buildDirectory((processed) => {
+			if (!cancelled) setDirectoryProgress(processed);
+		})
+			.then((entries) => {
+				if (cancelled) return;
+				setDirectory(entries);
+				setDirectoryReady(true);
+			})
+			.catch(() => {
+				if (!cancelled) setDirectoryReady(true);
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [isReady, gameDay, buildDirectory]);
+
+	const matches = useMemo(
+		() =>
+			queryDirectory(directory, {
+				query: debouncedQuery,
+				filters: { livingStatus, regionId },
+				sortKey,
+				direction: sortDirection,
+			}),
+		[directory, debouncedQuery, livingStatus, regionId, sortKey, sortDirection],
+	);
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: clear hydrate cache when match list identity changes
+	useEffect(() => {
+		setPersonCache(new Map());
+		loadedMatchRangeRef.current = { start: -1, end: -1 };
+	}, [matches]);
+
+	const rowCount = Math.ceil(matches.length / COLUMNS);
 
 	const virtualizer = useVirtualizer({
 		count: rowCount,
@@ -38,47 +138,46 @@ function PopulationPage() {
 
 	const loadVisibleRange = useCallback(async () => {
 		const virtualItems = virtualizer.getVirtualItems();
-		if (virtualItems.length === 0) return;
+		if (virtualItems.length === 0 || matches.length === 0) return;
 
 		const firstIndex = virtualItems[0]?.index ?? 0;
 		const lastIndex = virtualItems.at(-1)?.index ?? firstIndex;
-		const startPerson = Math.max(0, firstIndex * COLUMNS - PAGE_SIZE / 2);
-		const endPerson = Math.min(
-			total,
+		const startMatch = Math.max(0, firstIndex * COLUMNS - PAGE_SIZE / 2);
+		const endMatch = Math.min(
+			matches.length,
 			(lastIndex + 1) * COLUMNS + PAGE_SIZE / 2,
 		);
-		const count = endPerson - startPerson;
 
-		if (
-			loadedRange.start <= startPerson &&
-			loadedRange.end >= endPerson &&
-			count > 0
-		) {
+		const loaded = loadedMatchRangeRef.current;
+		if (loaded.start <= startMatch && loaded.end >= endMatch) {
 			return;
 		}
 
-		const people = await getPersonRange(startPerson, count);
+		const slice = matches.slice(startMatch, endMatch);
+		const indices = slice.map((entry) => entry.index);
+		const people = await getPeopleByIndices(indices);
+
 		setPersonCache((current) => {
 			const next = new Map(current);
 			for (let offset = 0; offset < people.length; offset++) {
 				const person = people[offset];
-				if (person) {
-					next.set(startPerson + offset, person);
-				}
+				const matchIndex = startMatch + offset;
+				if (person) next.set(matchIndex, person);
 			}
 			return next;
 		});
-		setLoadedRange({ start: startPerson, end: endPerson });
-	}, [getPersonRange, loadedRange, total, virtualizer]);
+		loadedMatchRangeRef.current = { start: startMatch, end: endMatch };
+	}, [getPeopleByIndices, matches, virtualizer]);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reload visible window when matches change
 	useEffect(() => {
-		if (!isReady) return;
+		if (!directoryReady) return;
 		loadVisibleRange().catch(() => undefined);
-	}, [isReady, loadVisibleRange]);
+	}, [directoryReady, matches, loadVisibleRange]);
 
 	useEffect(() => {
 		const element = listRef.current;
-		if (!element || !isReady) return;
+		if (!element || !directoryReady) return;
 
 		const handleScroll = () => {
 			loadVisibleRange().catch(() => undefined);
@@ -88,13 +187,9 @@ function PopulationPage() {
 		return () => {
 			element.removeEventListener("scroll", handleScroll);
 		};
-	}, [isReady, loadVisibleRange]);
+	}, [directoryReady, loadVisibleRange]);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: invalidate cache when gameDay advances
-	useEffect(() => {
-		setPersonCache(new Map());
-		setLoadedRange({ start: -1, end: -1 });
-	}, [gameDay]);
+	const openGlossary = useCallback(() => setGlossaryOpen(true), []);
 
 	if (!isReady) {
 		const percent = total === 0 ? 0 : Math.round((loadProgress / total) * 100);
@@ -116,15 +211,45 @@ function PopulationPage() {
 		);
 	}
 
+	if (!directoryReady) {
+		const percent =
+			total === 0 ? 0 : Math.round((directoryProgress / total) * 100);
+		return (
+			<div className="space-y-4">
+				<h2 className="text-xs sm:text-sm">Citizen Registry</h2>
+				<p className="text-sm text-muted-foreground">
+					Indexing {total.toLocaleString()} citizens for search…{" "}
+					{directoryProgress.toLocaleString()} ({percent}%)
+				</p>
+				<div className="h-2 border border-primary bg-surface-muted">
+					<div
+						className="h-full bg-primary transition-all"
+						style={{ width: `${percent}%` }}
+					/>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="space-y-6">
 			<header className="space-y-2">
-				<h2 className="text-xs sm:text-sm">Citizen Registry</h2>
-				<p className="text-sm leading-relaxed text-muted-foreground">
-					{total.toLocaleString()} citizens stored on disk. Browse by index —
-					only the visible window is loaded into memory. One cohort is updated
-					each in-game day.
-				</p>
+				<div className="flex flex-wrap items-start justify-between gap-3">
+					<div className="space-y-2">
+						<h2 className="text-xs sm:text-sm">Citizen Registry</h2>
+						<p className="text-sm leading-relaxed text-muted-foreground">
+							{matches.length.toLocaleString()} of {total.toLocaleString()}{" "}
+							citizens match. Only the visible window is loaded into memory.
+						</p>
+					</div>
+					<button
+						type="button"
+						onClick={openGlossary}
+						className="border-2 border-primary/30 bg-surface-muted px-3 py-1.5 text-xs hover:border-primary"
+					>
+						What do these stats mean?
+					</button>
+				</div>
 				<div className="flex flex-wrap items-center gap-3">
 					<p className="text-sm text-muted-foreground">
 						Game day {gameDay.toLocaleString()} · updating cohort {gameDay % 7}{" "}
@@ -148,49 +273,164 @@ function PopulationPage() {
 				</div>
 			</header>
 
-			<div
-				ref={listRef}
-				className="h-[32rem] overflow-auto border-2 border-primary/30 bg-surface"
-			>
-				<div
-					className="relative w-full"
-					style={{ height: `${virtualizer.getTotalSize()}px` }}
-				>
-					{virtualizer.getVirtualItems().map((virtualRow) => {
-						const startIndex = virtualRow.index * COLUMNS;
+			<div className="flex flex-col gap-3 border-2 border-primary/30 bg-surface-muted p-4">
+				<label className="block space-y-1">
+					<span className="font-label text-[10px] tracking-overline text-muted-foreground">
+						Search by name
+					</span>
+					<input
+						type="search"
+						value={searchInput}
+						onChange={(event) => setSearchInput(event.target.value)}
+						placeholder="e.g. Alice"
+						className="w-full border-2 border-primary/30 bg-surface px-3 py-2 text-sm outline-none focus:border-primary"
+						aria-label="Search citizens by name"
+					/>
+				</label>
 
-						return (
-							<div
-								key={virtualRow.key}
-								className="absolute top-0 left-0 grid w-full gap-4 px-4 sm:grid-cols-2"
-								style={{
-									height: `${virtualRow.size}px`,
-									transform: `translateY(${virtualRow.start}px)`,
-								}}
+				<div className="flex flex-wrap items-end gap-3">
+					<label className="space-y-1">
+						<span className="font-label text-[10px] tracking-overline text-muted-foreground">
+							Sort by
+						</span>
+						<select
+							value={sortKey}
+							onChange={(event) =>
+								setSortKey(event.target.value as PopulationSortKey)
+							}
+							className="block border-2 border-primary/30 bg-surface px-3 py-1.5 text-xs"
+							aria-label="Sort citizens by"
+						>
+							{SORT_OPTIONS.map((option) => (
+								<option key={option.id} value={option.id}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					</label>
+
+					<fieldset className="flex flex-wrap items-center gap-2 border-0 p-0">
+						<legend className="sr-only">Sort direction</legend>
+						{(
+							[
+								{ id: "asc", label: "Asc" },
+								{ id: "desc", label: "Desc" },
+							] as const
+						).map((option) => (
+							<button
+								key={option.id}
+								type="button"
+								onClick={() => setSortDirection(option.id)}
+								className={`cursor-pointer border-2 px-3 py-1.5 font-label text-[10px] tracking-overline transition-colors ${
+									sortDirection === option.id
+										? "border-primary bg-primary text-primary-foreground"
+										: "border-primary/30 bg-surface text-muted-foreground hover:border-primary"
+								}`}
 							>
-								{Array.from({ length: COLUMNS }, (_, columnIndex) => {
-									const personIndex = startIndex + columnIndex;
-									if (personIndex >= total) return null;
+								{option.label}
+							</button>
+						))}
+					</fieldset>
 
-									const person = personCache.get(personIndex);
-									if (!person) {
-										return (
-											<div
-												key={personIndex}
-												className="flex h-40 items-center justify-center border-2 border-primary/20 bg-surface-muted p-4 text-xs text-muted-foreground"
-											>
-												Loading #{personIndex.toLocaleString()}…
-											</div>
-										);
-									}
+					<fieldset className="flex flex-wrap items-center gap-2 border-0 p-0">
+						<legend className="sr-only">Living status</legend>
+						{LIVING_OPTIONS.map((option) => (
+							<button
+								key={option.id}
+								type="button"
+								onClick={() => setLivingStatus(option.id)}
+								className={`cursor-pointer border-2 px-3 py-1.5 font-label text-[10px] tracking-overline transition-colors ${
+									livingStatus === option.id
+										? "border-primary bg-primary text-primary-foreground"
+										: "border-primary/30 bg-surface text-muted-foreground hover:border-primary"
+								}`}
+							>
+								{option.label}
+							</button>
+						))}
+					</fieldset>
 
-									return <PersonCard key={personIndex} person={person} />;
-								})}
-							</div>
-						);
-					})}
+					<label className="space-y-1">
+						<span className="font-label text-[10px] tracking-overline text-muted-foreground">
+							Region
+						</span>
+						<select
+							value={regionId}
+							onChange={(event) => setRegionId(event.target.value)}
+							className="block max-w-[14rem] border-2 border-primary/30 bg-surface px-3 py-1.5 text-xs"
+							aria-label="Filter by region"
+						>
+							<option value="">All regions</option>
+							{landRegions.map((region) => (
+								<option key={region.id} value={region.id}>
+									{region.name}
+								</option>
+							))}
+						</select>
+					</label>
 				</div>
 			</div>
+
+			{matches.length === 0 ? (
+				<p className="border-2 border-primary/20 bg-surface-muted p-6 text-sm text-muted-foreground">
+					No citizens match these filters.
+				</p>
+			) : (
+				<div
+					ref={listRef}
+					className="h-[32rem] overflow-auto border-2 border-primary/30 bg-surface"
+				>
+					<div
+						className="relative w-full"
+						style={{ height: `${virtualizer.getTotalSize()}px` }}
+					>
+						{virtualizer.getVirtualItems().map((virtualRow) => {
+							const startIndex = virtualRow.index * COLUMNS;
+
+							return (
+								<div
+									key={virtualRow.key}
+									className="absolute top-0 left-0 grid w-full gap-4 px-4 sm:grid-cols-2"
+									style={{
+										height: `${virtualRow.size}px`,
+										transform: `translateY(${virtualRow.start}px)`,
+									}}
+								>
+									{Array.from({ length: COLUMNS }, (_, columnIndex) => {
+										const matchIndex = startIndex + columnIndex;
+										if (matchIndex >= matches.length) return null;
+
+										const person = personCache.get(matchIndex);
+										if (!person) {
+											return (
+												<div
+													key={matchIndex}
+													className="flex h-40 items-center justify-center border-2 border-primary/20 bg-surface-muted p-4 text-xs text-muted-foreground"
+												>
+													Loading…
+												</div>
+											);
+										}
+
+										return (
+											<PersonCard
+												key={matchIndex}
+												person={person}
+												onOpenGlossary={openGlossary}
+											/>
+										);
+									})}
+								</div>
+							);
+						})}
+					</div>
+				</div>
+			)}
+
+			<StatGlossaryModal
+				isOpen={glossaryOpen}
+				onClose={() => setGlossaryOpen(false)}
+			/>
 		</div>
 	);
 }

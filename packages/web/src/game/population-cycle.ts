@@ -27,6 +27,7 @@ import {
 	getCalamityModifiersForCitizen,
 	getEnvironmentalQualityModifier,
 	processCalamitiesForDay,
+	syncEmploymentWithAge,
 } from "economy-simulator-simulation";
 import { getFacePoolIds, isFaceId } from "../data/faces";
 import {
@@ -40,6 +41,7 @@ import {
 	getCohortSize,
 	getGlobalIndex,
 } from "../data/population-cohorts";
+import type { PopulationDirectoryEntry } from "../data/population-directory";
 import type { RegionId } from "../data/regions";
 import {
 	applyCalamityMutations,
@@ -49,6 +51,7 @@ import {
 	toCalamityRunSlice,
 } from "../game/calamity-effects";
 import { appendYearlyScore, finalizeGameRun } from "../game/progression";
+import { getViableExtractiveSubSectorIdsForRegion } from "../models/generatePerson";
 import {
 	generateImmigrantPerson,
 	generateNewbornPerson,
@@ -345,12 +348,28 @@ async function runAnnualCycle(
 				happinessTotal += happiness;
 				healthTotal += health;
 				livingCount += 1;
-				trackWorker(person);
 
 				const age = Math.min(
 					settings.demographics.maxAge,
 					(person.getAge() ?? settings.demographics.minAge) + 1,
 				);
+				const employment = syncEmploymentWithAge(
+					age,
+					{
+						categoryId: person.getCategoryId(),
+						subSectorId: person.getSubSectorId(),
+					},
+					random,
+					getViableExtractiveSubSectorIdsForRegion(
+						regions,
+						person.getRegionId(),
+					),
+					settings,
+				);
+				person.setCategoryId(employment.categoryId);
+				person.setSubSectorId(employment.subSectorId);
+				trackWorker(person);
+
 				const sex = person.getSex() ?? "F";
 
 				const outcome = computeAnnualOutcomeForCitizen(
@@ -658,6 +677,113 @@ async function getPersonRangeBatched(
 	return results.slice(0, writeIndex);
 }
 
+/**
+ * Compact directory of every citizen for in-memory search/sort/filter.
+ * Scans cohort chunks once (same pattern as demographic stats).
+ */
+async function buildPopulationDirectory(
+	onProgress?: (processed: number, total: number) => void,
+): Promise<PopulationDirectoryEntry[]> {
+	const meta = await loadMeta();
+	if (!meta) return [];
+
+	const entries: PopulationDirectoryEntry[] = [];
+	let processed = 0;
+
+	for (let cohort = 0; cohort < meta.cohortCount; cohort++) {
+		const chunkCount = getChunkCount(meta.cohortSizes[cohort] ?? 0);
+		for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
+			const chunk = await loadCohortChunk(cohort, chunkIndex);
+			if (!chunk) continue;
+
+			for (let offset = 0; offset < chunk.length; offset++) {
+				const person = chunk[offset];
+				if (!person) continue;
+
+				const globalIndex =
+					person.getIndex() ??
+					getGlobalIndex(
+						cohort,
+						chunkIndex * appConfig.population.chunkSize + offset,
+					);
+
+				entries.push({
+					index: globalIndex,
+					name: person.getName() ?? "Unknown",
+					age: person.getAge() ?? 0,
+					sex: person.getSex(),
+					isAlive: person.isLiving(),
+					overallHealth: person.getOverallHealth() ?? 0,
+					overallHappiness: person.getOverallHappiness() ?? 0,
+					regionId: person.getRegionId(),
+				});
+
+				processed += 1;
+				onProgress?.(processed, meta.size);
+			}
+		}
+	}
+
+	return entries;
+}
+
+/**
+ * Hydrate people by arbitrary global indices, loading each cohort chunk at most once.
+ * Returns one slot per requested index (null when missing / out of range).
+ */
+async function getPeopleByIndices(
+	indices: number[],
+): Promise<(Person | null)[]> {
+	const meta = await loadMeta();
+	if (!meta || indices.length === 0) return [];
+
+	type ChunkGroup = {
+		cohort: number;
+		chunkIndex: number;
+		requests: { order: number; offset: number }[];
+	};
+	const byChunk = new Map<string, ChunkGroup>();
+
+	for (let order = 0; order < indices.length; order++) {
+		const globalIndex = indices[order];
+		if (
+			globalIndex === undefined ||
+			globalIndex < 0 ||
+			globalIndex >= meta.size
+		) {
+			continue;
+		}
+
+		const cohort = getCohortForIndex(globalIndex);
+		const cohortPosition = getCohortPosition(globalIndex);
+		const chunkIndex = getChunkIndex(cohortPosition);
+		const chunkOffset = getChunkOffset(cohortPosition);
+		const key = formatChunkKey(cohort, chunkIndex);
+
+		let group = byChunk.get(key);
+		if (!group) {
+			group = { cohort, chunkIndex, requests: [] };
+			byChunk.set(key, group);
+		}
+		group.requests.push({ order, offset: chunkOffset });
+	}
+
+	const results: (Person | null)[] = Array.from(
+		{ length: indices.length },
+		() => null,
+	);
+
+	for (const group of byChunk.values()) {
+		const chunk = await loadCohortChunk(group.cohort, group.chunkIndex);
+		if (!chunk) continue;
+		for (const request of group.requests) {
+			results[request.order] = chunk[request.offset] ?? null;
+		}
+	}
+
+	return results;
+}
+
 async function savePopulationChunk(
 	cohort: number,
 	chunkIndex: number,
@@ -948,11 +1074,13 @@ export type {
 };
 export {
 	advanceGameDay,
+	buildPopulationDirectory,
 	clearPopulation,
 	computeDemographicStats,
 	computeRegionStats,
 	computeSectorStats,
 	finalizePopulationMeta,
+	getPeopleByIndices,
 	getPerson,
 	getPersonRange,
 	getPersonRangeBatched,

@@ -18,7 +18,8 @@ function InstructionsPage() {
 					</li>
 					<li>
 						The game generates a unique island (biomes, resource deposits,
-						ocean) and assigns every citizen a home region and job.
+						ocean) and assigns every citizen a home region. Working-age citizens
+						(18–65) also get a job; children and retirees do not.
 					</li>
 				</ul>
 			</section>

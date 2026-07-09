@@ -2,12 +2,18 @@ import { en, Faker } from "@faker-js/faker";
 import {
 	gameSettings,
 	getViableExtractiveSubSectorIds,
+	isLand,
 } from "economy-simulator-data";
 import { assignJobSector, isWorkingAge } from "economy-simulator-simulation";
 import type { FaceId } from "../data/faces";
 import { personGenerationConfig } from "../data/person-generation";
 import type { WorldRegion } from "../data/world";
 import { Person, type PersonalityTrait, type PersonSex } from "./Person";
+
+/** Citizens live on land only — ocean tiles are geography, not homes. */
+function landRegions(regions: readonly WorldRegion[]): WorldRegion[] {
+	return regions.filter((region) => isLand(region.terrain));
+}
 
 type RandomFn = () => number;
 
@@ -89,8 +95,9 @@ function generatePerson(
 	);
 	person.setIsAlive(true);
 	person.setFaceId(faceIds[randomInt(0, faceIds.length - 1, random)]);
-	if (regions.length > 0) {
-		person.setRegionId(regions[randomInt(0, regions.length - 1, random)]?.id);
+	const homes = landRegions(regions);
+	if (homes.length > 0) {
+		person.setRegionId(homes[randomInt(0, homes.length - 1, random)]?.id);
 	}
 	person.setOverallHealth(
 		randomInt(config.health.min, config.health.max, random),

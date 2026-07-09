@@ -64,7 +64,7 @@ function AppShell() {
 		gameRun != null && (gameRun.status === "won" || gameRun.status === "lost");
 
 	return (
-		<main className="min-h-screen bg-surface p-4 font-sans sm:p-6">
+		<main className="min-h-screen p-4 font-sans sm:p-6">
 			<div className="mx-auto flex max-w-6xl gap-4">
 				<nav
 					className="w-44 shrink-0 border-2 border-primary bg-surface-muted sm:w-52"

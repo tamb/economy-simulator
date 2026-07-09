@@ -9,11 +9,13 @@ export type {
 } from "../game/population-cycle";
 export {
 	advanceGameDay,
+	buildPopulationDirectory,
 	clearPopulation,
 	computeDemographicStats,
 	computeRegionStats,
 	computeSectorStats,
 	finalizePopulationMeta,
+	getPeopleByIndices,
 	getPerson,
 	getPersonRange,
 	getPersonRangeBatched,

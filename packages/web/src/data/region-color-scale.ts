@@ -14,6 +14,11 @@ interface RgbColor {
 	b: number;
 }
 
+interface QualityRange {
+	min: number;
+	max: number;
+}
+
 function toRgb(hex: string): RgbColor {
 	return {
 		r: Number.parseInt(hex.slice(1, 3), 16),
@@ -27,6 +32,7 @@ const YELLOW = toRgb(themeColors.yellow);
 const GREEN = toRgb(themeColors.green);
 const CYAN_DARK = toRgb(themeColors.cyanDark);
 const SURFACE_MUTED = toRgb(themeColors.surfaceMuted);
+const OCEAN = getTerrainColor("ocean");
 
 function clamp01(value: number): number {
 	if (Number.isNaN(value)) return 0;
@@ -50,7 +56,10 @@ function toHex(color: RgbColor): string {
 	return `#${channel(color.r)}${channel(color.g)}${channel(color.b)}`;
 }
 
-/** Red (0) -> Yellow (50) -> Green (100), for happiness/health/environment tiles. */
+/**
+ * Red (0) -> Yellow (50) -> Green (100). Used for happiness/health/environment
+ * after values are normalized into a 0–100 display range.
+ */
 function qualityColor(value: number): string {
 	const t = clamp01(value / 100);
 	const color =
@@ -66,20 +75,39 @@ function populationColor(value: number, maxValue: number): string {
 	return toHex(lerpColor(SURFACE_MUTED, CYAN_DARK, t));
 }
 
+/**
+ * Map a raw quality score onto the red→green ramp. When `range` spans more
+ * than one distinct value, stretch the observed min/max across the full ramp
+ * so choropleth tiles don't collapse to a single mid-tone.
+ */
+function qualityColorInRange(value: number, range?: QualityRange): string {
+	if (!range || range.max <= range.min) {
+		return qualityColor(value);
+	}
+	const normalized = ((value - range.min) / (range.max - range.min)) * 100;
+	return qualityColor(normalized);
+}
+
 /** Fill color for a region hex tile given the active metric and its stats. */
 function getRegionColor(
 	metric: MapMetric,
 	value: number | undefined,
 	maxValue: number,
 	terrain?: string,
+	qualityRange?: QualityRange,
 ): string {
+	// Ocean stays ocean-blue on every metric so the island silhouette reads
+	// clearly and metric fills don't paint the surrounding sea.
+	if (terrain === "ocean") {
+		return OCEAN;
+	}
 	if (metric === "terrain" && terrain) {
 		return getTerrainColor(terrain as Parameters<typeof getTerrainColor>[0]);
 	}
 	if (value === undefined) return toHex(SURFACE_MUTED);
 	if (metric === "population") return populationColor(value, maxValue);
-	return qualityColor(value);
+	return qualityColorInRange(value, qualityRange);
 }
 
-export type { MapMetric };
+export type { MapMetric, QualityRange };
 export { getRegionColor };

@@ -3,6 +3,7 @@ import {
 	type GameSettings,
 	gameSettings,
 } from "economy-simulator-data";
+import { isWorkingAge } from "../employment/job-assignment";
 import {
 	getPersonalitySectorAffinity,
 	type PersonalityProfile,
@@ -18,6 +19,8 @@ interface QualityOfLifeState {
 
 interface QualityOfLifeInput extends QualityOfLifeState {
 	personality: PersonalityProfile;
+	/** Citizen age; used to gate the working-age idle penalty. */
+	age: number;
 	/** Weekly work hours, or `undefined` if the citizen has no job. */
 	weeklyHours: number | undefined;
 	/** Assigned job category, or `undefined` if the citizen has no job. */
@@ -67,6 +70,7 @@ function computeDailyQualityOfLifeUpdate(
 	const workHoursDelta = getWorkHoursHappinessDelta(
 		input.weeklyHours,
 		settings,
+		{ isWorkingAge: isWorkingAge(input.age, settings) },
 	);
 
 	const affinity = input.categoryId

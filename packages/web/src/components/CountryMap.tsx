@@ -1,6 +1,6 @@
 import { getResourceOverlay } from "economy-simulator-data";
 import { useMemo, useState } from "react";
-import type { MapMetric } from "../data/region-color-scale";
+import type { MapMetric, QualityRange } from "../data/region-color-scale";
 import { getRegionColor } from "../data/region-color-scale";
 import { getHexLayout, HEX_DIMENSIONS } from "../data/regions";
 import { getTerrainLabel } from "../data/terrain-color-scale";
@@ -28,6 +28,7 @@ function metricValue(
 	regionStats: RegionStats | undefined,
 ): number | undefined {
 	if (metric === "terrain") return undefined;
+	if (region.terrain === "ocean") return undefined;
 	if (metric === "environment") return region.resourceState.environmentQuality;
 	if (!regionStats) return undefined;
 	if (metric === "population") return regionStats.population;
@@ -43,6 +44,61 @@ function tileLayer(
 	if (regionId === selectedId) return 2;
 	if (regionId === hoveredId) return 1;
 	return 0;
+}
+
+/** Stable back-to-front paint order so neighboring hexes don't flicker when selection/hover changes. */
+function comparePaintOrder(
+	a: { region: Region; isLand: boolean },
+	b: { region: Region; isLand: boolean },
+	selectedRegionId: string | null,
+	hoveredRegionId: string | null,
+): number {
+	const layerA = tileLayer(a.region.id, selectedRegionId, hoveredRegionId);
+	const layerB = tileLayer(b.region.id, selectedRegionId, hoveredRegionId);
+	if (layerA !== layerB) return layerA - layerB;
+	// Ocean under land so land edges always win shared borders.
+	if (a.isLand !== b.isLand) return a.isLand ? 1 : -1;
+	if (a.region.r !== b.region.r) return a.region.r - b.region.r;
+	return a.region.q - b.region.q;
+}
+
+function qualityRangeForMetric(
+	metric: MapMetric,
+	regions: Region[],
+	stats: Map<string, RegionStats>,
+): QualityRange | undefined {
+	if (
+		metric !== "happiness" &&
+		metric !== "health" &&
+		metric !== "environment"
+	) {
+		return undefined;
+	}
+
+	let min = Number.POSITIVE_INFINITY;
+	let max = Number.NEGATIVE_INFINITY;
+
+	for (const region of regions) {
+		if (region.terrain === "ocean") continue;
+		const value = metricValue(metric, region, stats.get(region.id));
+		if (value === undefined) continue;
+		min = Math.min(min, value);
+		max = Math.max(max, value);
+	}
+
+	if (!Number.isFinite(min) || !Number.isFinite(max)) return undefined;
+	return { min, max };
+}
+
+function formatMetricTooltip(
+	metric: MapMetric,
+	value: number | undefined,
+): string | null {
+	if (value === undefined || metric === "terrain") return null;
+	if (metric === "population") return `${value.toLocaleString()} citizens`;
+	if (metric === "happiness") return `Happiness ${value.toFixed(1)}`;
+	if (metric === "health") return `Health ${value.toFixed(1)}`;
+	return `Environment ${value.toFixed(0)}/100`;
 }
 
 function CountryMap({
@@ -65,19 +121,24 @@ function CountryMap({
 			isLand: region.terrain !== "ocean",
 		}));
 
-		return mapped.sort((a, b) => {
-			const layerA = tileLayer(a.region.id, selectedRegionId, hoveredRegionId);
-			const layerB = tileLayer(b.region.id, selectedRegionId, hoveredRegionId);
-			if (layerA !== layerB) return layerA - layerB;
-			if (a.isLand !== b.isLand) return a.isLand ? 1 : -1;
-			return 0;
-		});
+		return mapped.sort((a, b) =>
+			comparePaintOrder(a, b, selectedRegionId, hoveredRegionId),
+		);
 	}, [regions, selectedRegionId, hoveredRegionId]);
 
-	const maxPopulation = useMemo(
-		() =>
-			Math.max(1, ...Array.from(stats.values(), (entry) => entry.population)),
-		[stats],
+	const maxPopulation = useMemo(() => {
+		let max = 0;
+		for (const region of regions) {
+			if (region.terrain === "ocean") continue;
+			const population = stats.get(region.id)?.population ?? 0;
+			if (population > max) max = population;
+		}
+		return Math.max(1, max);
+	}, [regions, stats]);
+
+	const qualityRange = useMemo(
+		() => qualityRangeForMetric(metric, regions, stats),
+		[metric, regions, stats],
 	);
 
 	const bounds = useMemo(() => {
@@ -105,6 +166,10 @@ function CountryMap({
 	}, [tiles]);
 
 	const hoveredRegion = regions.find((region) => region.id === hoveredRegionId);
+	const hoveredValue = hoveredRegion
+		? metricValue(metric, hoveredRegion, stats.get(hoveredRegion.id))
+		: undefined;
+	const hoveredMetricLabel = formatMetricTooltip(metric, hoveredValue);
 
 	return (
 		<div className="relative">
@@ -118,6 +183,7 @@ function CountryMap({
 					setTooltipPosition(null);
 				}}
 			>
+				<title>Country map colored by {metric}</title>
 				<defs>
 					<filter id="region-glow" x="-50%" y="-50%" width="200%" height="200%">
 						<feDropShadow
@@ -137,6 +203,7 @@ function CountryMap({
 						value,
 						maxPopulation,
 						region.terrain,
+						qualityRange,
 					);
 					const isSelected = region.id === selectedRegionId;
 					const isHovered = region.id === hoveredRegionId;
@@ -152,6 +219,9 @@ function CountryMap({
 						<polygon
 							points={points}
 							fill={fill}
+							data-region-id={region.id}
+							data-metric={metric}
+							data-fill={fill}
 							stroke={
 								isSelected
 									? "var(--color-highlight)"
@@ -163,7 +233,7 @@ function CountryMap({
 							}
 							strokeWidth={isSelected ? 3 : isHovered ? 2 : 1}
 							filter={isSelected ? "url(#region-glow)" : undefined}
-							opacity={isLand ? 1 : 0.85}
+							opacity={isLand ? 1 : 0.9}
 						/>
 					);
 
@@ -239,11 +309,8 @@ function CountryMap({
 							{getResourceOverlay(hoveredRegion.resourceOverlay)?.label}
 						</p>
 					)}
-					{stats.get(hoveredRegion.id) && (
-						<p className="mt-1 text-muted-foreground">
-							{stats.get(hoveredRegion.id)?.population.toLocaleString()}{" "}
-							citizens
-						</p>
+					{hoveredMetricLabel && (
+						<p className="mt-1 text-muted-foreground">{hoveredMetricLabel}</p>
 					)}
 				</div>
 			)}
@@ -251,4 +318,4 @@ function CountryMap({
 	);
 }
 
-export { CountryMap };
+export { CountryMap, comparePaintOrder, metricValue, qualityRangeForMetric };

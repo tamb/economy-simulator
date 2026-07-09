@@ -9,10 +9,21 @@ describe("getWorkHoursHappinessDelta", () => {
 		);
 	});
 
-	it("applies the idle penalty for undefined hours (not working-age or unemployed)", () => {
+	it("applies the idle penalty for undefined hours (working-age unemployed)", () => {
 		expect(getWorkHoursHappinessDelta(undefined)).toBe(
 			-gameSettings.work.idlePenaltyPerDay,
 		);
+	});
+
+	it("does not apply the idle penalty for non-working-age citizens", () => {
+		expect(
+			getWorkHoursHappinessDelta(undefined, gameSettings, {
+				isWorkingAge: false,
+			}),
+		).toBe(0);
+		expect(
+			getWorkHoursHappinessDelta(0, gameSettings, { isWorkingAge: false }),
+		).toBe(0);
 	});
 
 	it("applies no penalty across the neutral dosage zone", () => {

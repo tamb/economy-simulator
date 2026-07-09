@@ -94,4 +94,29 @@ describe("CountryMapPage", () => {
 			await screen.findByText("No citizens currently call this region home."),
 		).toBeInTheDocument();
 	});
+
+	it("recolors land tiles when switching map metrics", async () => {
+		render(<CountryMapPage />);
+
+		await screen.findByRole("img");
+		const alphaFill = () =>
+			document
+				.querySelector('polygon[data-region-id="R00"]')
+				?.getAttribute("data-fill");
+
+		fireEvent.click(screen.getByRole("button", { name: "Population" }));
+		const populationFill = alphaFill();
+
+		fireEvent.click(screen.getByRole("button", { name: "Happiness" }));
+		const happinessFill = alphaFill();
+
+		fireEvent.click(screen.getByRole("button", { name: "Environment" }));
+		const environmentFill = alphaFill();
+
+		expect(populationFill).toBeTruthy();
+		expect(happinessFill).toBeTruthy();
+		expect(environmentFill).toBeTruthy();
+		expect(populationFill).not.toBe(happinessFill);
+		expect(happinessFill).not.toBe(environmentFill);
+	});
 });

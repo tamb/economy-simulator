@@ -16,9 +16,15 @@ const traitLabels: Record<
 
 interface PersonCardProps {
 	person: Person;
+	onOpenGlossary?: () => void;
 }
 
-function PersonCard({ person }: PersonCardProps) {
+function formatPercentStat(value: number | undefined): string {
+	if (value === undefined) return "—";
+	return `${Math.ceil(value)}%`;
+}
+
+function PersonCard({ person, onOpenGlossary }: PersonCardProps) {
 	const { getFace } = useFacePool();
 	const face = getFace(person.getFaceId());
 	const isAlive = person.isLiving();
@@ -39,15 +45,27 @@ function PersonCard({ person }: PersonCardProps) {
 
 			<div className="min-w-0 flex-1 space-y-3">
 				<div>
-					<h3 className="truncate text-[10px] leading-relaxed sm:text-xs">
-						{person.getName() ?? "Unknown"}
-						{person.getIndex() !== undefined && (
-							<span className="text-muted-foreground">
-								{" "}
-								#{person.getIndex()?.toLocaleString()}
-							</span>
+					<div className="flex items-start justify-between gap-2">
+						<h3 className="truncate text-[10px] leading-relaxed sm:text-xs">
+							{person.getName() ?? "Unknown"}
+							{person.getIndex() !== undefined && (
+								<span className="text-muted-foreground">
+									{" "}
+									#{person.getIndex()?.toLocaleString()}
+								</span>
+							)}
+						</h3>
+						{onOpenGlossary && (
+							<button
+								type="button"
+								onClick={onOpenGlossary}
+								className="shrink-0 border border-primary/30 bg-surface px-1.5 py-0.5 font-label text-[10px] tracking-overline text-muted-foreground hover:border-primary hover:text-primary"
+								aria-label="What do these stats mean?"
+							>
+								?
+							</button>
 						)}
-					</h3>
+					</div>
 					<p className="mt-1 font-label text-[10px] tracking-overline text-muted-foreground">
 						Age {person.getAge() ?? "—"} · {person.getSex() ?? "—"}
 						{!isAlive && <span className="text-primary"> · Deceased</span>}
@@ -85,9 +103,9 @@ function Stat({ label, value }: { label: string; value?: number }) {
 			<p className="font-label text-[10px] tracking-overline text-muted-foreground">
 				{label}
 			</p>
-			<p className="text-sm">{value ?? "—"}%</p>
+			<p className="text-sm">{formatPercentStat(value)}</p>
 		</div>
 	);
 }
 
-export { PersonCard };
+export { formatPercentStat, PersonCard };

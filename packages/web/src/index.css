@@ -60,12 +60,21 @@
 @layer base {
 	html {
 		font-family: var(--font-sans);
+		font-size: 17px;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
 
 	body {
-		@apply bg-background text-foreground;
+		@apply text-foreground;
+		/* Fallback while the image paints; panels keep --color-surface* */
+		background-color: #c9b896;
+		background-image: url("/parchment-bg.png");
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		min-height: 100vh;
 	}
 
 	h1,

@@ -21,6 +21,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: undefined,
 			categoryId: undefined,
@@ -30,10 +31,27 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		expect(result.happiness).toBeLessThan(50);
 	});
 
+	it("does not apply the idle penalty to children or retirees", () => {
+		for (const age of [10, 80]) {
+			const input: QualityOfLifeInput = {
+				happiness: 50,
+				health: 50,
+				age,
+				personality: neutralPersonality,
+				weeklyHours: undefined,
+				categoryId: undefined,
+			};
+
+			const result = computeDailyQualityOfLifeUpdate(input, noRandomNoise);
+			expect(result.happiness).toBe(50);
+		}
+	});
+
 	it("does not penalize a citizen working within the neutral hours zone with neutral personality", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: 40,
 			categoryId: "services",
@@ -55,6 +73,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: extraverted,
 			weeklyHours: 38,
 			categoryId: "services",
@@ -76,6 +95,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: introvertedIntrospective,
 			weeklyHours: 70,
 			categoryId: "command",
@@ -89,6 +109,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 1,
 			health: 50,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: undefined,
 			categoryId: undefined,
@@ -105,6 +126,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 100,
 			health: 99,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: 40,
 			categoryId: "services",
@@ -118,6 +140,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 20,
 			health: 80,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: 40,
 			categoryId: "services",
@@ -143,6 +166,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 			{
 				happiness: 50,
 				health: 50,
+				age: 30,
 				personality: extraverted,
 				weeklyHours: 38,
 				categoryId: "services",
@@ -153,6 +177,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 			{
 				happiness: 50,
 				health: 50,
+				age: 30,
 				personality: extraverted,
 				weeklyHours: 38,
 				categoryId: "services",
@@ -168,6 +193,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: 40,
 			categoryId: "services",
@@ -182,6 +208,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: 40,
 			categoryId: "services",
@@ -197,6 +224,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 			{
 				happiness: 50,
 				health: 50,
+				age: 30,
 				personality: neutralPersonality,
 				weeklyHours: 40,
 				categoryId: "services",
@@ -207,6 +235,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 			{
 				happiness: 50,
 				health: 50,
+				age: 30,
 				personality: neutralPersonality,
 				weeklyHours: 40,
 				categoryId: "services",
@@ -223,6 +252,7 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const input: QualityOfLifeInput = {
 			happiness: 50,
 			health: 50,
+			age: 30,
 			personality: neutralPersonality,
 			weeklyHours: 40,
 			categoryId: "services",

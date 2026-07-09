@@ -91,6 +91,26 @@ describe("updatePersonStats", () => {
 		);
 	});
 
+	it("does not apply the idle penalty to children or retirees", () => {
+		const child = new Person();
+		child.setAge(10);
+		child.setIsAlive(true);
+		child.setOverallHappiness(50);
+		child.setOverallHealth(50);
+
+		const retiree = new Person();
+		retiree.setAge(80);
+		retiree.setIsAlive(true);
+		retiree.setOverallHappiness(50);
+		retiree.setOverallHealth(50);
+
+		updatePersonStats(child, () => 0.5);
+		updatePersonStats(retiree, () => 0.5);
+
+		expect(child.getOverallHappiness()).toBe(50);
+		expect(retiree.getOverallHappiness()).toBe(50);
+	});
+
 	it("applies a resource shortfall happiness penalty from context", () => {
 		const withoutPenalty = new Person();
 		withoutPenalty.setAge(30);

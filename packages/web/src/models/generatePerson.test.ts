@@ -205,6 +205,21 @@ describe("generatePerson", () => {
 		expect(person.getSubSectorId()).toBeUndefined();
 	});
 
+	it("does not assign a job sector to a citizen above working age", () => {
+		const person = generatePerson(
+			faceIds,
+			regions,
+			personGenerationConfig,
+			sequenceRandom([0, 0, 0.999, 0, 0, 0, 0]),
+		);
+
+		expect(person.getAge()).toBeGreaterThan(
+			gameSettings.demographics.workingAgeMax,
+		);
+		expect(person.getCategoryId()).toBeUndefined();
+		expect(person.getSubSectorId()).toBeUndefined();
+	});
+
 	it("only assigns an extractive sub-sector viable for the person's assigned region", () => {
 		const onlyMountain: WorldRegion[] = [
 			{ id: "R00", q: 0, r: 0, terrain: "mountains", isCoastal: false },
@@ -250,6 +265,34 @@ describe("generatePerson", () => {
 			sequenceRandom([0.5, 0.5, 0.5, 0.5, 0]),
 		);
 		expect(person.getRegionId()).toBe("R00");
+	});
+
+	it("only assigns land regions when the pool includes ocean", () => {
+		const pool: WorldRegion[] = [
+			{ id: "R00", q: 0, r: 0, terrain: "ocean", isCoastal: false },
+			{ id: "R01", q: 1, r: 0, terrain: "plains", isCoastal: false },
+			{ id: "R02", q: 0, r: 1, terrain: "ocean", isCoastal: false },
+		];
+
+		for (let attempt = 0; attempt < 20; attempt++) {
+			const person = generatePerson(
+				faceIds,
+				pool,
+				personGenerationConfig,
+				sequenceRandom([0.5, 0.5, 0.5, 0.5, attempt / 20]),
+			);
+			expect(person.getRegionId()).toBe("R01");
+		}
+	});
+
+	it("leaves regionId undefined when no land regions are provided", () => {
+		const person = generatePerson(
+			faceIds,
+			[{ id: "R00", q: 0, r: 0, terrain: "ocean", isCoastal: false }],
+			personGenerationConfig,
+			sequenceRandom([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]),
+		);
+		expect(person.getRegionId()).toBeUndefined();
 	});
 
 	it("leaves regionId undefined when no regions are provided", () => {

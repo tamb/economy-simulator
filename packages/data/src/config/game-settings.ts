@@ -16,12 +16,13 @@ const gameSettings = {
 		 */
 		maxAge: 110,
 		/**
-		 * Working-age population range, World Bank/ILO convention
-		 * ("population ages 15-64"). Citizens outside this range are not
-		 * assigned a job sector.
+		 * Inclusive working-age range. Citizens enter the workforce at
+		 * `workingAgeMin` and leave after `workingAgeMax` (children and
+		 * retirees are never assigned a job sector). A designed gameplay
+		 * band, not the World Bank/ILO 15–64 convention.
 		 */
-		workingAgeMin: 15,
-		workingAgeMax: 64,
+		workingAgeMin: 18,
+		workingAgeMax: 65,
 	},
 
 	calendar: {
@@ -41,7 +42,7 @@ const gameSettings = {
 	work: {
 		/** Upper bound of the "no penalty" work-hours dosage zone. */
 		neutralZoneMaxHours: 48,
-		/** Happiness lost per day for a working-age citizen with 0 weekly hours. */
+		/** Happiness lost per day for a working-age citizen with 0 weekly hours. Children and retirees are exempt. */
 		idlePenaltyPerDay: 3,
 		/** Happiness lost per day, per hour worked beyond `neutralZoneMaxHours`. */
 		overworkPenaltyPerExcessHour: 0.15,

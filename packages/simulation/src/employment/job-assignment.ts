@@ -70,5 +70,34 @@ function isWorkingAge(
 	);
 }
 
-export type { JobAssignment, RandomFn };
-export { assignJobSector, isWorkingAge };
+interface EmploymentState {
+	categoryId: CategoryId | undefined;
+	subSectorId: string | undefined;
+}
+
+/**
+ * Keep a citizen's job in sync with their age: assign a sector when they
+ * enter working age without one, and clear it when they leave (childhood
+ * or retirement). Existing jobs are preserved across working-age years.
+ */
+function syncEmploymentWithAge(
+	age: number,
+	current: EmploymentState,
+	random: RandomFn = Math.random,
+	viableExtractiveSubSectorIds?: readonly string[],
+	settings: GameSettings = gameSettings,
+): EmploymentState {
+	if (!isWorkingAge(age, settings)) {
+		return { categoryId: undefined, subSectorId: undefined };
+	}
+
+	if (current.categoryId && current.subSectorId) {
+		return current;
+	}
+
+	const job = assignJobSector(random, viableExtractiveSubSectorIds);
+	return { categoryId: job.categoryId, subSectorId: job.subSectorId };
+}
+
+export type { EmploymentState, JobAssignment, RandomFn };
+export { assignJobSector, isWorkingAge, syncEmploymentWithAge };

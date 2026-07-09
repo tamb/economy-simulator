@@ -29,9 +29,11 @@ import {
 import { Person, type PersonSnapshot } from "../models/Person";
 import {
 	advanceGameDay,
+	buildPopulationDirectory,
 	computeDemographicStats,
 	computeRegionStats,
 	computeSectorStats,
+	getPeopleByIndices,
 	getPerson,
 	getPersonRangeBatched,
 	hasPopulation,
@@ -133,6 +135,26 @@ describe("population storage", () => {
 
 		expect(people).toHaveLength(TEST_SIZE);
 		expect(people[0]?.getIndex()).toBe(0);
+	});
+
+	it("builds a compact directory covering every citizen", async () => {
+		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
+
+		const directory = await buildPopulationDirectory();
+		expect(directory).toHaveLength(TEST_SIZE);
+		expect(directory.every((entry) => entry.name.length > 0)).toBe(true);
+		expect(new Set(directory.map((entry) => entry.index)).size).toBe(TEST_SIZE);
+	});
+
+	it("hydrates people by arbitrary indices in request order", async () => {
+		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
+
+		const people = await getPeopleByIndices([3, 0, 3, 99]);
+		expect(people).toHaveLength(4);
+		expect(people[0]?.getIndex()).toBe(3);
+		expect(people[1]?.getIndex()).toBe(0);
+		expect(people[2]?.getIndex()).toBe(3);
+		expect(people[3]).toBeNull();
 	});
 });
 

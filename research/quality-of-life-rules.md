@@ -56,6 +56,7 @@ here as the v1 defaults):
 | Weekly hours | Zone | Daily happiness delta |
 | --- | --- | --- |
 | 0 (working-age, unemployed) | Idle | Strong penalty (loses the "employment dosage" benefit) |
+| 0 (child or retiree) | Not in labor force | No work-hours delta |
 | 1–48 | Neutral | ~No penalty — flat per the Cambridge/Salford finding |
 | 48+ | Overwork | Escalating penalty, growing faster the further above 48 |
 

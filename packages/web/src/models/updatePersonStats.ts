@@ -46,6 +46,7 @@ function updatePersonStats(
 		{
 			happiness: person.getOverallHappiness() ?? 50,
 			health: person.getOverallHealth() ?? 50,
+			age: person.getAge() ?? settings.demographics.minAge,
 			weeklyHours: getWeeklyHoursForPerson(person),
 			categoryId: person.getCategoryId(),
 			personality: {

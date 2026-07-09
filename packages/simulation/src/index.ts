@@ -18,7 +18,11 @@ export {
 	selectTargetRegions,
 } from "./calamities/calamity-engine";
 export type { JobAssignment, RandomFn } from "./employment/job-assignment";
-export { assignJobSector, isWorkingAge } from "./employment/job-assignment";
+export {
+	assignJobSector,
+	isWorkingAge,
+	syncEmploymentWithAge,
+} from "./employment/job-assignment";
 export type {
 	AnnualCitizenInput,
 	AnnualCitizenOutcome,
