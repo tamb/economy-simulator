@@ -126,14 +126,7 @@ async function startGame(
 		throw new Error("Nation setup is incomplete");
 	}
 
-	let gameRun = await ensureGameRunState(size);
-	gameRun = {
-		...gameRun,
-		phase: "active",
-		startedAt: Date.now(),
-		startingPopulation: size,
-	};
-	await saveGameRunState(gameRun);
+	await ensureGameRunState(size);
 
 	await generateAndSavePopulation(
 		faceIds,
@@ -142,6 +135,18 @@ async function startGame(
 		onProgress,
 		roleConfigs,
 	);
+
+	const gameRun = await loadGameRunState();
+	if (!gameRun) {
+		throw new Error("Game run state missing after population generation");
+	}
+
+	await saveGameRunState({
+		...gameRun,
+		phase: "active",
+		startedAt: Date.now(),
+		startingPopulation: size,
+	});
 }
 
 async function isNationInSetupPhase(): Promise<boolean> {
