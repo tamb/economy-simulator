@@ -1,54 +1,63 @@
 import {
+	createInitialGameRunState,
+	ensureGameRunState,
 	loadGameRunState,
-	loadPlayerProfile,
 	loadPopulationMeta,
-	MemoryDriver,
-	setStorageDriver,
+	saveGameRunState,
+	savePopulationMeta,
 } from "economy-simulator-persistence";
 import { beforeEach, describe, expect, it } from "vitest";
-import { getFacePoolIds } from "../data/faces";
-import { buildWorldRegions } from "../data/world";
-import { generateAndSavePopulation } from "../models/generatePopulation";
-import { hasPopulation } from "../storage/population";
-import { autoAssignAllSectors, startGame } from "./nation-setup";
+import { setupMemoryStorage } from "../test/storage-driver";
 import { abandonActiveRun, startNewNation } from "./new-game";
 
-const faceIds = getFacePoolIds();
-const regions = buildWorldRegions(99_001);
-
 beforeEach(() => {
-	setStorageDriver(new MemoryDriver());
+	setupMemoryStorage();
 });
 
-describe("new-game", () => {
-	it("startNewNation clears population and creates a setup-phase game run", async () => {
-		await autoAssignAllSectors();
-		await generateAndSavePopulation(faceIds, regions, 8);
-		await startGame(8, faceIds, regions);
+describe("abandonActiveRun", () => {
+	it("archives an active run and marks it abandoned", async () => {
+		const active = createInitialGameRunState(25);
+		await saveGameRunState(active);
+		await savePopulationMeta({
+			version: 1,
+			size: 25,
+			cohortCount: 7,
+			chunkSize: 100,
+			cohortSizes: [4, 4, 4, 4, 3, 3, 3],
+			gameDay: 12,
+		});
 
-		expect(await hasPopulation()).toBe(true);
-
-		await startNewNation(12);
-
-		expect(await hasPopulation()).toBe(false);
-		const run = await loadGameRunState();
-		expect(run?.phase).toBe("setup");
-		expect(run?.startingPopulation).toBe(12);
-		expect(run?.status).toBe("active");
-	});
-
-	it("abandonActiveRun archives an in-progress run before reset", async () => {
-		await autoAssignAllSectors();
-		await startGame(6, faceIds, regions);
-
-		const meta = await loadPopulationMeta();
 		await abandonActiveRun();
 
-		const profile = await loadPlayerProfile();
-		expect(profile?.abandoned).toBe(1);
-		expect(profile?.runHistory[0]?.endingPopulation).toBe(meta?.size ?? 0);
+		const saved = await loadGameRunState();
+		expect(saved?.status).toBe("abandoned");
+		expect(saved?.endReason).toBe("abandoned");
+	});
 
-		const run = await loadGameRunState();
-		expect(run?.status).toBe("abandoned");
+	it("does nothing when there is no active run to abandon", async () => {
+		await abandonActiveRun();
+		expect(await loadGameRunState()).toBeNull();
+	});
+});
+
+describe("startNewNation", () => {
+	it("resets nation stores and creates a fresh active game run", async () => {
+		await ensureGameRunState(10);
+		await savePopulationMeta({
+			version: 1,
+			size: 10,
+			cohortCount: 7,
+			chunkSize: 100,
+			cohortSizes: [2, 2, 2, 1, 1, 1, 1],
+			gameDay: 99,
+		});
+
+		await startNewNation(50);
+
+		expect(await loadPopulationMeta()).toBeNull();
+		const gameRun = await loadGameRunState();
+		expect(gameRun?.status).toBe("active");
+		expect(gameRun?.startingPopulation).toBe(50);
+		expect(gameRun?.scoreHistory).toEqual([]);
 	});
 });

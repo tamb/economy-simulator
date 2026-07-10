@@ -1,12 +1,11 @@
 import {
 	createInitialGameRunState,
-	ensurePlayerProfile,
+	createInitialWinLoseStreaks,
 	loadGameRunState,
 	loadPlayerProfile,
-	MemoryDriver,
-	setStorageDriver,
 } from "economy-simulator-persistence";
 import { beforeEach, describe, expect, it } from "vitest";
+import { setupMemoryStorage } from "../test/storage-driver";
 import {
 	appendYearlyScore,
 	archiveRunToProfile,
@@ -15,93 +14,155 @@ import {
 } from "./progression";
 
 beforeEach(() => {
-	setStorageDriver(new MemoryDriver());
+	setupMemoryStorage();
 });
 
-describe("progression", () => {
-	it("appendYearlyScore appends score history and merges badges", () => {
-		const gameRun = createInitialGameRunState(1000);
-		const score = {
-			year: 1,
-			total: 42,
-			populationGrowth: 1,
-			averageQualityOfLife: 50,
-			netMigration: 0,
-			resourceSufficiency: 1,
-			environmentHealth: 1,
-		};
-
-		const next = appendYearlyScore(gameRun, score, ["badge_a", "badge_b"]);
-		expect(next.scoreHistory).toHaveLength(1);
-		expect(next.scoreHistory[0]?.total).toBe(42);
-		expect(next.unlockedThisRun).toEqual(["badge_a", "badge_b"]);
-	});
-
-	it("mergeUniqueBadges deduplicates badge ids", () => {
+describe("mergeUniqueBadges", () => {
+	it("deduplicates badge ids while preserving order", () => {
 		expect(mergeUniqueBadges(["a", "b"], ["b", "c"])).toEqual(["a", "b", "c"]);
 	});
+});
 
-	it("archiveRunToProfile records a completed run on the player profile", async () => {
-		const gameRun = {
-			...createInitialGameRunState(500),
+describe("appendYearlyScore", () => {
+	it("appends score history and merges run badges", () => {
+		const gameRun = createInitialGameRunState(100);
+		const next = appendYearlyScore(
+			gameRun,
+			{
+				year: 1,
+				total: 42,
+				populationGrowth: 1,
+				averageQualityOfLife: 60,
+				netMigration: 0,
+				resourceSufficiency: 70,
+				environmentHealth: 80,
+			},
+			["first_census", "first_census"],
+		);
+
+		expect(next.scoreHistory).toHaveLength(1);
+		expect(next.scoreHistory[0]?.total).toBe(42);
+		expect(next.unlockedThisRun).toEqual(["first_census"]);
+	});
+});
+
+describe("archiveRunToProfile", () => {
+	it("no-ops while the run is still active", async () => {
+		const active = createInitialGameRunState(50);
+		const result = await archiveRunToProfile(active, 50);
+
+		expect(result).toBe(active);
+		expect(await loadPlayerProfile()).toBeNull();
+	});
+
+	it("records a won run, score totals, and end-run badges on the profile", async () => {
+		const won = {
+			...createInitialGameRunState(100),
 			status: "won" as const,
-			phase: "active" as const,
+			endReason: "prosperity_sustained",
 			endedAt: 1_700_000_000_000,
-			endReason: "prosperity",
 			scoreHistory: [
 				{
 					year: 1,
-					total: 80,
-					populationGrowth: 1,
-					averageQualityOfLife: 60,
-					netMigration: 0,
-					resourceSufficiency: 1,
-					environmentHealth: 1,
+					total: 88,
+					populationGrowth: 2,
+					averageQualityOfLife: 75,
+					netMigration: 1,
+					resourceSufficiency: 80,
+					environmentHealth: 85,
 				},
 			],
+			unlockedThisRun: ["first_census"],
+			streaks: createInitialWinLoseStreaks(),
 		};
 
-		await archiveRunToProfile(gameRun, 520);
+		await archiveRunToProfile(won, 120);
 
 		const profile = await loadPlayerProfile();
 		expect(profile?.wins).toBe(1);
-		expect(profile?.runHistory).toHaveLength(1);
-		expect(profile?.runHistory[0]?.endingPopulation).toBe(520);
-		expect(profile?.runHistory[0]?.finalScore).toBe(80);
+		expect(profile?.losses).toBe(0);
+		expect(profile?.bestScore).toBe(88);
+		expect(profile?.totalYearsRuled).toBe(1);
+		expect(profile?.runHistory[0]).toMatchObject({
+			status: "won",
+			startingPopulation: 100,
+			endingPopulation: 120,
+			yearsPlayed: 1,
+			finalScore: 88,
+			endReason: "prosperity_sustained",
+		});
+		expect(profile?.unlockedBadges.map((badge) => badge.id)).toEqual(
+			expect.arrayContaining(["monarch_emeritus", "first_census"]),
+		);
 	});
 
-	it("archiveRunToProfile is a no-op for active runs", async () => {
-		const gameRun = createInitialGameRunState(500);
-		await ensurePlayerProfile();
+	it("records a lost run with the mass-exodus badge when applicable", async () => {
+		const lost = {
+			...createInitialGameRunState(80),
+			status: "lost" as const,
+			endReason: "mass_exodus",
+			endedAt: 1_700_000_000_001,
+			scoreHistory: [
+				{
+					year: 3,
+					total: 12,
+					populationGrowth: -5,
+					averageQualityOfLife: 30,
+					netMigration: -4,
+					resourceSufficiency: 20,
+					environmentHealth: 25,
+				},
+			],
+			unlockedThisRun: [],
+			streaks: createInitialWinLoseStreaks(),
+		};
 
-		await archiveRunToProfile(gameRun, 500);
+		await archiveRunToProfile(lost, 10);
 
 		const profile = await loadPlayerProfile();
-		expect(profile?.runHistory).toHaveLength(0);
-		expect(profile?.wins).toBe(0);
-	});
-
-	it("finalizeGameRun archives ended runs but not active ones", async () => {
-		const activeRun = createInitialGameRunState(300);
-		await ensurePlayerProfile();
-		await finalizeGameRun(activeRun, 300);
-
-		let profile = await loadPlayerProfile();
-		expect(profile?.runHistory).toHaveLength(0);
-
-		const lostRun = {
-			...activeRun,
-			status: "lost" as const,
-			endedAt: Date.now(),
-			endReason: "collapse",
-		};
-		await finalizeGameRun(lostRun, 100);
-
-		profile = await loadPlayerProfile();
 		expect(profile?.losses).toBe(1);
 		expect(profile?.runHistory[0]?.status).toBe("lost");
+		expect(profile?.unlockedBadges.map((badge) => badge.id)).toContain(
+			"exodus",
+		);
+	});
+});
+
+describe("finalizeGameRun", () => {
+	it("persists the run and archives it when the run has ended", async () => {
+		const ended = {
+			...createInitialGameRunState(60),
+			status: "won" as const,
+			endReason: "long_reign",
+			endedAt: 1_700_000_000_002,
+			scoreHistory: [
+				{
+					year: 10,
+					total: 95,
+					populationGrowth: 0,
+					averageQualityOfLife: 80,
+					netMigration: 0,
+					resourceSufficiency: 90,
+					environmentHealth: 92,
+				},
+			],
+			unlockedThisRun: [],
+			streaks: createInitialWinLoseStreaks(),
+		};
+
+		await finalizeGameRun(ended, 65);
 
 		const saved = await loadGameRunState();
-		expect(saved?.status).toBe("lost");
+		expect(saved?.status).toBe("won");
+		expect((await loadPlayerProfile())?.wins).toBe(1);
+	});
+
+	it("persists an active run without touching the player profile", async () => {
+		const active = createInitialGameRunState(40);
+
+		await finalizeGameRun(active, 40);
+
+		expect((await loadGameRunState())?.status).toBe("active");
+		expect(await loadPlayerProfile()).toBeNull();
 	});
 });
