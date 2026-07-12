@@ -1,6 +1,6 @@
 # Intent
 
-## What economy-simulator is
+## What The Benevolent Monarch is
 
 A **desktop-first** application: a React web UI (vite) wrapped for native distribution via **neutralino**.
 

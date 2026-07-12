@@ -1,6 +1,6 @@
 # Major Economic Systems — Rules, Definitions & Success Parameters
 
-Reference for **economy-simulator**: how the world's major economic systems are defined, what rules govern them, and what measurable outcomes indicate success or failure.
+Reference for **The Benevolent Monarch**: how the world's major economic systems are defined, what rules govern them, and what measurable outcomes indicate success or failure.
 
 > **Note on spelling:** *Tripartism* (also written *triparism*) refers to structured cooperation among three social partners — government, labor, and employers.
 
@@ -563,7 +563,7 @@ Indigenous communal systems, pastoral nomadism, slash-and-burn horticulture soci
 
 ## Simulation Mapping (Suggested)
 
-When implementing these systems in **economy-simulator**, each can be parameterized roughly as follows:
+When implementing these systems in **The Benevolent Monarch**, each can be parameterized roughly as follows:
 
 ```
 System {
@@ -603,4 +603,4 @@ Adjust weights per system — e.g., socialism weights equity higher; capitalism 
 
 ---
 
-*Last updated: July 2026 — economy-simulator reference document*
+*Last updated: July 2026 — The Benevolent Monarch reference document*

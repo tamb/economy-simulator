@@ -4,6 +4,8 @@
  * balance (see `game-settings.ts` for rules that affect gameplay outcomes).
  */
 const appConfig = {
+	/** Player-facing product title shown in chrome, setup screens, and docs. */
+	productName: "The Benevolent Monarch",
 	population: {
 		/** Total citizens simulated, chosen by the player at new-game setup. */
 		size: 100_000,

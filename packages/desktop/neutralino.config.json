@@ -16,7 +16,7 @@
 	"nativeAllowList": ["app.*", "os.*", "debug.*", "filesystem.*", "storage.*"],
 	"modes": {
 		"window": {
-			"title": "economy-simulator",
+			"title": "The Benevolent Monarch",
 			"width": 1280,
 			"height": 800,
 			"minWidth": 640,

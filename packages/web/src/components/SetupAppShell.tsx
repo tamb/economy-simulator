@@ -1,3 +1,4 @@
+import { appConfig } from "economy-simulator-data";
 import { NavLink, Outlet } from "react-router";
 
 const setupPages = [
@@ -48,7 +49,7 @@ function SetupAppShell() {
 							Executive Office of the President
 						</p>
 						<h1 className="mt-2 text-base text-highlight sm:text-lg">
-							economy-simulator
+							{appConfig.productName}
 						</h1>
 						<p className="mt-1 font-label text-xs text-on-dark-muted tracking-overline">
 							Nation Founding

@@ -1,4 +1,4 @@
-# economy-simulator Constitution
+# The Benevolent Monarch Constitution
 
 Human- and AI-readable project charter. When product intent, architecture, or repo layout is unclear, **start here** before guessing from code alone.
 

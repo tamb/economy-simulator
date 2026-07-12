@@ -1,4 +1,4 @@
-# economy-simulator
+# The Benevolent Monarch
 
 You are the monarch of a procedurally generated island nation. Manage the
 economy, steer up to 1,000,000 simulated citizens across economic sectors,
