@@ -1,8 +1,6 @@
 [
 	{
 		"id": "accidental_fire",
-		"name": "Accidental Fire",
-		"description": "A careless blaze guts workshops and homes before brigades contain it.",
 		"category": "human",
 		"tier": "v1",
 		"weight": 14,
@@ -81,8 +79,6 @@
 	},
 	{
 		"id": "factory_fire",
-		"name": "Factory Fire",
-		"description": "Industrial plant burns, idling lines and scattering ash over the yard.",
 		"category": "human",
 		"tier": "v1",
 		"weight": 10,
@@ -161,8 +157,6 @@
 	},
 	{
 		"id": "warehouse_fire",
-		"name": "Warehouse Fire",
-		"description": "Stored goods go up in smoke, jolting trade and local supply.",
 		"category": "human",
 		"tier": "v1.5",
 		"weight": 9,
@@ -237,8 +231,6 @@
 	},
 	{
 		"id": "oil_spill",
-		"name": "Oil Spill",
-		"description": "Fuel slicks the coast, killing fish and staining the shoreline for seasons.",
 		"category": "human",
 		"tier": "v1",
 		"weight": 5,
@@ -321,8 +313,6 @@
 	},
 	{
 		"id": "chemical_spill",
-		"name": "Chemical Spill",
-		"description": "Industrial toxins leak into soil and water near plant yards.",
 		"category": "human",
 		"tier": "v1.5",
 		"weight": 6,
@@ -397,8 +387,6 @@
 	},
 	{
 		"id": "dam_failure",
-		"name": "Dam Failure",
-		"description": "A reservoir wall fails, flooding valleys and wrecking water works.",
 		"category": "human",
 		"tier": "v2",
 		"weight": 3,
@@ -491,8 +479,6 @@
 	},
 	{
 		"id": "power_outage",
-		"name": "Power Outage",
-		"description": "The grid falters. Factories idle and services stumble in the dark.",
 		"category": "human",
 		"tier": "v1.5",
 		"weight": 11,
@@ -573,8 +559,6 @@
 	},
 	{
 		"id": "bridge_collapse",
-		"name": "Bridge Collapse",
-		"description": "A key crossing fails, snarling freight and regional travel.",
 		"category": "human",
 		"tier": "v2",
 		"weight": 4,
@@ -653,8 +637,6 @@
 	},
 	{
 		"id": "mining_accident",
-		"name": "Mining Accident",
-		"description": "A shaft disaster halts production and shakes mining communities.",
 		"category": "human",
 		"tier": "v1",
 		"weight": 8,
@@ -743,8 +725,6 @@
 	},
 	{
 		"id": "overfishing_scandal",
-		"name": "Overfishing Scandal",
-		"description": "Public outrage forces a hard throttle on coastal fleets.",
 		"category": "human",
 		"tier": "v2",
 		"weight": 4,

@@ -9,11 +9,11 @@ import {
 	setStorageDriver,
 } from "economy-simulator-persistence";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getFacePoolIds } from "../data/faces";
-import { buildWorldRegions } from "../data/world";
+import { getFacePoolIds } from "../lib/faces";
+import { buildWorldRegions } from "../lib/world";
 import * as generatePopulation from "../models/generatePopulation";
-import { loadSectorAssignments } from "../storage/sector-assignments";
-import { loadSectorRoleConfigs } from "../storage/sector-role-config";
+import { loadSectorAssignments } from "../repos/sector-assignments";
+import { loadSectorRoleConfigs } from "../repos/sector-role-config";
 import {
 	autoAssignAllSectors,
 	getNationSetupValidation,

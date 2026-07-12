@@ -1,10 +1,12 @@
-import mandatesCopy from "../copy/mandates.json" with { type: "json" };
+import mandatesCopy from "../copy/mandates/mandates.json" with { type: "json" };
 
 type MandateId =
 	| "resource_security"
 	| "stem_emigration"
 	| "raise_qol"
-	| "heal_land";
+	| "heal_land"
+	| "grow_population"
+	| "tighten_ledger";
 
 interface MandateDefinition {
 	id: MandateId;
@@ -14,7 +16,7 @@ interface MandateDefinition {
 	scoreBonus: number;
 }
 
-/** Game logic only — labels/descriptions come from `copy/mandates.json`. */
+/** Game logic only — labels/descriptions come from `copy/mandates/mandates.json`. */
 interface MandateLogic {
 	id: MandateId;
 	scoreBonus: number;
@@ -25,6 +27,8 @@ const mandatesLogic: MandateLogic[] = [
 	{ id: "stem_emigration", scoreBonus: 3 },
 	{ id: "raise_qol", scoreBonus: 2 },
 	{ id: "heal_land", scoreBonus: 2 },
+	{ id: "grow_population", scoreBonus: 3 },
+	{ id: "tighten_ledger", scoreBonus: 4 },
 ];
 
 type MandatesCopyFile = Record<string, { label: string; description: string }>;
@@ -36,7 +40,7 @@ function mergeMandates(): MandateDefinition[] {
 		const text = copy[mandate.id];
 		if (!text) {
 			throw new Error(
-				`Missing copy for mandate "${mandate.id}" in copy/mandates.json`,
+				`Missing copy for mandate "${mandate.id}" in copy/mandates/mandates.json`,
 			);
 		}
 		return {

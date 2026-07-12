@@ -5,13 +5,13 @@ import { useRegions } from "../../context/RegionContext";
 import {
 	buildQualityOfLifeTrendData,
 	buildRegionLeaderboard,
-} from "../../data/country-dashboard";
+} from "../../lib/country-dashboard";
 import {
 	type AnnualCycleStats,
 	computeRegionStats,
 	loadPopulationMeta,
 	type RegionStats,
-} from "../../storage/population";
+} from "../../repos/population";
 import { ChartCard } from "./ChartCard";
 
 function CountryDashboard() {

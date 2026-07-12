@@ -16,9 +16,9 @@
 | Routing | **react-router** (`HashRouter`) — hash-based (not `BrowserRouter`) because the desktop build is served by Neutralino's static file server with no SPA fallback for arbitrary paths; every route still resolves to the same `index.html`. `AppShell` is the layout route (nav + throne HUD + interrupt modals + `<Outlet />`); `/atlas`, `/atlas/:categoryId`, and `/atlas/:categoryId/:sectorId` give the sector-atlas drill-down real back/forward support too |
 | Build | **Vite** |
 | Styling | **Tailwind CSS v4** (`@tailwindcss/vite` or PostCSS for Next.js) |
-| Storage | **`economy-simulator-persistence`** (IndexedDB via localforage under the hood) — web does not own drivers directly |
+| Storage | **`economy-simulator-persistence`** (IndexedDB via localforage under the hood) — web adapters live in `src/repos/`; web does not own drivers directly |
 | Map | **honeycomb-grid** for hex coordinate math, hand-rolled SVG rendering (`CountryMap`) styled with the Tailwind theme tokens |
-| Charts | **chart.js** + **react-chartjs-2**, themed via `data/chart-theme.ts` (retro, no smoothing/animation) |
+| Charts | **chart.js** + **react-chartjs-2**, themed via `lib/chart-theme.ts` (retro, no smoothing/animation) |
 | Heavy calculations | Dedicated Web Worker (`workers/population.worker.ts`, its own `tsconfig.worker.json` with the `WebWorker` lib) runs the daily cohort tick and annual population cycle off the main thread; progress renders in a reusable `CalculationModal` |
 | Component tests | **Vitest** `projects` split: `.test.ts` runs under `node`, `.test.tsx` runs under `jsdom` with `@testing-library/react` |
 | End-to-end tests | **Playwright** (`e2e/`, `tsconfig.e2e.json`, `bun run test:e2e`) drives the real production build (`vite build && vite preview`) rather than the dev server — see note below on why |
@@ -36,7 +36,7 @@ state breaks in a way that's easy to misdiagnose:
   hooks dispatcher — `Cannot read properties of null (reading 'useRef')`,
   which crashes the whole app on first mount (no error boundary today).
 - A duplicated **chart.js** meant `ChartJS.register(...)` (in
-  `data/chart-theme.ts`) populated one copy's registry while chart rendering
+  `lib/chart-theme.ts`) populated one copy's registry while chart rendering
   read from another — `"linear" is not a registered scale`, etc.
 
 Both reproduced deterministically on a first, cold visit to the Dashboards
@@ -69,13 +69,25 @@ Pure TypeScript, no framework. Holds:
   roles, biome/resource overlays under `src/geography/`)
 - Calamity definitions under `src/calamities/catalog/*.json`
 - Briefing / mandate **logic** under `src/briefings/` and `src/progression/`
-- Player-facing **creative copy** under `src/copy/*.json` (see
+- Player-facing **creative copy** under `src/copy/` (folders for aides, weekly,
+  mandates, calamities — see
   [`src/copy/README.md`](../packages/data/src/copy/README.md))
 
 No build step — consumed as source via the workspace.
-`packages/web/src/data/economic-systems.ts` and
-`packages/web/src/data/taxonomy.ts` are thin re-export shims (UI-only concerns
+`packages/web/src/lib/economic-systems.ts` and
+`packages/web/src/lib/taxonomy.ts` are thin re-export shims (UI-only concerns
 like category accent colors are layered on in the shim, not the shared data).
+
+### Web `src/` layout
+
+| Folder | Role |
+| --- | --- |
+| `pages/` / `components/` / `context/` | UI shell |
+| `game/` | Run loop, decrees, interrupt effects |
+| `models/` | Citizen generate / mutate (web-local) |
+| `lib/` | UI helpers, calendar, presentation adapters, thin re-exports from `economy-simulator-data` |
+| `repos/` | Thin adapters over `economy-simulator-persistence` (+ a few re-exports of game orchestration) |
+| `workers/` / `audio/` | Population worker; SFX |
 
 ## Geography (`packages/geography`)
 

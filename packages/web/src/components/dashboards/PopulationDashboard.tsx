@@ -5,14 +5,14 @@ import {
 	buildAgeSexPyramidData,
 	buildHistogramData,
 	buildPopulationTrendData,
-} from "../../data/population-dashboard";
-import { themeColors } from "../../data/theme-colors";
+} from "../../lib/population-dashboard";
+import { themeColors } from "../../lib/theme-colors";
 import {
 	type AnnualCycleStats,
 	computeDemographicStats,
 	type DemographicStats,
 	loadPopulationMeta,
-} from "../../storage/population";
+} from "../../repos/population";
 import { ChartCard } from "./ChartCard";
 
 const EMPTY_STATS: DemographicStats = {

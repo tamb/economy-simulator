@@ -2,7 +2,7 @@ import { appConfig } from "economy-simulator-data";
 import { getVisibleActiveCalamities } from "economy-simulator-simulation";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { usePopulation } from "../context/PopulationContext";
-import { appVersion } from "../data/app-version";
+import { appVersion } from "../lib/app-version";
 import { AideProposalModal } from "./AideProposalModal";
 import { CalamityDebuffStrip } from "./CalamityDebuffStrip";
 import { CalamityOnsetModal } from "./CalamityOnsetModal";

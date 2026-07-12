@@ -15,20 +15,20 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { EconomicSystemId } from "../data/economic-systems";
-import type { CategoryId } from "../data/taxonomy";
+import type { EconomicSystemId } from "../lib/economic-systems";
+import type { CategoryId } from "../lib/taxonomy";
 import {
 	getSectorAssignment,
 	loadSectorAssignments,
 	type SectorAssignments,
 	setSectorAssignment,
-} from "../storage/sector-assignments";
+} from "../repos/sector-assignments";
 import {
 	getSectorRoleConfig,
 	loadSectorRoleConfigs,
 	type SectorRoleConfigs,
 	setSectorRoleConfig,
-} from "../storage/sector-role-config";
+} from "../repos/sector-role-config";
 
 interface SectorAssignmentContextValue {
 	assignments: SectorAssignments;

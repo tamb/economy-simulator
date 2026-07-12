@@ -1,10 +1,11 @@
 import {
 	getWeeklyDecisionTree,
+	pickWeeklyPrompt,
 	type RegionDistressKind,
 } from "economy-simulator-data";
 import type { ActiveCalamity } from "economy-simulator-persistence";
-import type { RegionStats } from "../storage/population";
-import type { Region } from "../storage/regions";
+import type { RegionStats } from "../repos/population";
+import type { Region } from "../repos/regions";
 import type {
 	WeeklyReportRegionSummary,
 	WeeklyReportSummary,
@@ -15,6 +16,7 @@ interface BuildWeeklyReportInput {
 	stats: Map<string, RegionStats>;
 	regions: Region[];
 	activeCalamities: ActiveCalamity[];
+	random?: () => number;
 }
 
 function classifyDistress(input: {
@@ -95,7 +97,7 @@ function buildWeeklyReport(
 		regions: top,
 		primaryRegionId: primary.regionId,
 		distress: primary.distress,
-		prompt: tree.prompt,
+		prompt: pickWeeklyPrompt(tree, input.random ?? Math.random),
 	};
 }
 

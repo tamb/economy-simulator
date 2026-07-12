@@ -11,7 +11,7 @@ import type { Person } from "./Person";
 
 type RandomFn = () => number;
 
-/** Per-day resource-economy context for one person's home region/sub-sector, sourced from the last annual cycle's resource extraction and national ledger (see `storage/resource-extraction.ts`, `storage/national-ledger.ts`). */
+/** Per-day resource-economy context for one person's home region/sub-sector, sourced from the last annual cycle's resource extraction and national ledger (see `repos/resource-extraction.ts`, `repos/national-ledger.ts`). */
 interface UpdatePersonStatsContext {
 	/** `getEconomicSystemEffect(...).moraleMultiplier` for the person's assigned sub-sector, if any. */
 	economicSystemMoraleMultiplier?: number;
@@ -40,7 +40,7 @@ function getWeeklyHoursForPerson(person: Person): number | undefined {
  * Apply one in-game day's quality-of-life update to a person. Aging,
  * mortality, fertility, and migration are handled once per game year by the
  * annual population-dynamics cycle (see `runAnnualCycle` in
- * `storage/population.ts`), not here.
+ * `repos/population.ts`), not here.
  */
 function updatePersonStats(
 	person: Person,

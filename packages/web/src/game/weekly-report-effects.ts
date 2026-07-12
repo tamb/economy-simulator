@@ -9,14 +9,14 @@ import {
 	savePopulationChunkRaw,
 	type TemporaryRunModifier,
 } from "economy-simulator-persistence";
-import { formatChunkKey, getChunkCount } from "../data/population-cohorts";
+import { formatChunkKey, getChunkCount } from "../lib/population-cohorts";
 import { Person, type PersonSnapshot } from "../models/Person";
 import {
 	ensureRegionResourceStates,
 	ensureWorld,
 	saveRegionResourceStates,
 	saveWorldRegions,
-} from "../storage/world";
+} from "../repos/world";
 
 function isPersonSnapshot(value: unknown): value is PersonSnapshot {
 	if (!value || typeof value !== "object") return false;

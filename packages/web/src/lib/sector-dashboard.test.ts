@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { SectorStats } from "../storage/population";
+import type { SectorStats } from "../repos/population";
 import {
 	buildAvgHappinessBySectorData,
 	buildEconomicSystemMixData,

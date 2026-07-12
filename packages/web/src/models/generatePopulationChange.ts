@@ -4,10 +4,10 @@ import {
 	assignRoleForCitizen,
 	isWorkingAge,
 } from "economy-simulator-simulation";
-import type { FaceId } from "../data/faces";
-import { personGenerationConfig } from "../data/person-generation";
-import type { WorldRegion } from "../data/world";
-import type { SectorRoleConfigs } from "../storage/sector-role-config";
+import type { FaceId } from "../lib/faces";
+import { personGenerationConfig } from "../lib/person-generation";
+import type { WorldRegion } from "../lib/world";
+import type { SectorRoleConfigs } from "../repos/sector-role-config";
 import {
 	generatePerson,
 	getViableExtractiveSubSectorIdsForRegion,

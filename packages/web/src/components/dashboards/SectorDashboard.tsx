@@ -7,9 +7,9 @@ import {
 	buildEconomicSystemMixData,
 	buildEmploymentShareData,
 	buildSectorEmploymentEntries,
-} from "../../data/sector-dashboard";
-import { type CategoryId, categories } from "../../data/taxonomy";
-import { computeSectorStats, type SectorStats } from "../../storage/population";
+} from "../../lib/sector-dashboard";
+import { type CategoryId, categories } from "../../lib/taxonomy";
+import { computeSectorStats, type SectorStats } from "../../repos/population";
 import { ChartCard } from "./ChartCard";
 
 function SectorDashboard() {

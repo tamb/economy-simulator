@@ -5,8 +5,8 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import type { RegionId } from "../data/regions";
-import { ensureRegionPool, type Region } from "../storage/regions";
+import type { RegionId } from "../lib/regions";
+import { ensureRegionPool, type Region } from "../repos/regions";
 
 interface RegionContextValue {
 	regions: Region[];

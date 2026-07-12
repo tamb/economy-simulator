@@ -22,12 +22,6 @@ import {
 	useState,
 } from "react";
 import { playSfx } from "../audio/sfx";
-import { daysUntilYearEnd } from "../data/calendar";
-import type { PopulationDirectoryEntry } from "../data/population-directory";
-import {
-	getPopulationSize,
-	getPopulationSizeOverride,
-} from "../data/runtime-config";
 import type {
 	AdvanceGameDayResult,
 	AideProposalSummary,
@@ -47,6 +41,12 @@ import {
 } from "../game/nation-setup";
 import { startNewNation } from "../game/new-game";
 import { applyWeeklyChoiceEffects } from "../game/weekly-report-effects";
+import { daysUntilYearEnd } from "../lib/calendar";
+import type { PopulationDirectoryEntry } from "../lib/population-directory";
+import {
+	getPopulationSize,
+	getPopulationSizeOverride,
+} from "../lib/runtime-config";
 import type { Person } from "../models/Person";
 import {
 	buildPopulationDirectory,
@@ -54,8 +54,8 @@ import {
 	getPersonRangeBatched,
 	hasPopulation,
 	loadPopulationMeta,
-} from "../storage/population";
-import { ensureWorld } from "../storage/world";
+} from "../repos/population";
+import { ensureWorld } from "../repos/world";
 import type {
 	PopulationMutationResult,
 	PopulationWorkerRequest,

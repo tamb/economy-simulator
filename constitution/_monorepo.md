@@ -6,7 +6,7 @@
 | --- | --- |
 | `constitution/` | Product intent and agent guidance |
 | `research/` | Sourced demographic, quality-of-life, and resource/geography reference notes |
-| `packages/web/` | React + vite app (UI + orchestration; consumes `data` + `simulation` + `geography` + `persistence`) |
+| `packages/web/` | React + vite app (UI + orchestration; consumes `data` + `simulation` + `geography` + `persistence`). Layout: `pages`/`components`/`context` (UI), `game` (run loop), `models` (citizens), `lib` (helpers + data shims), `repos` (persistence adapters), `workers`/`audio` |
 | `packages/simulation/` | Pure TypeScript calculation engine — no React, no I/O |
 | `packages/geography/` | Pure, deterministic (seeded) world generation — island shape, biomes, resource overlays, adjacency — no React, no I/O |
 | `packages/data/` | Shared config (`AppConfig`, `GameSettings`), research-backed catalogs, briefing/mandate **logic**, and editable **copy JSON** (`src/copy/`) — no React |
@@ -39,12 +39,13 @@ flowchart TD
 
 ### Creative copy (`packages/data/src/copy/`)
 
-Player-facing strings (dialog, titles, hints, How to rule tips, mandate labels)
-live in JSON files documented in
+Player-facing strings (dialog, titles, hints, How to rule tips, mandate labels,
+calamity names) live under `packages/data/src/copy/` (aides / weekly / mandates /
+calamities folders), documented in
 [`packages/data/src/copy/README.md`](../packages/data/src/copy/README.md).
 TypeScript under `briefings/` and `progression/` owns ids, weights, and
-effects, then merges copy by id at import time. Calamity catalog definitions
-already follow the same JSON-import pattern under `packages/data/src/calamities/catalog/`.
+effects, then merges copy by id at import time. Calamity **mechanics** stay in
+`packages/data/src/calamities/catalog/`; flavor text merges from `copy/calamities/`.
 
 ### Calendar conventions (gameplay)
 

@@ -2,9 +2,9 @@ import type { AideProposalChoiceKind } from "economy-simulator-data";
 import { AIDE_ROLE_LABELS } from "economy-simulator-data";
 import { Face } from "facesjs/react";
 import { useFacePool } from "../context/FacePoolContext";
-import type { FaceId } from "../data/faces";
-import { isFaceId } from "../data/faces";
 import type { AideProposalSummary } from "../game/advance-day-result";
+import type { FaceId } from "../lib/faces";
+import { isFaceId } from "../lib/faces";
 
 interface AideProposalModalProps {
 	proposal: AideProposalSummary;

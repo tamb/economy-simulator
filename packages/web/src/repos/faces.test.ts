@@ -15,7 +15,7 @@ vi.mock("facesjs", () => ({
 	}),
 }));
 
-import { FACE_POOL_SIZE, getFacePoolIds } from "../data/faces";
+import { FACE_POOL_SIZE, getFacePoolIds } from "../lib/faces";
 import {
 	clearFacePool,
 	ensureFacePool,

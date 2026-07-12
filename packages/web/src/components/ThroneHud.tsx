@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { usePopulation } from "../context/PopulationContext";
-import { getGameYear } from "../data/calendar";
-import { getThreatsAndGoals } from "../data/threats-and-goals";
+import { getGameYear } from "../lib/calendar";
+import { getThreatsAndGoals } from "../lib/threats-and-goals";
 
 /**
  * Persistent throne controls: time, score, threats/goals, and advance actions.

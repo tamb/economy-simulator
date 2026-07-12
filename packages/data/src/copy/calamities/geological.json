@@ -1,0 +1,30 @@
+{
+	"earthquake": {
+		"name": "Earthquake",
+		"description": "The ground heaves. Mines crack, quarries slide, and buildings shudder."
+	},
+	"aftershock_cluster": {
+		"name": "Aftershock Cluster",
+		"description": "Repeated tremors prolong the quake's damage and keep nerves frayed."
+	},
+	"tsunami": {
+		"name": "Tsunami",
+		"description": "A wall of water smashes the coast, wrecking fleets and shoreline works."
+	},
+	"coastal_erosion": {
+		"name": "Coastal Erosion",
+		"description": "The sea steadily eats the shoreline, nibbling harbors and fishing grounds."
+	},
+	"sinkhole": {
+		"name": "Sinkhole",
+		"description": "Ground collapses into a void, swallowing quarry faces and access roads."
+	},
+	"mine_collapse": {
+		"name": "Mine Collapse",
+		"description": "Tunnels fail. Ore access is lost and miners flee the dark."
+	},
+	"well_blowout": {
+		"name": "Well Blowout",
+		"description": "A fuel well erupts uncontrolled, wasting reserves and poisoning ground."
+	}
+}

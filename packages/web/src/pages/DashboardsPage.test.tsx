@@ -51,7 +51,7 @@ vi.mock("../context/SectorAssignmentContext", () => ({
 	}),
 }));
 
-vi.mock("../storage/national-ledger", () => ({
+vi.mock("../repos/national-ledger", () => ({
 	loadNationalLedger: vi.fn(async () => ({
 		resources: [
 			{
@@ -65,7 +65,7 @@ vi.mock("../storage/national-ledger", () => ({
 	})),
 }));
 
-vi.mock("../storage/population", () => ({
+vi.mock("../repos/population", () => ({
 	computeDemographicStats: vi.fn(async () => ({
 		ageSexPyramid: [{ label: "0-9", male: 1, female: 1 }],
 		happinessHistogram: [{ label: "50-59", count: 2 }],

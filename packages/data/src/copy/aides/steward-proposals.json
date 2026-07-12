@@ -1,0 +1,56 @@
+{
+	"steward_labor_shift": {
+		"title": "Labor shift",
+		"dialog": "My liege, industrial shortfalls are biting. Permit me to reassign a share of idle hands toward the starving workshops.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Reassign 10% toward shortfall work"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Reassign 5%"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Leave the roster alone"
+			}
+		}
+	},
+	"steward_role_reshuffle": {
+		"title": "Role reshuffle",
+		"dialog": "The role mix no longer matches the quotas you set. A controlled reform will sting, but inefficiency will sting more.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Full role reform in one sector"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Reform half the workforce"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Avoid unrest"
+			}
+		}
+	},
+	"steward_granary_draft": {
+		"title": "Granary draft",
+		"dialog": "Storehouses sit half-empty while fields and mills wait on hands. A short draft into primary production will refill the stockpile.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Reassign 8% toward shortfall work"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Reassign 4%"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Trust the markets"
+			}
+		}
+	}
+}

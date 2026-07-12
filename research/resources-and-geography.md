@@ -275,7 +275,7 @@ All defaults live in `GameSettings.resources`
 | Biome, resource, overlay, input catalogs + tunables | `packages/data/src/geography/`, `packages/data/src/config/` |
 | Island shape, biome assignment, overlay placement | `packages/geography/` |
 | Extraction yield, depletion/regen, environment, ledger | `packages/simulation/src/resources/` |
-| World persistence, annual extraction pass, job assignment | `packages/web/src/storage/` |
+| World persistence, annual extraction pass, job assignment | `packages/web/src/repos/` |
 | Map + Resource Ledger dashboard | `packages/web/src/pages/`, `packages/web/src/components/` |
 
 ```mermaid

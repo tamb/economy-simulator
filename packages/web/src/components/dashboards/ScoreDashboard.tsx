@@ -1,6 +1,6 @@
 import type { GameRunState } from "economy-simulator-persistence";
 import { Line } from "react-chartjs-2";
-import { buildNationScoreTrendData } from "../../data/score-dashboard";
+import { buildNationScoreTrendData } from "../../lib/score-dashboard";
 import { ChartCard } from "./ChartCard";
 
 interface ScoreDashboardProps {

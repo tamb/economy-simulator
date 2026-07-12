@@ -6,7 +6,7 @@ import {
 import { generateWorld } from "economy-simulator-geography";
 import { generateRegionCoordinates, type RegionId } from "./regions";
 
-/** One region's terrain (land biome or ocean), independent of its player-facing name or mutable resource state — see `../storage/world.ts` for persistence. */
+/** One region's terrain (land biome or ocean), independent of its player-facing name or mutable resource state — see `../repos/world.ts` for persistence. */
 interface WorldRegion {
 	id: RegionId;
 	q: number;

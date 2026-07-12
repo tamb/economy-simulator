@@ -1,0 +1,54 @@
+{
+	"forest_fire": {
+		"name": "Forest Fire",
+		"description": "Wildfire sweeps through woodland, burning timber stands and fouling the air."
+	},
+	"wildfire_smoke": {
+		"name": "Wildfire Smoke",
+		"description": "Smoke from nearby fires blankets the region, irritating lungs and lowering morale."
+	},
+	"drought": {
+		"name": "Drought",
+		"description": "Rain fails for weeks. Crops wilt and pastures brown under a hard sky."
+	},
+	"heatwave": {
+		"name": "Heatwave",
+		"description": "Oppressive heat saps workers and livestock across open country."
+	},
+	"flood": {
+		"name": "Flood",
+		"description": "Rivers burst their banks, drowning fields and fouling low ground."
+	},
+	"flash_flood": {
+		"name": "Flash Flood",
+		"description": "Sudden mountain runoff scours valleys and buries roads in debris."
+	},
+	"hurricane": {
+		"name": "Hurricane",
+		"description": "A spinning storm hammers the coast with wind, rain, and surge."
+	},
+	"tropical_storm": {
+		"name": "Tropical Storm",
+		"description": "A lesser coastal storm lashes harbors and fishing fleets."
+	},
+	"tornado": {
+		"name": "Tornado",
+		"description": "A narrow funnel tears through farmland and light structures."
+	},
+	"blizzard": {
+		"name": "Blizzard",
+		"description": "Heavy snow and wind shut mountain passes and freeze quarry work."
+	},
+	"hailstorm": {
+		"name": "Hailstorm",
+		"description": "Ice stones shred standing crops across open plains."
+	},
+	"landslide": {
+		"name": "Landslide",
+		"description": "A slope gives way, burying roads, timber stands, and mine mouths."
+	},
+	"volcanic_ash": {
+		"name": "Volcanic Ash",
+		"description": "Ash falls from a distant eruption, smothering crops and clogging lungs."
+	}
+}

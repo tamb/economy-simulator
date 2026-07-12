@@ -1,8 +1,6 @@
 [
 	{
 		"id": "disease",
-		"name": "Disease Outbreak",
-		"description": "Illness spreads through settlements, thinning labor and fraying nerves.",
 		"category": "biological",
 		"tier": "v1",
 		"weight": 9,
@@ -77,8 +75,6 @@
 	},
 	{
 		"id": "livestock_plague",
-		"name": "Livestock Plague",
-		"description": "A contagion tears through herds and flocks.",
 		"category": "biological",
 		"tier": "v1",
 		"weight": 8,
@@ -162,8 +158,6 @@
 	},
 	{
 		"id": "crop_blight",
-		"name": "Crop Blight",
-		"description": "Fungus and rot sweep the fields before harvest.",
 		"category": "biological",
 		"tier": "v1",
 		"weight": 9,
@@ -247,8 +241,6 @@
 	},
 	{
 		"id": "fishery_collapse",
-		"name": "Fishery Collapse",
-		"description": "Coastal stocks crash — empty nets and idle boats along the shore.",
 		"category": "biological",
 		"tier": "v1",
 		"weight": 7,
@@ -332,8 +324,6 @@
 	},
 	{
 		"id": "insect_swarm",
-		"name": "Insect Swarm",
-		"description": "Clouds of pests strip leaves and grain from the fields.",
 		"category": "biological",
 		"tier": "v1.5",
 		"weight": 8,
@@ -417,8 +407,6 @@
 	},
 	{
 		"id": "invasive_species",
-		"name": "Invasive Species",
-		"description": "An outsider species takes root, quietly taxing forests, farms, or shores.",
 		"category": "biological",
 		"tier": "v2",
 		"weight": 5,
@@ -511,8 +499,6 @@
 	},
 	{
 		"id": "red_tide",
-		"name": "Red Tide",
-		"description": "Toxic algal bloom stains coastal waters and kills fish in droves.",
 		"category": "biological",
 		"tier": "v1.5",
 		"weight": 6,

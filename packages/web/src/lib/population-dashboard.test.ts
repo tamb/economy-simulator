@@ -3,7 +3,7 @@ import type {
 	AgeSexBucket,
 	AnnualCycleStats,
 	HistogramBucket,
-} from "../storage/population";
+} from "../repos/population";
 import {
 	buildAgeSexPyramidData,
 	buildHistogramData,

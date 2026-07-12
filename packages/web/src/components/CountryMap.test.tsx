@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { getTerrainColor } from "../data/terrain-color-scale";
-import type { RegionStats } from "../storage/population";
-import type { Region } from "../storage/regions";
+import { getTerrainColor } from "../lib/terrain-color-scale";
+import type { RegionStats } from "../repos/population";
+import type { Region } from "../repos/regions";
 import {
 	CountryMap,
 	comparePaintOrder,

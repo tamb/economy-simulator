@@ -17,8 +17,8 @@ import {
 	saveWorldRegions as saveWorldRegionsRepo,
 	type WorldMeta,
 } from "economy-simulator-persistence";
-import type { RegionId } from "../data/regions";
-import { buildWorldRegions, type WorldRegion } from "../data/world";
+import type { RegionId } from "../lib/regions";
+import { buildWorldRegions, type WorldRegion } from "../lib/world";
 
 type RandomFn = () => number;
 

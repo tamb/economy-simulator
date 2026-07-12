@@ -1,8 +1,6 @@
 [
 	{
 		"id": "earthquake",
-		"name": "Earthquake",
-		"description": "The ground heaves. Mines crack, quarries slide, and buildings shudder.",
 		"category": "geological",
 		"tier": "v1",
 		"weight": 7,
@@ -112,8 +110,6 @@
 	},
 	{
 		"id": "aftershock_cluster",
-		"name": "Aftershock Cluster",
-		"description": "Repeated tremors prolong the quake's damage and keep nerves frayed.",
 		"category": "geological",
 		"tier": "v1.5",
 		"weight": 4,
@@ -201,8 +197,6 @@
 	},
 	{
 		"id": "tsunami",
-		"name": "Tsunami",
-		"description": "A wall of water smashes the coast, wrecking fleets and shoreline works.",
 		"category": "geological",
 		"tier": "v1",
 		"weight": 5,
@@ -295,8 +289,6 @@
 	},
 	{
 		"id": "coastal_erosion",
-		"name": "Coastal Erosion",
-		"description": "The sea steadily eats the shoreline, nibbling harbors and fishing grounds.",
 		"category": "geological",
 		"tier": "v2",
 		"weight": 6,
@@ -384,8 +376,6 @@
 	},
 	{
 		"id": "sinkhole",
-		"name": "Sinkhole",
-		"description": "Ground collapses into a void, swallowing quarry faces and access roads.",
 		"category": "geological",
 		"tier": "v1.5",
 		"weight": 5,
@@ -474,8 +464,6 @@
 	},
 	{
 		"id": "mine_collapse",
-		"name": "Mine Collapse",
-		"description": "Tunnels fail. Ore access is lost and miners flee the dark.",
 		"category": "geological",
 		"tier": "v1",
 		"weight": 7,
@@ -559,8 +547,6 @@
 	},
 	{
 		"id": "well_blowout",
-		"name": "Well Blowout",
-		"description": "A fuel well erupts uncontrolled, wasting reserves and poisoning ground.",
 		"category": "geological",
 		"tier": "v1",
 		"weight": 5,

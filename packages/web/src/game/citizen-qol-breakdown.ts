@@ -16,11 +16,11 @@ import {
 	isWorkingAge,
 } from "economy-simulator-simulation";
 import type { Person } from "../models/Person";
-import type { Region } from "../storage/regions";
+import type { Region } from "../repos/regions";
 import {
 	getSectorAssignment,
 	type SectorAssignments,
-} from "../storage/sector-assignments";
+} from "../repos/sector-assignments";
 
 interface QolFactorLine {
 	id: string;

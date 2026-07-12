@@ -15,11 +15,11 @@ import {
 	loadGameRunState,
 	saveGameRunState,
 } from "economy-simulator-persistence";
-import type { FaceId } from "../data/faces";
-import { categories } from "../data/taxonomy";
-import { loadNationalLedger } from "../storage/national-ledger";
-import { computeRegionStats } from "../storage/population";
-import { ensureRegionResourceStates, ensureWorld } from "../storage/world";
+import type { FaceId } from "../lib/faces";
+import { categories } from "../lib/taxonomy";
+import { loadNationalLedger } from "../repos/national-ledger";
+import { computeRegionStats } from "../repos/population";
+import { ensureRegionResourceStates, ensureWorld } from "../repos/world";
 import type { AideProposalSummary } from "./advance-day-result";
 import { applyLaborEdict, applyRoleReform } from "./population-mutations";
 import {

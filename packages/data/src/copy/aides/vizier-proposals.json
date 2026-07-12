@@ -1,0 +1,56 @@
+{
+	"vizier_mandate_focus": {
+		"title": "Mandate focus",
+		"dialog": "Your royal mandate still hangs over the year. A focused push can buy progress — if you authorize it.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "National happiness nudge toward the mandate"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Smaller nudge"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "No special focus"
+			}
+		}
+	},
+	"vizier_public_triumph": {
+		"title": "Public triumph",
+		"dialog": "A modest triumph parade would lift spirits and burnish the score — unless the people are already too weary to cheer.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+happiness and a small pending score bonus"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Quieter celebration"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Thrift over spectacle"
+			}
+		}
+	},
+	"vizier_court_survey": {
+		"title": "Court survey",
+		"dialog": "Let the scribes walk the wards and report what the people actually want. A little attention buys goodwill — and a cleaner ledger of your reign.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+happiness and a small pending score bonus"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Shorter survey round"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Skip the paperwork"
+			}
+		}
+	}
+}

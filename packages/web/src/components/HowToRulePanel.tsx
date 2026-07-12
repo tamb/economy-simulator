@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { usePopulation } from "../context/PopulationContext";
-import { HOW_TO_RULE_STEPS } from "../data/how-to-rule";
+import { HOW_TO_RULE_STEPS } from "../lib/how-to-rule";
 
 /**
  * Fixed bottom-right toggle that opens a slide-up "How to rule" briefing.

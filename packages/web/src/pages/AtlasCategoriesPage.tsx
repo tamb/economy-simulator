@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { CategoryMap } from "../components/CategoryMap";
-import { categories } from "../data/taxonomy";
+import { categories } from "../lib/taxonomy";
 
 /** Index route for `/atlas` — the five-tier category pyramid. */
 function AtlasCategoriesPage() {

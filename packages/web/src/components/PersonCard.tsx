@@ -1,6 +1,6 @@
 import { Face } from "facesjs/react";
 import { useFacePool } from "../context/FacePoolContext";
-import { personGenerationConfig } from "../data/person-generation";
+import { personGenerationConfig } from "../lib/person-generation";
 import type { Person } from "../models/Person";
 
 const traitLabels: Record<

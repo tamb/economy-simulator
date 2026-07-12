@@ -1,6 +1,10 @@
 /**
  * One-shot generator for calamity JSON catalogs. Run:
  *   bun packages/data/src/calamities/generate-catalog.ts
+ *
+ * Writes mechanics-only files under `catalog/` and flavor (`name` /
+ * `description`) under `../copy/calamities/`. Do not re-embed flavor in
+ * the mechanics catalogs — `calamities/index.ts` merges them at load.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -1210,12 +1214,26 @@ const catalogs = {
 
 const root = dirname(fileURLToPath(import.meta.url));
 const outDir = join(root, "catalog");
+const copyDir = join(root, "../copy/calamities");
 mkdirSync(outDir, { recursive: true });
+mkdirSync(copyDir, { recursive: true });
 
 for (const [name, entries] of Object.entries(catalogs)) {
-	const path = join(outDir, `${name}.json`);
-	writeFileSync(path, `${JSON.stringify(entries, null, "\t")}\n`, "utf8");
-	console.log(`wrote ${path} (${entries.length})`);
+	const flavor: Record<string, { name: string; description: string }> = {};
+	const mechanics = entries.map((entry) => {
+		const { name: calamityName, description, ...rest } = entry;
+		flavor[entry.id] = { name: calamityName, description };
+		return rest;
+	});
+	const mechanicsPath = join(outDir, `${name}.json`);
+	const copyPath = join(copyDir, `${name}.json`);
+	writeFileSync(
+		mechanicsPath,
+		`${JSON.stringify(mechanics, null, "\t")}\n`,
+		"utf8",
+	);
+	writeFileSync(copyPath, `${JSON.stringify(flavor, null, "\t")}\n`, "utf8");
+	console.log(`wrote ${mechanicsPath} + ${copyPath} (${entries.length})`);
 }
 
 const all = Object.values(catalogs).flat();

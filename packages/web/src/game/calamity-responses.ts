@@ -1,3 +1,4 @@
+import { getCalamityResponseCopy } from "economy-simulator-data";
 import type {
 	ActiveCalamity,
 	CalamityPlayerResponse,
@@ -15,30 +16,41 @@ interface CalamityResponseEffect {
 	detail: string;
 }
 
+/** Numeric scales live here; labels/details come from `copy/calamities/responses.json`. */
+const RESPONSE_SCALES: Record<
+	CalamityPlayerResponse,
+	Omit<CalamityResponseEffect, "label" | "detail">
+> = {
+	endure: {
+		happinessPenaltyScale: 1,
+		extractionHitScale: 1,
+		midTermRemainingFactor: 1,
+	},
+	relief: {
+		happinessPenaltyScale: 0.55,
+		extractionHitScale: 1,
+		midTermRemainingFactor: 0.55,
+	},
+	rebuild: {
+		happinessPenaltyScale: 1.15,
+		extractionHitScale: 0.45,
+		midTermRemainingFactor: 0.85,
+	},
+};
+
 const RESPONSE_EFFECTS: Record<CalamityPlayerResponse, CalamityResponseEffect> =
 	{
 		endure: {
-			happinessPenaltyScale: 1,
-			extractionHitScale: 1,
-			midTermRemainingFactor: 1,
-			label: "Endure",
-			detail: "No intervention — full catalog duration and penalties.",
+			...RESPONSE_SCALES.endure,
+			...getCalamityResponseCopy("endure"),
 		},
 		relief: {
-			happinessPenaltyScale: 0.55,
-			extractionHitScale: 1,
-			midTermRemainingFactor: 0.55,
-			label: "Relief",
-			detail:
-				"Divert aid to the stricken regions: shorter crisis, softer happiness hit; extraction stays damaged.",
+			...RESPONSE_SCALES.relief,
+			...getCalamityResponseCopy("relief"),
 		},
 		rebuild: {
-			happinessPenaltyScale: 1.15,
-			extractionHitScale: 0.45,
-			midTermRemainingFactor: 0.85,
-			label: "Rebuild",
-			detail:
-				"Prioritize infrastructure: extraction recovers faster, workers are strained, crisis lasts a bit less.",
+			...RESPONSE_SCALES.rebuild,
+			...getCalamityResponseCopy("rebuild"),
 		},
 	};
 

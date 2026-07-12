@@ -6,8 +6,8 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { FACE_POOL_SIZE, type FaceId } from "../data/faces";
-import { ensureFacePool, loadFacePool } from "../storage/faces";
+import { FACE_POOL_SIZE, type FaceId } from "../lib/faces";
+import { ensureFacePool, loadFacePool } from "../repos/faces";
 
 interface FacePoolContextValue {
 	faceIds: FaceId[];

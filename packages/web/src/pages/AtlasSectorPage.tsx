@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 import { SectorMap } from "../components/SectorMap";
-import { type CategoryId, getCategory } from "../data/taxonomy";
+import { type CategoryId, getCategory } from "../lib/taxonomy";
 
 /** Renders for both `/atlas/:categoryId` and `/atlas/:categoryId/:sectorId`. */
 function AtlasSectorPage() {

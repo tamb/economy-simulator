@@ -1,8 +1,8 @@
 import { gameSettings } from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
-import { getFacePoolIds } from "../data/faces";
-import { personGenerationConfig } from "../data/person-generation";
-import type { WorldRegion } from "../data/world";
+import { getFacePoolIds } from "../lib/faces";
+import { personGenerationConfig } from "../lib/person-generation";
+import type { WorldRegion } from "../lib/world";
 import { generatePerson, type RandomFn } from "./generatePerson";
 import { Person } from "./Person";
 

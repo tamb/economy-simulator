@@ -52,7 +52,7 @@ vi.mock("../context/RegionContext", () => ({
 	}),
 }));
 
-vi.mock("../storage/population", () => ({
+vi.mock("../repos/population", () => ({
 	computeRegionStats: vi.fn(
 		async () =>
 			new Map([

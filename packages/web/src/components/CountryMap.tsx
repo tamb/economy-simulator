@@ -1,11 +1,11 @@
 import { getResourceOverlay } from "economy-simulator-data";
 import { useMemo, useState } from "react";
-import type { MapMetric, QualityRange } from "../data/region-color-scale";
-import { getRegionColor } from "../data/region-color-scale";
-import { getHexLayout, HEX_DIMENSIONS } from "../data/regions";
-import { getTerrainLabel } from "../data/terrain-color-scale";
-import type { RegionStats } from "../storage/population";
-import type { Region } from "../storage/regions";
+import type { MapMetric, QualityRange } from "../lib/region-color-scale";
+import { getRegionColor } from "../lib/region-color-scale";
+import { getHexLayout, HEX_DIMENSIONS } from "../lib/regions";
+import { getTerrainLabel } from "../lib/terrain-color-scale";
+import type { RegionStats } from "../repos/population";
+import type { Region } from "../repos/regions";
 
 interface CountryMapProps {
 	regions: Region[];

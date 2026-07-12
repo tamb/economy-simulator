@@ -14,5 +14,13 @@
 	"heal_land": {
 		"label": "Heal the land",
 		"description": "Restore environment health to 60 or higher."
+	},
+	"grow_population": {
+		"label": "Grow the realm",
+		"description": "End the year with more living citizens than you began it."
+	},
+	"tighten_ledger": {
+		"label": "Tighten the ledger",
+		"description": "Keep average resource sufficiency at 80% or higher."
 	}
 }

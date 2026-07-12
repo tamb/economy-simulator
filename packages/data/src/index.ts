@@ -21,6 +21,7 @@ export type {
 } from "./briefings/weekly-reports";
 export {
 	getWeeklyDecisionTree,
+	pickWeeklyPrompt,
 	weeklyDecisionTrees,
 } from "./briefings/weekly-reports";
 export type {
@@ -46,6 +47,14 @@ export type { AppConfig } from "./config/app-config";
 export { appConfig } from "./config/app-config";
 export type { GameSettings } from "./config/game-settings";
 export { gameSettings } from "./config/game-settings";
+export type {
+	CalamityResponseCopy,
+	CalamityResponseKind,
+} from "./copy/calamities/responses";
+export {
+	CALAMITY_RESPONSE_COPY,
+	getCalamityResponseCopy,
+} from "./copy/calamities/responses";
 export type { HowToRuleStep } from "./copy/how-to-rule";
 export { HOW_TO_RULE_STEPS } from "./copy/how-to-rule";
 export type { LifeTableRow, Sex } from "./demographics/life-tables";

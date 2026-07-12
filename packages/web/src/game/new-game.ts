@@ -6,12 +6,12 @@ import {
 	loadPopulationMeta,
 	saveGameRunState,
 } from "economy-simulator-persistence";
-import { clearNationalLedger } from "../storage/national-ledger";
-import { clearPopulation } from "../storage/population";
-import { clearRegionPool } from "../storage/regions";
-import { clearSectorAssignments } from "../storage/sector-assignments";
-import { clearSectorRoleConfigs } from "../storage/sector-role-config";
-import { clearWorld } from "../storage/world";
+import { clearNationalLedger } from "../repos/national-ledger";
+import { clearPopulation } from "../repos/population";
+import { clearRegionPool } from "../repos/regions";
+import { clearSectorAssignments } from "../repos/sector-assignments";
+import { clearSectorRoleConfigs } from "../repos/sector-role-config";
+import { clearWorld } from "../repos/world";
 import { archiveRunToProfile } from "./progression";
 
 async function resetNationStores(): Promise<void> {

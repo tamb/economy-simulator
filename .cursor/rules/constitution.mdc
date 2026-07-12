@@ -33,7 +33,7 @@ When product intent, architecture, repo layout, or conventions are unclear, read
 - Read the index and relevant `_*.md` topic before introducing new patterns.
 - Match existing package conventions; minimize scope.
 - Do not hand-edit generated assets under `packages/desktop/resources/` — run `copy-web-to-desktop` after web builds.
-- Edit player-facing dialogue/labels in `packages/data/src/copy/*.json`; keep effects/weights/ids in TypeScript (see that folder’s README).
+- Edit player-facing dialogue/labels under `packages/data/src/copy/` (see that folder’s README); keep effects/weights/ids in TypeScript.
 - Update constitution docs when product or architecture decisions change.
 
 ## Quality gates

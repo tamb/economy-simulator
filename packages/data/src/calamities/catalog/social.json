@@ -1,8 +1,6 @@
 [
 	{
 		"id": "labor_strike",
-		"name": "Labor Strike",
-		"description": "Workers walk out of a key sector, freezing output until tempers cool.",
 		"category": "social",
 		"tier": "v2",
 		"weight": 7,
@@ -83,8 +81,6 @@
 	},
 	{
 		"id": "food_riot",
-		"name": "Food Riot",
-		"description": "Hunger and anger spill into the streets after shortages bite.",
 		"category": "social",
 		"tier": "v2",
 		"weight": 5,
@@ -163,8 +159,6 @@
 	},
 	{
 		"id": "bank_panic",
-		"name": "Bank Panic",
-		"description": "Depositors rush the banks; credit freezes and services seize up.",
 		"category": "social",
 		"tier": "v2",
 		"weight": 4,
@@ -243,8 +237,6 @@
 	},
 	{
 		"id": "plague_of_corruption",
-		"name": "Plague of Corruption",
-		"description": "Graft and favoritism sap administration and public trust.",
 		"category": "social",
 		"tier": "v2",
 		"weight": 4,

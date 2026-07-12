@@ -1,6 +1,6 @@
 import type { ChartData } from "chart.js";
-import type { AnnualCycleStats, RegionStats } from "../storage/population";
-import type { Region } from "../storage/regions";
+import type { AnnualCycleStats, RegionStats } from "../repos/population";
+import type { Region } from "../repos/regions";
 import { themeColors } from "./theme-colors";
 
 /** National average quality-of-life (mean of happiness and health) per recorded game year. */

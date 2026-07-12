@@ -11,9 +11,9 @@ import {
 	assignRoleForCitizen,
 	isWorkingAge,
 } from "economy-simulator-simulation";
-import type { FaceId } from "../data/faces";
-import { personGenerationConfig } from "../data/person-generation";
-import type { WorldRegion } from "../data/world";
+import type { FaceId } from "../lib/faces";
+import { personGenerationConfig } from "../lib/person-generation";
+import type { WorldRegion } from "../lib/world";
 import { Person, type PersonalityTrait, type PersonSex } from "./Person";
 
 function landRegions(regions: readonly WorldRegion[]): WorldRegion[] {

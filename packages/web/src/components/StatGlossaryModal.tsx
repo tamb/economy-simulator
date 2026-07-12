@@ -1,4 +1,4 @@
-import { statGlossary } from "../data/stat-glossary";
+import { statGlossary } from "../lib/stat-glossary";
 
 interface StatGlossaryModalProps {
 	isOpen: boolean;

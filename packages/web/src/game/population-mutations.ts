@@ -22,11 +22,11 @@ import {
 	rerollRoleForCitizen,
 	selectLaborEdictCandidates,
 } from "economy-simulator-simulation";
-import { formatChunkKey, getChunkCount } from "../data/population-cohorts";
+import { formatChunkKey, getChunkCount } from "../lib/population-cohorts";
 import { getViableExtractiveSubSectorIdsForRegion } from "../models/generatePerson";
 import { Person, type PersonSnapshot } from "../models/Person";
-import { loadSectorRoleConfigs } from "../storage/sector-role-config";
-import { ensureWorld } from "../storage/world";
+import { loadSectorRoleConfigs } from "../repos/sector-role-config";
+import { ensureWorld } from "../repos/world";
 
 const LABOR_EDICT_HAPPINESS_PENALTY = 8;
 const ROLE_REFORM_HAPPINESS_PENALTY = 5;

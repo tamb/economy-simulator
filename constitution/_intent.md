@@ -66,5 +66,5 @@ from game logic.
 2. **Monorepo clarity** — shared tooling at the root; app code in packages.
 3. **Config vs. settings** — `AppConfig` (`packages/data`) holds non-gameplay tunables (population scale, storage chunking, perf/feature flags); `GameSettings` (`packages/data`) holds simulation rules that affect gameplay balance (ages, work hours, mortality/fertility/migration, calendar, calamity frequency). Both are single sources of truth — prefer importing them over redefining constants locally.
 4. **Pure engine, impure shell** — `packages/simulation` contains no React/I/O code; `packages/persistence` owns storage drivers and repositories; `packages/web` owns UI and game-loop orchestration.
-5. **Copy vs. logic** — player-facing dialogue, titles, hints, and tip text live in `packages/data/src/copy/*.json`. Mechanical ids, weights, and effects stay in TypeScript. Do not mix balance numbers into copy files.
+5. **Copy vs. logic** — player-facing dialogue, titles, hints, and tip text live under `packages/data/src/copy/` (see that folder’s README). Mechanical ids, weights, and effects stay in TypeScript. Do not mix balance numbers into copy files.
 6. **Document decisions** — update constitution when product or architecture changes.

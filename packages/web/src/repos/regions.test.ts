@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { getRegionCount, getRegionIds } from "../data/regions";
+import { getRegionCount, getRegionIds } from "../lib/regions";
 import { setupMemoryStorage } from "../test/storage-driver";
 import {
 	clearRegionPool,

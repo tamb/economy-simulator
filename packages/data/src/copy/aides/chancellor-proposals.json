@@ -1,0 +1,56 @@
+{
+	"chancellor_restoration_levy": {
+		"title": "Restoration levy",
+		"dialog": "The worst soil and timber stands need a levy for restoration. Yields will dip while the land heals.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+environment; extraction −10% for 14 days"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Half the restoration"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Let the land wait"
+			}
+		}
+	},
+	"chancellor_extraction_surge": {
+		"title": "Extraction surge",
+		"dialog": "Open the reserves for a short surge. The ledger will smile — the land will not.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+yield 14 days; −environment"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Smaller surge"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Conserve the land"
+			}
+		}
+	},
+	"chancellor_selective_fallow": {
+		"title": "Selective fallow",
+		"dialog": "Leave the most scarred plots fallow for a fortnight. Output softens; the soil remembers the rest.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+environment; extraction −8% for 14 days"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Milder fallow"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Keep every acre working"
+			}
+		}
+	}
+}

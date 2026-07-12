@@ -1,4 +1,4 @@
-import weeklyReportsCopy from "../copy/weekly-reports.json" with {
+import weeklyReportsCopy from "../copy/weekly/reports.json" with {
 	type: "json",
 };
 
@@ -38,11 +38,14 @@ interface WeeklyChoiceDefinition {
 
 interface WeeklyDecisionTree {
 	distress: RegionDistressKind;
+	/** Default prompt (first variant) for stable tests and UI fallbacks. */
 	prompt: string;
+	/** All player-facing prompt variants for this distress. */
+	prompts: string[];
 	choices: WeeklyChoiceDefinition[];
 }
 
-/** Game logic only — player-facing strings come from `copy/weekly-reports.json`. */
+/** Game logic only — player-facing strings come from `copy/weekly/reports.json`. */
 interface WeeklyChoiceLogic {
 	id: WeeklyChoiceId;
 	effects: WeeklyChoiceEffect;
@@ -66,6 +69,7 @@ const weeklyTreesLogic: WeeklyTreeLogic[] = [
 					modifierDurationDays: 14,
 				},
 			},
+			{ id: "festival_grant", effects: { happinessDelta: 3 } },
 			{ id: "let_them_endure", effects: { emigrationRisk: true } },
 		],
 	},
@@ -80,6 +84,7 @@ const weeklyTreesLogic: WeeklyTreeLogic[] = [
 				id: "quarantine_corridors",
 				effects: { healthDelta: 4, happinessDelta: -3 },
 			},
+			{ id: "field_clinics", effects: { healthDelta: 4 } },
 			{ id: "defer_health", effects: {} },
 		],
 	},
@@ -99,6 +104,14 @@ const weeklyTreesLogic: WeeklyTreeLogic[] = [
 				effects: {
 					environmentDelta: 4,
 					extractionEfficiencyFactor: 0.92,
+					modifierDurationDays: 14,
+				},
+			},
+			{
+				id: "seed_nurseries",
+				effects: {
+					environmentDelta: 3,
+					extractionEfficiencyFactor: 0.95,
 					modifierDurationDays: 14,
 				},
 			},
@@ -123,6 +136,7 @@ const weeklyTreesLogic: WeeklyTreeLogic[] = [
 				id: "evacuate_labor",
 				effects: { evacuateLaborPercent: 15, happinessDelta: -2 },
 			},
+			{ id: "emergency_rations", effects: { happinessDelta: 4 } },
 			{ id: "hold_the_line", effects: {} },
 		],
 	},
@@ -131,7 +145,7 @@ const weeklyTreesLogic: WeeklyTreeLogic[] = [
 type WeeklyCopyFile = Record<
 	string,
 	{
-		prompt: string;
+		prompts: string[];
 		choices: Record<string, { label: string; hint: string }>;
 	}
 >;
@@ -143,17 +157,24 @@ function mergeWeeklyTrees(): WeeklyDecisionTree[] {
 		const treeCopy = copy[tree.distress];
 		if (!treeCopy) {
 			throw new Error(
-				`Missing copy for weekly distress "${tree.distress}" in copy/weekly-reports.json`,
+				`Missing copy for weekly distress "${tree.distress}" in copy/weekly/reports.json`,
+			);
+		}
+		const prompts = treeCopy.prompts;
+		if (!prompts || prompts.length === 0) {
+			throw new Error(
+				`Missing prompts for weekly distress "${tree.distress}" in copy/weekly/reports.json`,
 			);
 		}
 		return {
 			distress: tree.distress,
-			prompt: treeCopy.prompt,
+			prompt: prompts[0] ?? "",
+			prompts,
 			choices: tree.choices.map((choice) => {
 				const choiceCopy = treeCopy.choices[choice.id];
 				if (!choiceCopy) {
 					throw new Error(
-						`Missing copy for weekly choice "${choice.id}" under "${tree.distress}" in copy/weekly-reports.json`,
+						`Missing copy for weekly choice "${choice.id}" under "${tree.distress}" in copy/weekly/reports.json`,
 					);
 				}
 				return {
@@ -175,6 +196,15 @@ function getWeeklyDecisionTree(
 	return weeklyDecisionTrees.find((tree) => tree.distress === distress);
 }
 
+function pickWeeklyPrompt(
+	tree: WeeklyDecisionTree,
+	random: () => number = Math.random,
+): string {
+	if (tree.prompts.length === 0) return tree.prompt;
+	const index = Math.floor(random() * tree.prompts.length);
+	return tree.prompts[index] ?? tree.prompt;
+}
+
 export type {
 	RegionDistressKind,
 	WeeklyChoiceDefinition,
@@ -182,4 +212,4 @@ export type {
 	WeeklyChoiceId,
 	WeeklyDecisionTree,
 };
-export { getWeeklyDecisionTree, weeklyDecisionTrees };
+export { getWeeklyDecisionTree, pickWeeklyPrompt, weeklyDecisionTrees };

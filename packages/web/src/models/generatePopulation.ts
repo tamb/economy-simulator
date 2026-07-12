@@ -1,15 +1,15 @@
 import { appConfig } from "economy-simulator-data";
-import type { FaceId } from "../data/faces";
-import { getChunkCount, getGlobalIndex } from "../data/population-cohorts";
-import type { WorldRegion } from "../data/world";
+import type { FaceId } from "../lib/faces";
+import { getChunkCount, getGlobalIndex } from "../lib/population-cohorts";
+import type { WorldRegion } from "../lib/world";
 import { generatePerson } from "../models/generatePerson";
 import type { Person } from "../models/Person";
 import {
 	finalizePopulationMeta,
 	hasPopulation,
 	savePopulationChunk,
-} from "../storage/population";
-import type { SectorRoleConfigs } from "../storage/sector-role-config";
+} from "../repos/population";
+import type { SectorRoleConfigs } from "../repos/sector-role-config";
 
 const { cohortCount, chunkSize, batchSize } = appConfig.population;
 

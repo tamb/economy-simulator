@@ -11,7 +11,7 @@ import { FacePoolProvider } from "./context/FacePoolContext";
 import { PopulationProvider } from "./context/PopulationContext";
 import { RegionProvider } from "./context/RegionContext";
 import { SectorAssignmentProvider } from "./context/SectorAssignmentContext";
-import { registerChartTheme } from "./data/chart-theme";
+import { registerChartTheme } from "./lib/chart-theme";
 import "./index.css";
 
 registerChartTheme();

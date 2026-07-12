@@ -3,9 +3,9 @@ import {
 	loadSectorAssignmentsRaw,
 	saveSectorAssignmentsRaw,
 } from "economy-simulator-persistence";
-import type { EconomicSystemId } from "../data/economic-systems";
-import { isEconomicSystemId } from "../data/economic-systems";
-import { type CategoryId, sectorKey } from "../data/taxonomy";
+import type { EconomicSystemId } from "../lib/economic-systems";
+import { isEconomicSystemId } from "../lib/economic-systems";
+import { type CategoryId, sectorKey } from "../lib/taxonomy";
 
 type SectorAssignments = Record<string, EconomicSystemId>;
 

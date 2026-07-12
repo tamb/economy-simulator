@@ -32,7 +32,9 @@ type MandateId =
 	| "resource_security"
 	| "stem_emigration"
 	| "raise_qol"
-	| "heal_land";
+	| "heal_land"
+	| "grow_population"
+	| "tighten_ledger";
 
 interface ActiveMandate {
 	id: MandateId;

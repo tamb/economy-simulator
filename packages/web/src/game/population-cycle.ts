@@ -36,21 +36,6 @@ import {
 	syncEmploymentWithAge,
 	syncRoleWithAge,
 } from "economy-simulator-simulation";
-import { isAideProposalDay, isWeekBoundary } from "../data/calendar";
-import { getFacePoolIds, isFaceId } from "../data/faces";
-import {
-	formatChunkKey,
-	getChunkCount,
-	getChunkIndex,
-	getChunkOffset,
-	getCohortForGameDay,
-	getCohortForIndex,
-	getCohortPosition,
-	getCohortSize,
-	getGlobalIndex,
-} from "../data/population-cohorts";
-import type { PopulationDirectoryEntry } from "../data/population-directory";
-import type { RegionId } from "../data/regions";
 import type {
 	AdvanceGameDayResult,
 	AideProposalSummary,
@@ -69,6 +54,21 @@ import {
 import { issueMandateForYear, resolveMandateAfterYear } from "../game/mandates";
 import { appendYearlyScore, finalizeGameRun } from "../game/progression";
 import { buildWeeklyReport } from "../game/weekly-reports";
+import { isAideProposalDay, isWeekBoundary } from "../lib/calendar";
+import { getFacePoolIds, isFaceId } from "../lib/faces";
+import {
+	formatChunkKey,
+	getChunkCount,
+	getChunkIndex,
+	getChunkOffset,
+	getCohortForGameDay,
+	getCohortForIndex,
+	getCohortPosition,
+	getCohortSize,
+	getGlobalIndex,
+} from "../lib/population-cohorts";
+import type { PopulationDirectoryEntry } from "../lib/population-directory";
+import type { RegionId } from "../lib/regions";
 import { getViableExtractiveSubSectorIdsForRegion } from "../models/generatePerson";
 import {
 	generateImmigrantPerson,
@@ -79,20 +79,20 @@ import { updatePersonStats } from "../models/updatePersonStats";
 import {
 	loadNationalLedger,
 	saveNationalLedger,
-} from "../storage/national-ledger";
-import { ensureRegionPool } from "../storage/regions";
-import { runAnnualResourceExtraction } from "../storage/resource-extraction";
+} from "../repos/national-ledger";
+import { ensureRegionPool } from "../repos/regions";
+import { runAnnualResourceExtraction } from "../repos/resource-extraction";
 import {
 	getSectorAssignment,
 	loadSectorAssignments,
-} from "../storage/sector-assignments";
-import { loadSectorRoleConfigs } from "../storage/sector-role-config";
+} from "../repos/sector-assignments";
+import { loadSectorRoleConfigs } from "../repos/sector-role-config";
 import {
 	ensureRegionResourceStates,
 	ensureWorld,
 	saveRegionResourceStates,
 	saveWorldRegions,
-} from "../storage/world";
+} from "../repos/world";
 
 function buildCohortSizes(size: number): number[] {
 	return Array.from({ length: appConfig.population.cohortCount }, (_, cohort) =>

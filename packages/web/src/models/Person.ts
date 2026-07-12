@@ -1,6 +1,6 @@
 import type { CategoryId } from "economy-simulator-data";
-import type { FaceId } from "../data/faces";
-import type { RegionId } from "../data/regions";
+import type { FaceId } from "../lib/faces";
+import type { RegionId } from "../lib/regions";
 
 /**
  * Big Five / OCEAN personality dimensions — the widely accepted

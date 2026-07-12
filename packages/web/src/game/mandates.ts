@@ -56,6 +56,10 @@ function evaluateMandate(
 			return input.stats.averageQualityOfLife >= 55;
 		case "heal_land":
 			return input.score.environmentHealth >= 60;
+		case "grow_population":
+			return input.stats.populationAfter > input.stats.populationBefore;
+		case "tighten_ledger":
+			return input.score.resourceSufficiency >= 80;
 		default:
 			return false;
 	}

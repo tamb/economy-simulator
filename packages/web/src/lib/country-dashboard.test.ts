@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { AnnualCycleStats, RegionStats } from "../storage/population";
-import type { Region } from "../storage/regions";
+import type { AnnualCycleStats, RegionStats } from "../repos/population";
+import type { Region } from "../repos/regions";
 import {
 	buildQualityOfLifeTrendData,
 	buildRegionLeaderboard,

@@ -4,20 +4,20 @@ import type { ChangeEvent } from "react";
 import { useMemo, useState } from "react";
 import { usePopulation } from "../context/PopulationContext";
 import { useSectorAssignments } from "../context/SectorAssignmentContext";
+import { autoAssignCategory, autoAssignSector } from "../game/nation-setup";
 import {
 	type EconomicSystemId,
 	economicSystems,
 	getEconomicSystem,
 	getRolesForSystem,
 	isEconomicSystemId,
-} from "../data/economic-systems";
+} from "../lib/economic-systems";
 import {
 	type Category,
 	categories,
 	categoryColorClasses,
 	type SubSector,
-} from "../data/taxonomy";
-import { autoAssignCategory, autoAssignSector } from "../game/nation-setup";
+} from "../lib/taxonomy";
 
 const LABOR_EDICT_PERCENTS = [5, 10, 25, 50] as const;
 

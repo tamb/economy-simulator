@@ -1,0 +1,56 @@
+{
+	"marshal_hardening": {
+		"title": "Hardening drills",
+		"dialog": "We can drill the provinces before the next calamity. It costs little now and softens the blow later.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Next calamity happiness hit ×0.85 for 28 days"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Softer prep ×0.92"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "No drills"
+			}
+		}
+	},
+	"marshal_martial_order": {
+		"title": "Martial order",
+		"dialog": "A distressed region needs lockdown corridors. Health may stabilize — happiness will not.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+health, −happiness in the worst region"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Softer lockdown"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Keep free movement"
+			}
+		}
+	},
+	"marshal_morale_patrol": {
+		"title": "Morale patrol",
+		"dialog": "My riders can show the colors in the worst province. Spirits rise — a few will resent the boots.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+happiness; slight −health from marches"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Smaller parade circuit"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Keep the garrison quiet"
+			}
+		}
+	}
+}

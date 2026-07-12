@@ -1,7 +1,7 @@
 import type { CategoryId } from "economy-simulator-data";
 import type { LaborEdictTarget } from "economy-simulator-simulation";
 import type { AdvanceGameDayResult } from "../game/advance-day-result";
-import type { PopulationMeta } from "../storage/population";
+import type { PopulationMeta } from "../repos/population";
 
 /** Messages the main thread sends to the population worker. */
 type PopulationWorkerRequest =

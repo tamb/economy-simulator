@@ -1,5 +1,5 @@
-import type { Category } from "../data/taxonomy";
-import { categories, categoryColorClasses } from "../data/taxonomy";
+import type { Category } from "../lib/taxonomy";
+import { categories, categoryColorClasses } from "../lib/taxonomy";
 
 interface CategoryMapProps {
 	onSelect: (categoryId: Category["id"]) => void;

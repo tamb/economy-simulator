@@ -1,6 +1,10 @@
 {
 	"low_happiness": {
-		"prompt": "Morale is collapsing. How do you answer the provinces?",
+		"prompts": [
+			"Morale is collapsing. How do you answer the provinces?",
+			"The people mutter in the markets. What signal do you send?",
+			"Joy is thin this week. Choose how the crown responds."
+		],
 		"choices": {
 			"relief_convoy": {
 				"label": "Relief convoy",
@@ -10,6 +14,10 @@
 				"label": "Work-hour reform",
 				"hint": "Modest +happiness; extraction −12% for 14 days"
 			},
+			"festival_grant": {
+				"label": "Festival grant",
+				"hint": "Smaller +happiness; no yield hit"
+			},
 			"let_them_endure": {
 				"label": "Let them endure",
 				"hint": "No aid; emigration risk rises"
@@ -17,7 +25,11 @@
 		}
 	},
 	"low_health": {
-		"prompt": "Illness and fatigue are spreading. Choose a public-health response.",
+		"prompts": [
+			"Illness and fatigue are spreading. Choose a public-health response.",
+			"Healers report rising fever wards. How hard do you intervene?",
+			"Bodies are failing faster than spirits. Pick a remedy."
+		],
 		"choices": {
 			"medical_campaign": {
 				"label": "Medical campaign",
@@ -27,6 +39,10 @@
 				"label": "Quarantine corridors",
 				"hint": "Smaller +health; −happiness from restrictions"
 			},
+			"field_clinics": {
+				"label": "Field clinics",
+				"hint": "Modest +health only"
+			},
 			"defer_health": {
 				"label": "Defer",
 				"hint": "No intervention this week"
@@ -34,7 +50,11 @@
 		}
 	},
 	"low_environment": {
-		"prompt": "The land is failing. How hard do you pull back extraction?",
+		"prompts": [
+			"The land is failing. How hard do you pull back extraction?",
+			"Soil and streams look exhausted. Choose a stewardship path.",
+			"The ledger wants ore; the land wants rest. Decide."
+		],
 		"choices": {
 			"restoration_crews": {
 				"label": "Restoration crews",
@@ -44,6 +64,10 @@
 				"label": "Cap extraction",
 				"hint": "Smaller env recovery; milder yield hit"
 			},
+			"seed_nurseries": {
+				"label": "Seed nurseries",
+				"hint": "Mild +environment; light yield dip"
+			},
 			"keep_digging": {
 				"label": "Keep digging",
 				"hint": "−environment; short-term yield surge"
@@ -51,7 +75,11 @@
 		}
 	},
 	"calamity_hit": {
-		"prompt": "This region is still under an active calamity. Reinforce, evacuate, or hold?",
+		"prompts": [
+			"This region is still under an active calamity. Reinforce, evacuate, or hold?",
+			"Disaster banners still fly here. How do you spend the week?",
+			"The crisis has not passed. Choose relief, retreat, or resolve."
+		],
 		"choices": {
 			"reinforce_relief": {
 				"label": "Reinforce relief",
@@ -60,6 +88,10 @@
 			"evacuate_labor": {
 				"label": "Evacuate labor",
 				"hint": "Move 15% of extractive workers out of the region’s jobs"
+			},
+			"emergency_rations": {
+				"label": "Emergency rations",
+				"hint": "Modest +happiness under the crisis"
 			},
 			"hold_the_line": {
 				"label": "Hold the line",

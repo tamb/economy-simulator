@@ -3,7 +3,7 @@ import type { EconomicSystemId } from "./economic-systems";
 /**
  * Mechanical consequences of assigning an economic system to a sub-sector.
  * Until this table existed, the system picker
- * (`packages/web/src/data/economic-systems.ts`) was purely descriptive —
+ * (`packages/web/src/lib/economic-systems.ts`) was purely descriptive —
  * this gives the player's choice real teeth on resource extraction (see
  * `../geography/resources.ts` and `economy-simulator-simulation`'s
  * `resources/` module).

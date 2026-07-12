@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { registerChartTheme } from "../../data/chart-theme";
+import { registerChartTheme } from "../../lib/chart-theme";
 
 registerChartTheme();
 

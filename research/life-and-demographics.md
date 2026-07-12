@@ -80,7 +80,7 @@ happiness (fertility) — see
 are computed daily. All of this lives in
 [`packages/simulation/src/population-dynamics/`](../packages/simulation/src/population-dynamics/)
 and runs once per game year, across the whole stored population, via
-`runAnnualCycle` in `packages/web/src/storage/population.ts`.
+`runAnnualCycle` in `packages/web/src/repos/population.ts`.
 
 ```mermaid
 flowchart LR

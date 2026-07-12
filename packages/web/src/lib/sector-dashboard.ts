@@ -1,5 +1,5 @@
 import type { ChartData } from "chart.js";
-import type { SectorStats } from "../storage/population";
+import type { SectorStats } from "../repos/population";
 import { paletteColor } from "./chart-theme";
 import type { EconomicSystemId } from "./economic-systems";
 import { getEconomicSystem } from "./economic-systems";

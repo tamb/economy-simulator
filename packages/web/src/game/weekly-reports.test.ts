@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Region } from "../storage/regions";
+import type { Region } from "../repos/regions";
 import { buildWeeklyReport, classifyDistress } from "./weekly-reports";
 
 describe("weekly reports", () => {

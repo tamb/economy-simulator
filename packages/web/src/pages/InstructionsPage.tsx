@@ -1,5 +1,5 @@
 import { CollapsibleSection } from "../components/CollapsibleSection";
-import { HOW_TO_RULE_STEPS } from "../data/how-to-rule";
+import { HOW_TO_RULE_STEPS } from "../lib/how-to-rule";
 
 function InstructionsPage() {
 	return (

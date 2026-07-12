@@ -3,7 +3,7 @@ import type {
 	AgeSexBucket,
 	AnnualCycleStats,
 	HistogramBucket,
-} from "../storage/population";
+} from "../repos/population";
 import { themeColors } from "./theme-colors";
 
 /** Age-sex pyramid: female bars extend right (positive), male bars extend left (negative). */

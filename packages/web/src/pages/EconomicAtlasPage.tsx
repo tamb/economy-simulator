@@ -1,5 +1,5 @@
 import { Link, Outlet, useParams } from "react-router";
-import { type CategoryId, getCategory } from "../data/taxonomy";
+import { type CategoryId, getCategory } from "../lib/taxonomy";
 
 /**
  * Breadcrumb layout shared by the atlas' nested routes (category grid ->

@@ -1,0 +1,30 @@
+{
+	"disease": {
+		"name": "Disease Outbreak",
+		"description": "Illness spreads through settlements, thinning labor and fraying nerves."
+	},
+	"livestock_plague": {
+		"name": "Livestock Plague",
+		"description": "A contagion tears through herds and flocks."
+	},
+	"crop_blight": {
+		"name": "Crop Blight",
+		"description": "Fungus and rot sweep the fields before harvest."
+	},
+	"fishery_collapse": {
+		"name": "Fishery Collapse",
+		"description": "Coastal stocks crash — empty nets and idle boats along the shore."
+	},
+	"insect_swarm": {
+		"name": "Insect Swarm",
+		"description": "Clouds of pests strip leaves and grain from the fields."
+	},
+	"invasive_species": {
+		"name": "Invasive Species",
+		"description": "An outsider species takes root, quietly taxing forests, farms, or shores."
+	},
+	"red_tide": {
+		"name": "Red Tide",
+		"description": "Toxic algal bloom stains coastal waters and kills fish in droves."
+	}
+}

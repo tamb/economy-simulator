@@ -49,7 +49,7 @@ function getRegionIds(radius = appConfig.regions.boundingRadius): RegionId[] {
  * regions centered on the origin, generated via `honeycomb-grid`'s spiral
  * traverser. No randomness — the same radius always produces the same
  * layout, so only region metadata (names) needs to be generated once and
- * persisted (see `storage/regions.ts`).
+ * persisted (see `repos/regions.ts`).
  */
 function generateRegionCoordinates(
 	radius = appConfig.regions.boundingRadius,

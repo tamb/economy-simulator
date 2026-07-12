@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { WorldRegion } from "../data/world";
+import type { WorldRegion } from "../lib/world";
 import { runAnnualResourceExtraction } from "./resource-extraction";
 import type { RegionResourceState } from "./world";
 

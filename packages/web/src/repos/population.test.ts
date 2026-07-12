@@ -23,9 +23,9 @@ import {
 	computeAnnualOutcomeForCitizen,
 	computeExpectedImmigrantCount,
 } from "economy-simulator-simulation";
-import { getFacePoolIds } from "../data/faces";
-import { formatChunkKey } from "../data/population-cohorts";
-import { buildWorldRegions } from "../data/world";
+import { getFacePoolIds } from "../lib/faces";
+import { formatChunkKey } from "../lib/population-cohorts";
+import { buildWorldRegions } from "../lib/world";
 import {
 	generateAndSavePopulation,
 	loadEntirePopulationForTests,
@@ -271,8 +271,8 @@ describe("setup phase gating", () => {
 		const metaBefore = await loadPopulationMeta();
 		const result = await advanceGameDay();
 
-		expect(result?.gameDay).toBe(metaBefore?.gameDay);
-		expect(result?.size).toBe(metaBefore?.size);
+		expect(result.meta?.gameDay).toBe(metaBefore?.gameDay);
+		expect(result.meta?.size).toBe(metaBefore?.size);
 	});
 
 	it("returns null from runAnnualCycle while the game run is still in setup phase", async () => {
@@ -295,7 +295,7 @@ describe("setup phase gating", () => {
 
 		const result = await advanceGameDay();
 
-		expect(result?.gameDay).toBe(1);
+		expect(result.meta?.gameDay).toBe(1);
 	});
 });
 

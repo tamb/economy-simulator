@@ -1,5 +1,5 @@
 import type { GameRunState } from "economy-simulator-persistence";
-import { formatEndReason } from "../data/score-dashboard";
+import { formatEndReason } from "../lib/score-dashboard";
 import { badgeTitle } from "./BadgeGallery";
 
 interface GameEndModalProps {

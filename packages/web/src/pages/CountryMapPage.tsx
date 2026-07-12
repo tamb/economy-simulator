@@ -10,9 +10,9 @@ import { Link } from "react-router";
 import { CountryMap } from "../components/CountryMap";
 import { usePopulation } from "../context/PopulationContext";
 import { useRegions } from "../context/RegionContext";
-import type { MapMetric } from "../data/region-color-scale";
-import { getTerrainLabel } from "../data/terrain-color-scale";
-import { computeRegionStats, type RegionStats } from "../storage/population";
+import type { MapMetric } from "../lib/region-color-scale";
+import { getTerrainLabel } from "../lib/terrain-color-scale";
+import { computeRegionStats, type RegionStats } from "../repos/population";
 
 const METRICS: { id: MapMetric; label: string }[] = [
 	{ id: "terrain", label: "Terrain" },

@@ -12,20 +12,20 @@ import {
 	loadGameRunState,
 	saveGameRunState,
 } from "economy-simulator-persistence";
-import type { FaceId } from "../data/faces";
-import { type CategoryId, getCategory } from "../data/taxonomy";
+import type { FaceId } from "../lib/faces";
+import { type CategoryId, getCategory } from "../lib/taxonomy";
 import { generateAndSavePopulation } from "../models/generatePopulation";
 import {
 	loadSectorAssignments,
 	type SectorAssignments,
 	saveSectorAssignments,
-} from "../storage/sector-assignments";
+} from "../repos/sector-assignments";
 import {
 	loadSectorRoleConfigs,
 	type SectorRoleConfigs,
 	saveSectorRoleConfigs,
-} from "../storage/sector-role-config";
-import type { ensureWorld } from "../storage/world";
+} from "../repos/sector-role-config";
+import type { ensureWorld } from "../repos/world";
 import { assignInnerCircle } from "./aide-proposals";
 import { issueMandateForYear } from "./mandates";
 

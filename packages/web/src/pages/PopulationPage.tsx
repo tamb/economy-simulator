@@ -13,7 +13,7 @@ import {
 	type PopulationSortKey,
 	queryDirectory,
 	type SortDirection,
-} from "../data/population-directory";
+} from "../lib/population-directory";
 import type { Person } from "../models/Person";
 
 const ROW_HEIGHT = 176;

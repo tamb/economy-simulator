@@ -10,7 +10,7 @@ import {
 	type FaceId,
 	formatFaceId,
 	getFacePoolIds,
-} from "../data/faces";
+} from "../lib/faces";
 
 async function loadFace(id: FaceId): Promise<FaceConfig | null> {
 	const saved = await loadFaceRaw(id);

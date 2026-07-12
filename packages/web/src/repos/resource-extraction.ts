@@ -22,8 +22,8 @@ import {
 	type NationalLedger,
 	type RegionalProduction,
 } from "economy-simulator-simulation";
-import type { RegionId } from "../data/regions";
-import type { WorldRegion } from "../data/world";
+import type { RegionId } from "../lib/regions";
+import type { WorldRegion } from "../lib/world";
 import {
 	getSectorAssignment,
 	type SectorAssignments,

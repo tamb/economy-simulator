@@ -17,7 +17,7 @@ import type {
 	CalamityRunSlice,
 	RegionResourceMutation,
 } from "economy-simulator-simulation";
-import type { WorldRegion } from "../data/world";
+import type { WorldRegion } from "../lib/world";
 
 function toCalamityRunSlice(gameRun: GameRunState): CalamityRunSlice {
 	return {

@@ -6,8 +6,8 @@ import {
 	type CitizenQolBreakdown,
 } from "../game/citizen-qol-breakdown";
 import type { Person } from "../models/Person";
-import { loadNationalLedger } from "../storage/national-ledger";
-import { loadSectorAssignments } from "../storage/sector-assignments";
+import { loadNationalLedger } from "../repos/national-ledger";
+import { loadSectorAssignments } from "../repos/sector-assignments";
 
 interface CitizenDossierModalProps {
 	person: Person;

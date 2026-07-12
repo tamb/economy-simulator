@@ -75,7 +75,7 @@ here as the v1 defaults):
   Conventional), which correspond loosely to our five economic categories.
 
 Each of the game's five economic categories (see
-[`taxonomy.ts`](../packages/web/src/data/taxonomy.ts)) has an "ideal"
+[`taxonomy.ts`](../packages/web/src/lib/taxonomy.ts)) has an "ideal"
 personality profile. A citizen's alignment with their assigned sector is a
 similarity score between their own OCEAN traits and that profile, mapped to
 `-1..+1` and then into a happiness delta (well-aligned → bonus,

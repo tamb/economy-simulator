@@ -5,8 +5,8 @@ import {
 	removeRegionName,
 	saveRegionName as saveRegionNameRepo,
 } from "economy-simulator-persistence";
-import type { RegionId } from "../data/regions";
-import type { WorldRegion } from "../data/world";
+import type { RegionId } from "../lib/regions";
+import type { WorldRegion } from "../lib/world";
 import { randomInt } from "../models/generatePerson";
 import {
 	ensureRegionResourceStates,

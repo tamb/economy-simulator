@@ -1,7 +1,16 @@
-import aideProposalsCopy from "../copy/aide-proposals.json" with {
+import chancellorProposalsCopy from "../copy/aides/chancellor-proposals.json" with {
 	type: "json",
 };
-import aidesCopy from "../copy/aides.json" with { type: "json" };
+import marshalProposalsCopy from "../copy/aides/marshal-proposals.json" with {
+	type: "json",
+};
+import aidesCopy from "../copy/aides/roster.json" with { type: "json" };
+import stewardProposalsCopy from "../copy/aides/steward-proposals.json" with {
+	type: "json",
+};
+import vizierProposalsCopy from "../copy/aides/vizier-proposals.json" with {
+	type: "json",
+};
 
 type AideRole = "steward" | "marshal" | "chancellor" | "vizier";
 
@@ -46,7 +55,7 @@ interface AideProposalDefinition {
 	choices: AideProposalChoice[];
 }
 
-/** Game logic only — titles/dialog/hints come from `copy/aide-proposals.json`. */
+/** Game logic only — titles/dialog/hints come from `copy/aides/*-proposals.json`. */
 interface AideProposalChoiceLogic {
 	kind: AideProposalChoiceKind;
 	effects: AideProposalChoiceEffect;
@@ -82,6 +91,16 @@ const aideProposalsLogic: AideProposalLogic[] = [
 		],
 	},
 	{
+		id: "steward_granary_draft",
+		aideRole: "steward",
+		weight: 7,
+		choices: [
+			{ kind: "approve", effects: { laborEdictPercent: 8 } },
+			{ kind: "compromise", effects: { laborEdictPercent: 4 } },
+			{ kind: "reject", effects: {} },
+		],
+	},
+	{
 		id: "marshal_hardening",
 		aideRole: "marshal",
 		weight: 10,
@@ -110,6 +129,16 @@ const aideProposalsLogic: AideProposalLogic[] = [
 		choices: [
 			{ kind: "approve", effects: { healthDelta: 6, happinessDelta: -5 } },
 			{ kind: "compromise", effects: { healthDelta: 3, happinessDelta: -2 } },
+			{ kind: "reject", effects: {} },
+		],
+	},
+	{
+		id: "marshal_morale_patrol",
+		aideRole: "marshal",
+		weight: 6,
+		choices: [
+			{ kind: "approve", effects: { happinessDelta: 5, healthDelta: -2 } },
+			{ kind: "compromise", effects: { happinessDelta: 2, healthDelta: -1 } },
 			{ kind: "reject", effects: {} },
 		],
 	},
@@ -162,6 +191,30 @@ const aideProposalsLogic: AideProposalLogic[] = [
 		],
 	},
 	{
+		id: "chancellor_selective_fallow",
+		aideRole: "chancellor",
+		weight: 7,
+		choices: [
+			{
+				kind: "approve",
+				effects: {
+					environmentDelta: 7,
+					extractionEfficiencyFactor: 0.92,
+					modifierDurationDays: 14,
+				},
+			},
+			{
+				kind: "compromise",
+				effects: {
+					environmentDelta: 3,
+					extractionEfficiencyFactor: 0.96,
+					modifierDurationDays: 14,
+				},
+			},
+			{ kind: "reject", effects: {} },
+		],
+	},
+	{
 		id: "vizier_mandate_focus",
 		aideRole: "vizier",
 		weight: 9,
@@ -188,6 +241,22 @@ const aideProposalsLogic: AideProposalLogic[] = [
 			{ kind: "reject", effects: {} },
 		],
 	},
+	{
+		id: "vizier_court_survey",
+		aideRole: "vizier",
+		weight: 7,
+		choices: [
+			{
+				kind: "approve",
+				effects: { happinessDelta: 2, pendingScoreBonus: 1.5 },
+			},
+			{
+				kind: "compromise",
+				effects: { happinessDelta: 1, pendingScoreBonus: 0.75 },
+			},
+			{ kind: "reject", effects: {} },
+		],
+	},
 ];
 
 type AideProposalCopyFile = Record<
@@ -201,7 +270,12 @@ type AideProposalCopyFile = Record<
 
 type AidesCopyFile = Record<string, { label: string; name: string }>;
 
-const proposalCopy = aideProposalsCopy as AideProposalCopyFile;
+const proposalCopy: AideProposalCopyFile = {
+	...(stewardProposalsCopy as AideProposalCopyFile),
+	...(marshalProposalsCopy as AideProposalCopyFile),
+	...(chancellorProposalsCopy as AideProposalCopyFile),
+	...(vizierProposalsCopy as AideProposalCopyFile),
+};
 const aideCopy = aidesCopy as AidesCopyFile;
 
 function mergeAideProposals(): AideProposalDefinition[] {
@@ -209,7 +283,7 @@ function mergeAideProposals(): AideProposalDefinition[] {
 		const copy = proposalCopy[proposal.id];
 		if (!copy) {
 			throw new Error(
-				`Missing copy for aide proposal "${proposal.id}" in copy/aide-proposals.json`,
+				`Missing copy for aide proposal "${proposal.id}" in copy/aides/*-proposals.json`,
 			);
 		}
 		return {
@@ -223,7 +297,7 @@ function mergeAideProposals(): AideProposalDefinition[] {
 				const choiceCopy = copy.choices[choice.kind];
 				if (!choiceCopy) {
 					throw new Error(
-						`Missing copy for choice "${choice.kind}" on "${proposal.id}" in copy/aide-proposals.json`,
+						`Missing copy for choice "${choice.kind}" on "${proposal.id}" in copy/aides/*-proposals.json`,
 					);
 				}
 				return {

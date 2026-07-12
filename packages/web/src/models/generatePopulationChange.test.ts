@@ -1,7 +1,7 @@
 import { gameSettings } from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
-import { getFacePoolIds } from "../data/faces";
-import type { WorldRegion } from "../data/world";
+import { getFacePoolIds } from "../lib/faces";
+import type { WorldRegion } from "../lib/world";
 import {
 	generateImmigrantPerson,
 	generateNewbornPerson,

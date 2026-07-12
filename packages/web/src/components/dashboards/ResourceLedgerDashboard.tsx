@@ -6,8 +6,8 @@ import { usePopulation } from "../../context/PopulationContext";
 import {
 	buildResourceProductionDemandData,
 	buildResourceSufficiencyData,
-} from "../../data/resource-ledger-dashboard";
-import { loadNationalLedger } from "../../storage/national-ledger";
+} from "../../lib/resource-ledger-dashboard";
+import { loadNationalLedger } from "../../repos/national-ledger";
 import { ChartCard } from "./ChartCard";
 
 function ResourceLedgerDashboard() {

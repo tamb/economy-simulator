@@ -1,0 +1,42 @@
+{
+	"accidental_fire": {
+		"name": "Accidental Fire",
+		"description": "A careless blaze guts workshops and homes before brigades contain it."
+	},
+	"factory_fire": {
+		"name": "Factory Fire",
+		"description": "Industrial plant burns, idling lines and scattering ash over the yard."
+	},
+	"warehouse_fire": {
+		"name": "Warehouse Fire",
+		"description": "Stored goods go up in smoke, jolting trade and local supply."
+	},
+	"oil_spill": {
+		"name": "Oil Spill",
+		"description": "Fuel slicks the coast, killing fish and staining the shoreline for seasons."
+	},
+	"chemical_spill": {
+		"name": "Chemical Spill",
+		"description": "Industrial toxins leak into soil and water near plant yards."
+	},
+	"dam_failure": {
+		"name": "Dam Failure",
+		"description": "A reservoir wall fails, flooding valleys and wrecking water works."
+	},
+	"power_outage": {
+		"name": "Power Outage",
+		"description": "The grid falters. Factories idle and services stumble in the dark."
+	},
+	"bridge_collapse": {
+		"name": "Bridge Collapse",
+		"description": "A key crossing fails, snarling freight and regional travel."
+	},
+	"mining_accident": {
+		"name": "Mining Accident",
+		"description": "A shaft disaster halts production and shakes mining communities."
+	},
+	"overfishing_scandal": {
+		"name": "Overfishing Scandal",
+		"description": "Public outrage forces a hard throttle on coastal fleets."
+	}
+}

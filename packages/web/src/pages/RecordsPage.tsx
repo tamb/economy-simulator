@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { BadgeGallery } from "../components/BadgeGallery";
 import { DispatchLog } from "../components/DispatchLog";
 import { ScoreDashboard } from "../components/dashboards/ScoreDashboard";
-import { formatEndReason } from "../data/score-dashboard";
+import { formatEndReason } from "../lib/score-dashboard";
 
 function RecordsPage() {
 	const [profile, setProfile] = useState<PlayerProfile | null>(null);
