@@ -54,6 +54,20 @@ isProject: false
 
 Product roadmap for closing **documented v1 gaps**, then growing the game from a domestic island economy sim into a fuller **nation-management** experience — without abandoning the current QoL / extraction / calamity core.
 
+## Research to read before implementing
+
+Sourced baselines (citations, design implications, sourced-vs-designed boundaries) live under [`research/`](../../research/index.md). **Do not invent curves from scratch** when picking up a phase todo — extend the matching research doc and put magnitudes in `GameSettings`.
+
+| Phase | Research doc |
+| --- | --- |
+| 0 | [stockpiles-flows-and-regional-employment.md](../../research/stockpiles-flows-and-regional-employment.md) |
+| 1 | [infrastructure-fiscal-services.md](../../research/infrastructure-fiscal-services.md) |
+| 2 | [housing-order-politics.md](../../research/housing-order-politics.md) |
+| 3 | [trade-diplomacy-defense.md](../../research/trade-diplomacy-defense.md) |
+| 4 | [macro-metrics.md](../../research/macro-metrics.md) |
+
+This plan remains the authority for **staging, package ownership, UI surfaces, and non-goals**. The research docs are the authority for **why** a mechanic points the way it does.
+
 ## Current baseline (shipped)
 
 The loop today is intentionally **domestic and single-island**:
@@ -309,7 +323,7 @@ Also eligible here (from `.cursor/plans/scores_win_lose_badges_9809be54.plan.md`
 | Pure ticks: stockpiles, fiscal, infrastructure, order, relations | `packages/simulation` |
 | Run orchestration, dashboards, throne UI | `packages/web` |
 | New run-state fields | `packages/persistence` |
-| Research notes + sourced curves | `research/` |
+| Research notes + sourced curves | `research/` — **read the Phase 0–4 docs before implementing**; update them when sourced-vs-designed boundaries change |
 | Product intent updates when phases ship | `constitution/` |
 
 Prefer **extending** existing modules (`resources/`, `progression/`, briefings) over new top-level concepts until Phase 3 forces a `foreign/` or `nation/` simulation area.
@@ -350,4 +364,4 @@ bun run typecheck
 4. **3a → 3b → 3c** — open the border carefully  
 5. **4** — score what you can finally measure  
 
-Each todo above should ship as its own reviewable change set with docs updates (`research/`, constitution intent) when behavior changes.
+Each todo above should ship as its own reviewable change set with docs updates (`research/`, constitution intent) when behavior changes. Implementation PRs should link the matching Phase research doc from [`research/index.md`](../../research/index.md#product-roadmap).

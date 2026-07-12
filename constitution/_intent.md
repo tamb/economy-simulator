@@ -58,6 +58,8 @@ domestic flows, calamity agency) and then a domestic-first nation-management
 layer (infrastructure, fiscal, public services, housing, order, politics)
 before an optional external layer (trade, diplomacy, defense) is tracked in
 [nation_management_roadmap_a1b2c3d4.plan.md](../.cursor/plans/nation_management_roadmap_a1b2c3d4.plan.md).
+Sourced research for each phase (cite when implementing) is indexed under
+[research/index.md — Product roadmap](../research/index.md#product-roadmap).
 
 ## Product shape
 

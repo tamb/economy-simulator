@@ -203,7 +203,7 @@ citizens in unspoiled or recovered regions do not.
 
 The game's ledger is a deliberately simplified, single-country abstraction
 of this idea (no inter-region trade, pricing, or stockpiles, per the
-confirmed scope): national **production** (sum of regional extraction,
+confirmed **v1** scope): national **production** (sum of regional extraction,
 adjusted by worker count, biome/overlay yield, and economic-system
 efficiency) is compared against national **demand** (industrial sub-sectors'
 resource inputs, `packages/data/src/geography/resource-requirements.ts`) to
@@ -212,6 +212,12 @@ produce a per-resource **sufficiency ratio**. A ratio below the
 happiness penalty to workers in the shortfall-dependent industrial
 sub-sector(s) — the player's felt consequence of under-investing in (or
 over-depleting) a resource the rest of the economy depends on.
+
+**Forward research:** stockpiles, domestic inter-region flows, and regional
+non-extractive employment are scoped in Phase 0 of the nation-management
+roadmap — see
+[stockpiles-flows-and-regional-employment.md](./stockpiles-flows-and-regional-employment.md)
+before implementing those systems.
 
 ```mermaid
 flowchart LR
