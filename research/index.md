@@ -12,6 +12,12 @@ here — and the typed, code-consumable versions of these tables live in
 | [resources-and-geography.md](./resources-and-geography.md) | Island/biome/resource-overlay generation, extraction/depletion/environment model, the national resource ledger, and economic-system effects on extraction |
 | [economic-roles.md](./economic-roles.md) | Per-system economic roles, role quotas at nation setup, roleId on citizens, and role effects on QoL and extraction |
 
+## Product roadmap
+
+Staged plan to close documented v1 economy gaps, then grow domestic and external **nation-management** systems (infrastructure, fiscal, public services, housing, order, politics, trade, diplomacy, defense):
+
+- [Nation Management Roadmap](../.cursor/plans/nation_management_roadmap_a1b2c3d4.plan.md)
+
 ## Authority
 
 1. Cited public datasets (SSA, UN, peer-reviewed studies) are the source of

@@ -13,7 +13,7 @@ Human- and AI-readable project charter. When product intent, architecture, or re
 
 ## Design & research
 
-Simulation rules, sourcing, and model diagrams live in **[research/index.md](../research/index.md)**. For the island, biomes, resource ledger, and extraction economy, read **[resources-and-geography.md](../research/resources-and-geography.md)**.
+Simulation rules, sourcing, and model diagrams live in **[research/index.md](../research/index.md)**. For the island, biomes, resource ledger, and extraction economy, read **[resources-and-geography.md](../research/resources-and-geography.md)**. Product staging for v1 gaps and nation-management systems: **[nation management roadmap](../.cursor/plans/nation_management_roadmap_a1b2c3d4.plan.md)**.
 
 In-app player guidance: **Instructions** screen (`packages/web/src/pages/InstructionsPage.tsx`) and the **How to rule** slide-up (copy from `packages/data/src/copy/how-to-rule.json`).
 
