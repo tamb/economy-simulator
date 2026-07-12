@@ -1,6 +1,8 @@
 import {
 	buildAutoAssignments,
 	buildAutoRoleConfigs,
+	getCategory,
+	sectorKey,
 	validateNationSetup,
 } from "economy-simulator-data";
 import {
@@ -16,7 +18,11 @@ import { loadSectorAssignments } from "../storage/sector-assignments";
 import { loadSectorRoleConfigs } from "../storage/sector-role-config";
 import {
 	autoAssignAllSectors,
+	autoAssignCategory,
+	autoAssignSector,
+	beginNationFounding,
 	getNationSetupValidation,
+	isNationInSetupPhase,
 	startGame,
 } from "./nation-setup";
 
@@ -64,5 +70,54 @@ describe("nation-setup", () => {
 		const run = await loadGameRunState();
 		expect(run?.phase).toBe("setup");
 		generateSpy.mockRestore();
+	});
+
+	it("startGame rejects incomplete nation setup before generating population", async () => {
+		await expect(startGame(6, faceIds, regions)).rejects.toThrow(
+			"Nation setup is incomplete",
+		);
+
+		const run = await loadGameRunState();
+		expect(run).toBeNull();
+	});
+
+	it("autoAssignCategory configures only the requested category", async () => {
+		const category = getCategory("extractive");
+		expect(category).toBeDefined();
+
+		await autoAssignCategory("extractive");
+
+		const assignments = await loadSectorAssignments();
+		const roleConfigs = await loadSectorRoleConfigs();
+
+		for (const subSector of category?.subSectors ?? []) {
+			const key = sectorKey("extractive", subSector.id);
+			expect(assignments[key]).toBeTypeOf("string");
+			expect(roleConfigs[key]?.quotas.length).toBeGreaterThan(0);
+		}
+
+		const validation = getNationSetupValidation(assignments, roleConfigs);
+		expect(validation.ready).toBe(false);
+		expect(validation.configuredCount).toBe(category?.subSectors.length);
+	});
+
+	it("autoAssignSector configures a single sector with an optional system override", async () => {
+		await autoAssignSector("services", "healthcare", "socialism");
+
+		const assignments = await loadSectorAssignments();
+		const roleConfigs = await loadSectorRoleConfigs();
+		const key = sectorKey("services", "healthcare");
+
+		expect(assignments[key]).toBe("socialism");
+		expect(roleConfigs[key]?.quotas.length).toBeGreaterThan(0);
+	});
+
+	it("beginNationFounding creates a setup-phase run and isNationInSetupPhase reflects it", async () => {
+		await beginNationFounding(42);
+
+		const run = await loadGameRunState();
+		expect(run?.phase).toBe("setup");
+		expect(run?.startingPopulation).toBe(42);
+		expect(await isNationInSetupPhase()).toBe(true);
 	});
 });
