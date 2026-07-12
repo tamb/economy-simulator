@@ -53,6 +53,12 @@ dialogue and labels live in editable JSON under
 [`packages/data/src/copy/`](../packages/data/src/copy/README.md) — separate
 from game logic.
 
+**Forward roadmap:** closing v1 economy gaps (regional employment, stockpiles,
+domestic flows, calamity agency) and then a domestic-first nation-management
+layer (infrastructure, fiscal, public services, housing, order, politics)
+before an optional external layer (trade, diplomacy, defense) is tracked in
+[nation_management_roadmap_a1b2c3d4.plan.md](../.cursor/plans/nation_management_roadmap_a1b2c3d4.plan.md).
+
 ## Product shape
 
 | Layer | Description |
