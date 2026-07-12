@@ -22,3 +22,8 @@ Edit these JSON files to change dialogue, titles, hints, and briefing text.
 
 1. Add the mechanical id + effects in the matching TypeScript file under `src/briefings/` or `src/progression/`.
 2. Add the matching strings in the JSON file here under the same id.
+
+## Related docs
+
+- Product intent: [`constitution/_intent.md`](../../../../constitution/_intent.md)
+- Monorepo / calendar notes: [`constitution/_monorepo.md`](../../../../constitution/_monorepo.md)

@@ -6,10 +6,10 @@
 | --- | --- |
 | `constitution/` | Product intent and agent guidance |
 | `research/` | Sourced demographic, quality-of-life, and resource/geography reference notes |
-| `packages/web/` | React + vite app (UI only; consumes `data` + `simulation` + `geography`) |
+| `packages/web/` | React + vite app (UI + orchestration; consumes `data` + `simulation` + `geography` + `persistence`) |
 | `packages/simulation/` | Pure TypeScript calculation engine — no React, no I/O |
 | `packages/geography/` | Pure, deterministic (seeded) world generation — island shape, biomes, resource overlays, adjacency — no React, no I/O |
-| `packages/data/` | Shared config (`AppConfig`, `GameSettings`) and research-backed reference data — no React |
+| `packages/data/` | Shared config (`AppConfig`, `GameSettings`), research-backed catalogs, briefing/mandate **logic**, and editable **copy JSON** (`src/copy/`) — no React |
 | `packages/persistence/` | Storage drivers (IndexedDB default) and typed repositories — no React |
 | `packages/desktop/` | neutralino desktop distribution |
 | `scripts/` | Cross-package automation |
@@ -22,7 +22,7 @@ Vite/`tsc` resolve them through each package's `main`/`types` entry
 
 ```mermaid
 flowchart TD
-    data["packages/data\nAppConfig, GameSettings,\nbiome/resource/calamity catalogs"]
+    data["packages/data\nAppConfig, GameSettings,\ncatalogs, copy JSON,\nbriefings logic"]
     geo["packages/geography\nisland shape, biomes,\nresource-overlay placement"]
     sim["packages/simulation\nQoL, population dynamics,\nresources, calamities, progression"]
     persistence["packages/persistence\nstorage drivers + repositories"]
@@ -34,7 +34,26 @@ flowchart TD
     geo --> web
     sim --> web
     persistence --> web
+    data --> web
 ```
+
+### Creative copy (`packages/data/src/copy/`)
+
+Player-facing strings (dialog, titles, hints, How to rule tips, mandate labels)
+live in JSON files documented in
+[`packages/data/src/copy/README.md`](../packages/data/src/copy/README.md).
+TypeScript under `briefings/` and `progression/` owns ids, weights, and
+effects, then merges copy by id at import time. Calamity catalog definitions
+already follow the same JSON-import pattern under `packages/data/src/calamities/catalog/`.
+
+### Calendar conventions (gameplay)
+
+| Unit | Length | Notes |
+| --- | --- | --- |
+| Day | 1 | Cohort QoL tick; optional calamity / interrupt |
+| Week | 7 days | Weekly region report boundary |
+| Month | 28 days | Calamity floor (`guaranteedOnsetIntervalDays: 28`); aide proposals on 1-based month-days 14 & 28 |
+| Year | 364 days | Annual cycle + year review (`GameSettings.calendar.daysPerYear` = 364; 13 months) |
 
 ## Root scripts
 

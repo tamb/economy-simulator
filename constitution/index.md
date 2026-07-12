@@ -15,7 +15,9 @@ Human- and AI-readable project charter. When product intent, architecture, or re
 
 Simulation rules, sourcing, and model diagrams live in **[research/index.md](../research/index.md)**. For the island, biomes, resource ledger, and extraction economy, read **[resources-and-geography.md](../research/resources-and-geography.md)**.
 
-In-app player guidance: **Instructions** screen (`packages/web/src/pages/InstructionsPage.tsx`).
+In-app player guidance: **Instructions** screen (`packages/web/src/pages/InstructionsPage.tsx`) and the **How to rule** slide-up (copy from `packages/data/src/copy/how-to-rule.json`).
+
+Creative dialogue / labels (weekly reports, aide proposals, mandates, aide names): **[packages/data/src/copy/README.md](../packages/data/src/copy/README.md)**.
 
 ## Authority
 

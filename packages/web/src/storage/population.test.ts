@@ -16,6 +16,10 @@ vi.mock("economy-simulator-simulation", async (importOriginal) => {
 
 import { gameSettings } from "economy-simulator-data";
 import {
+	createInitialGameRunState,
+	saveGameRunState,
+} from "economy-simulator-persistence";
+import {
 	computeAnnualOutcomeForCitizen,
 	computeExpectedImmigrantCount,
 } from "economy-simulator-simulation";
@@ -254,6 +258,44 @@ describe("runAnnualCycle", () => {
 	it("returns null when there is no stored population", async () => {
 		const stats = await runAnnualCycle();
 		expect(stats).toBeNull();
+	});
+});
+
+describe("setup phase gating", () => {
+	it("does not advance the simulation while the game run is still in setup phase", async () => {
+		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
+
+		const setupRun = createInitialGameRunState(TEST_SIZE);
+		await saveGameRunState(setupRun);
+
+		const metaBefore = await loadPopulationMeta();
+		const result = await advanceGameDay();
+
+		expect(result?.gameDay).toBe(metaBefore?.gameDay);
+		expect(result?.size).toBe(metaBefore?.size);
+	});
+
+	it("returns null from runAnnualCycle while the game run is still in setup phase", async () => {
+		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
+		await saveGameRunState(createInitialGameRunState(TEST_SIZE));
+
+		const stats = await runAnnualCycle();
+
+		expect(stats).toBeNull();
+	});
+
+	it("advances the simulation once the game run enters the active phase", async () => {
+		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
+
+		const activeRun = {
+			...createInitialGameRunState(TEST_SIZE),
+			phase: "active" as const,
+		};
+		await saveGameRunState(activeRun);
+
+		const result = await advanceGameDay();
+
+		expect(result?.gameDay).toBe(1);
 	});
 });
 

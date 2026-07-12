@@ -10,17 +10,24 @@ it to unrest or emigration. Monorepo desktop app: **vite + React** wrapped in
 
 | Screen | What it does |
 | --- | --- |
-| New Game Setup | First-run screen (no population exists yet); choose a starting population size — 10,000 / 100,000 (default) / 1,000,000 — before generation begins |
-| Instructions | Concise how-to-play for the island economy, day advance, and dashboards |
-| Sector Atlas | Browse the five-tier economic taxonomy and assign an economic system to each sub-sector |
-| Population | Virtualized registry of every stored citizen; advances one cohort per in-game day |
-| Country Map | Procedurally generated island hex map — color by terrain, population, happiness, health, or environment; hover tooltip + region inspector with reserves |
-| Dashboards | Chart.js dashboards for population demographics, economic sectors, national quality-of-life trends, region leaderboard, and the national resource ledger |
+| New Game Setup | First-run screen; choose starting population — 10,000 / 100,000 (default) / 1,000,000 |
+| Nation Setup | Assign economic systems and role mixes to every sub-sector (or auto-assign), then start |
+| Country Map | Home command view — hex island; terrain / population / happiness / health / environment; calamity glow |
+| Sector Atlas | Five-tier taxonomy; systems/roles at setup; mid-game labor edicts and role reforms |
+| Population | Virtualized citizen registry; dossiers; region deep-links from the map |
+| Dashboards | Population, sectors, country overview, resource ledger, nation score |
+| Records | Career wins/losses, run score, badges, dispatches, calamity log |
+| Instructions | How to play + How to rule (collapsible); mirrors in-game tip copy |
 | Credits | Third-party attribution |
 
-Advancing a game day (and the once-a-year population-dynamics cycle it can
-trigger) runs in a dedicated Web Worker so a 1,000,000-citizen calculation
-doesn't freeze the UI; a retro `CalculationModal` shows live progress.
+**Throne HUD** (on play screens): advance day / week / year, population, nation
+score, active royal mandate, win/lose streak chips. Time advances pause for
+blocking interrupts in order: calamity onset → weekly region report → aide
+executive proposal → year in review.
+
+Advancing a game day (and the annual population-dynamics cycle) runs in a Web
+Worker so large populations don't freeze the UI; a retro `CalculationModal`
+shows live progress.
 
 ## Quick start
 
@@ -66,6 +73,7 @@ bun run test:e2e
 | Doc | Purpose |
 | --- | --- |
 | [constitution/index.md](constitution/index.md) | Product intent, monorepo layout, agent rules |
+| [packages/data/src/copy/README.md](packages/data/src/copy/README.md) | Editable creative copy (dialogue, tips, mandate labels) |
 | [research/index.md](research/index.md) | Sourced simulation rules and model diagrams |
 | [research/resources-and-geography.md](research/resources-and-geography.md) | Island generation, biomes, resource ledger, extraction economy |
 
@@ -73,10 +81,11 @@ bun run test:e2e
 
 | Package | Path | Purpose |
 | --- | --- | --- |
-| Web | `packages/web` | React UI (vite), IndexedDB storage, all game screens |
-| Simulation | `packages/simulation` | Pure TypeScript calculation engine (quality-of-life, population dynamics, resource extraction/ledger) |
-| Geography | `packages/geography` | Pure, deterministic world generation (island shape, biomes, resource overlays) |
-| Data | `packages/data` | Shared `AppConfig`/`GameSettings` and research-backed reference data |
+| Web | `packages/web` | React UI (vite), game orchestration, workers, screens |
+| Simulation | `packages/simulation` | Pure TypeScript engine (QoL, population, resources, calamities, progression) |
+| Geography | `packages/geography` | Pure, deterministic world generation |
+| Data | `packages/data` | `AppConfig` / `GameSettings`, catalogs, briefing logic, copy JSON |
+| Persistence | `packages/persistence` | Storage drivers and typed repositories |
 | Desktop | `packages/desktop` | Neutralino wrapper |
 
 Bootstrapped with [bootstrap-desktop-app](../bootstrap-desktop-app).

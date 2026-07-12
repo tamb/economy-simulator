@@ -13,16 +13,16 @@
 | Layer | Choice |
 | --- | --- |
 | UI | **React 19.2.7** |
-| Routing | **react-router** (`HashRouter`) — hash-based (not `BrowserRouter`) because the desktop build is served by Neutralino's static file server with no SPA fallback for arbitrary paths; every route still resolves to the same `index.html`. `AppShell` is the layout route (nav + header + footer + `<Outlet />`); `/atlas`, `/atlas/:categoryId`, and `/atlas/:categoryId/:sectorId` give the sector-atlas drill-down real back/forward support too |
+| Routing | **react-router** (`HashRouter`) — hash-based (not `BrowserRouter`) because the desktop build is served by Neutralino's static file server with no SPA fallback for arbitrary paths; every route still resolves to the same `index.html`. `AppShell` is the layout route (nav + throne HUD + interrupt modals + `<Outlet />`); `/atlas`, `/atlas/:categoryId`, and `/atlas/:categoryId/:sectorId` give the sector-atlas drill-down real back/forward support too |
 | Build | **Vite** |
 | Styling | **Tailwind CSS v4** (`@tailwindcss/vite` or PostCSS for Next.js) |
-| Storage | **localforage** (IndexedDB) |
+| Storage | **`economy-simulator-persistence`** (IndexedDB via localforage under the hood) — web does not own drivers directly |
 | Map | **honeycomb-grid** for hex coordinate math, hand-rolled SVG rendering (`CountryMap`) styled with the Tailwind theme tokens |
 | Charts | **chart.js** + **react-chartjs-2**, themed via `data/chart-theme.ts` (retro, no smoothing/animation) |
 | Heavy calculations | Dedicated Web Worker (`workers/population.worker.ts`, its own `tsconfig.worker.json` with the `WebWorker` lib) runs the daily cohort tick and annual population cycle off the main thread; progress renders in a reusable `CalculationModal` |
 | Component tests | **Vitest** `projects` split: `.test.ts` runs under `node`, `.test.tsx` runs under `jsdom` with `@testing-library/react` |
 | End-to-end tests | **Playwright** (`e2e/`, `tsconfig.e2e.json`, `bun run test:e2e`) drives the real production build (`vite build && vite preview`) rather than the dev server — see note below on why |
-| New game setup | Before any population exists, `NewGameSetupPage` gates the whole app (see `App.tsx`'s `needsSetup` check) and lets the player pick a starting size from `appConfig.population.sizeOptions` (default `appConfig.population.size`); `startGeneration` (from `PopulationContext`) then hands off to the normal app shell, which shows generation progress the same way the `VITE_POPULATION_SIZE` override does |
+| New game flow | `NewGameSetupPage` gates when no population exists (`needsSetup`); after generation, `NationSetupPage` gates until every sub-sector has a system + role mix (`needsConfiguration`); then `AppShell` with Country Map as home (`/map`) |
 | Code splitting | `DashboardsPage` and `CountryMapPage` are lazy-loaded (`React.lazy` + `Suspense` in `App.tsx`) so chart.js/react-chartjs-2 and honeycomb-grid live in their own chunks |
 
 ### Gotcha: `resolve.dedupe` is load-bearing
@@ -62,14 +62,20 @@ reuse the main preview server.
 
 ## Data (`packages/data`)
 
-Pure TypeScript, no framework. Holds `AppConfig`, `GameSettings`, and
-research-backed reference tables (demographics, sector affinities, economic
-systems + their extraction effects, and the biome/resource/resource-overlay/
-resource-requirement catalogs under `src/geography/`). No build step —
-consumed as source via the workspace. `packages/web/src/data/economic-systems.ts`
-and `packages/web/src/data/taxonomy.ts` are both thin re-export shims over
-this package (UI-only concerns like category accent colors are layered on
-top in the shim, not the shared data).
+Pure TypeScript, no framework. Holds:
+
+- `AppConfig` / `GameSettings` (including calendar and calamity frequency)
+- Research-backed catalogs (demographics, sector affinities, economic systems /
+  roles, biome/resource overlays under `src/geography/`)
+- Calamity definitions under `src/calamities/catalog/*.json`
+- Briefing / mandate **logic** under `src/briefings/` and `src/progression/`
+- Player-facing **creative copy** under `src/copy/*.json` (see
+  [`src/copy/README.md`](../packages/data/src/copy/README.md))
+
+No build step — consumed as source via the workspace.
+`packages/web/src/data/economic-systems.ts` and
+`packages/web/src/data/taxonomy.ts` are thin re-export shims (UI-only concerns
+like category accent colors are layered on in the shim, not the shared data).
 
 ## Geography (`packages/geography`)
 
@@ -84,11 +90,20 @@ tunables; uses `honeycomb-grid` for hex adjacency math (same library
 
 ## Simulation (`packages/simulation`)
 
-Pure TypeScript calculation engine (quality-of-life, mortality/fertility/
-migration, resource extraction/depletion/environment/national ledger). No
-React, no storage, no DOM — takes plain data in, returns plain data out, so
-it's trivially unit-testable and safe to run inside a Web Worker. Depends on
-`packages/data` for reference data; no build step.
+Pure TypeScript calculation engine: quality-of-life, mortality/fertility/
+migration, resource extraction/depletion/environment/national ledger,
+calamity engine, employment (labor edicts / role assignment), and progression
+helpers (nation score, win/lose, badges). No React, no storage, no DOM —
+takes plain data in, returns plain data out. Depends on `packages/data` for
+reference data; no build step.
+
+## Persistence (`packages/persistence`)
+
+Storage drivers (IndexedDB via **localforage** by default) and typed
+repositories for population chunks, game-run / progression state (including
+`innerCircle`, mandates, calamity history, dispatch events), sector role
+config, and player profile. No React. Web and the population worker import
+repositories from this package rather than talking to IndexedDB directly.
 
 ## Desktop (`packages/desktop`)
 
