@@ -119,7 +119,8 @@ describe("calamity engine", () => {
 					},
 				],
 				calamityHistory: [],
-				lastCalamityOnsetGameDay: 0,
+				// Recent enough that monthly guarantee and cooldowns block a new roll.
+				lastCalamityOnsetGameDay: 20,
 				lastSevereCalamityOnsetGameDay: null,
 			},
 			gameDay: 30,
@@ -130,6 +131,41 @@ describe("calamity engine", () => {
 		expect(result.run.activeCalamities).toHaveLength(0);
 		expect(result.expired).toHaveLength(1);
 		expect(result.run.calamityHistory[0]?.calamityId).toBe("tornado");
+		expect(result.onsets).toHaveLength(0);
+	});
+
+	it("forces a primary onset when the monthly guarantee window elapses", () => {
+		const result = processCalamitiesForDay({
+			run: {
+				activeCalamities: [],
+				calamityHistory: [],
+				lastCalamityOnsetGameDay: 0,
+				lastSevereCalamityOnsetGameDay: null,
+			},
+			gameDay: 28,
+			regions: [forestRegion()],
+			// Random would never succeed — guarantee must force the roll.
+			random: () => 0.999,
+		});
+
+		expect(result.onsets.length).toBeGreaterThanOrEqual(1);
+		expect(result.run.lastCalamityOnsetGameDay).toBe(28);
+	});
+
+	it("does not force a monthly onset while cooldown is still active", () => {
+		const result = processCalamitiesForDay({
+			run: {
+				activeCalamities: [],
+				calamityHistory: [],
+				lastCalamityOnsetGameDay: 20,
+				lastSevereCalamityOnsetGameDay: null,
+			},
+			gameDay: 28,
+			regions: [forestRegion()],
+			random: () => 0,
+		});
+
+		expect(result.onsets).toHaveLength(0);
 	});
 
 	it("applies regional happiness and extraction modifiers", () => {

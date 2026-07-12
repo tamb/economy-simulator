@@ -9,6 +9,7 @@ interface RunBadgeYearContext {
 	emigrations: number;
 	score: NationScoreBreakdown;
 	netImmigrationPositiveStreak: number;
+	mandateCompletedThisYear?: boolean;
 }
 
 interface CareerBadgeContext {
@@ -56,6 +57,8 @@ function matchesRunBadge(
 			return context.score.total >= 80;
 		case "steward":
 			return context.year >= 25 && context.score.environmentHealth >= 90;
+		case "royal_mandate":
+			return context.mandateCompletedThisYear === true;
 		default:
 			return false;
 	}

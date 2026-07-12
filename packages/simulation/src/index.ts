@@ -23,11 +23,20 @@ export {
 	isWorkingAge,
 	syncEmploymentWithAge,
 } from "./employment/job-assignment";
+export type {
+	LaborEdictCandidate,
+	LaborEdictTarget,
+} from "./employment/labor-edict";
+export {
+	isEligibleLaborEdictWorker,
+	selectLaborEdictCandidates,
+} from "./employment/labor-edict";
 export {
 	assignRoleForCitizen,
 	getRoleModifiersForCitizen,
 	syncRoleWithAge,
 } from "./employment/role-assignment";
+export { rerollRoleForCitizen } from "./employment/role-reform";
 export type {
 	AnnualCitizenInput,
 	AnnualCitizenOutcome,

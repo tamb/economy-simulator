@@ -64,6 +64,7 @@ function PopulationDashboard() {
 			)}
 
 			<ChartCard
+				variant="briefing"
 				title="Age-Sex Pyramid"
 				description="Living citizens by 10-year age band and sex."
 				height={320}
@@ -99,6 +100,7 @@ function PopulationDashboard() {
 
 			<div className="grid gap-4 sm:grid-cols-2">
 				<ChartCard
+					variant="briefing"
 					title="Happiness Distribution"
 					description="Living citizens grouped by overall happiness."
 				>
@@ -113,6 +115,7 @@ function PopulationDashboard() {
 				</ChartCard>
 
 				<ChartCard
+					variant="briefing"
 					title="Health Distribution"
 					description="Living citizens grouped by overall health."
 				>
@@ -128,6 +131,7 @@ function PopulationDashboard() {
 			</div>
 
 			<ChartCard
+				variant="briefing"
 				title="Births, Deaths & Migration"
 				description="Recorded outcomes from each completed game year's annual cycle."
 			>

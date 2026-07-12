@@ -7,12 +7,15 @@ import {
 } from "economy-simulator-data";
 import {
 	type AnnualCycleStats,
+	appendGameEvents,
 	clearLegacyPopulationKey,
 	ensureGameRunState,
+	type GameEvent,
 	loadGameRunState,
 	loadPopulationChunkRaw,
 	loadPopulationMeta as loadPopulationMetaRepo,
 	type PopulationMeta,
+	pruneExpiredModifiers,
 	removePopulationKey,
 	saveGameRunState,
 	savePopulationChunkRaw,
@@ -33,6 +36,7 @@ import {
 	syncEmploymentWithAge,
 	syncRoleWithAge,
 } from "economy-simulator-simulation";
+import { isAideProposalDay, isWeekBoundary } from "../data/calendar";
 import { getFacePoolIds, isFaceId } from "../data/faces";
 import {
 	formatChunkKey,
@@ -47,6 +51,14 @@ import {
 } from "../data/population-cohorts";
 import type { PopulationDirectoryEntry } from "../data/population-directory";
 import type { RegionId } from "../data/regions";
+import type {
+	AdvanceGameDayResult,
+	AideProposalSummary,
+	CalamityOnsetSummary,
+	WeeklyReportSummary,
+	YearReviewSummary,
+} from "../game/advance-day-result";
+import { buildAideProposalSummary } from "../game/aide-proposals";
 import {
 	applyCalamityMutations,
 	buildCalamityRegionInputs,
@@ -54,7 +66,9 @@ import {
 	mergeCalamityRunSlice,
 	toCalamityRunSlice,
 } from "../game/calamity-effects";
+import { issueMandateForYear, resolveMandateAfterYear } from "../game/mandates";
 import { appendYearlyScore, finalizeGameRun } from "../game/progression";
+import { buildWeeklyReport } from "../game/weekly-reports";
 import { getViableExtractiveSubSectorIdsForRegion } from "../models/generatePerson";
 import {
 	generateImmigrantPerson,
@@ -66,6 +80,7 @@ import {
 	loadNationalLedger,
 	saveNationalLedger,
 } from "../storage/national-ledger";
+import { ensureRegionPool } from "../storage/regions";
 import { runAnnualResourceExtraction } from "../storage/resource-extraction";
 import {
 	getSectorAssignment,
@@ -250,29 +265,45 @@ async function processProgressionAfterYear(
 
 	gameRun = { ...gameRun, streaks: evaluation.streaks };
 
+	const mandateResolution = resolveMandateAfterYear(
+		gameRun,
+		{ stats, score: scoreBreakdown },
+		stats.year * settings.calendar.daysPerYear,
+	);
+	gameRun = mandateResolution.gameRun;
+	const pendingBonus = gameRun.pendingScoreBonus ?? 0;
+	const scoredBreakdown = {
+		...scoreBreakdown,
+		total: scoreBreakdown.total + mandateResolution.scoreBonus + pendingBonus,
+	};
+	gameRun = { ...gameRun, pendingScoreBonus: 0 };
+
 	const runBadges = evaluateRunBadges({
 		year: stats.year,
 		births: stats.births,
 		deaths: stats.deaths,
 		immigrations: stats.immigrations,
 		emigrations: stats.emigrations,
-		score: scoreBreakdown,
+		score: scoredBreakdown,
 		netImmigrationPositiveStreak: gameRun.streaks.netImmigrationPositive,
+		mandateCompletedThisYear: mandateResolution.mandateCompleted,
 	});
 
 	gameRun = appendYearlyScore(
 		gameRun,
 		{
-			year: scoreBreakdown.year,
-			total: scoreBreakdown.total,
-			populationGrowth: scoreBreakdown.populationGrowth,
-			averageQualityOfLife: scoreBreakdown.averageQualityOfLife,
-			netMigration: scoreBreakdown.netMigration,
-			resourceSufficiency: scoreBreakdown.resourceSufficiency,
-			environmentHealth: scoreBreakdown.environmentHealth,
+			year: scoredBreakdown.year,
+			total: scoredBreakdown.total,
+			populationGrowth: scoredBreakdown.populationGrowth,
+			averageQualityOfLife: scoredBreakdown.averageQualityOfLife,
+			netMigration: scoredBreakdown.netMigration,
+			resourceSufficiency: scoredBreakdown.resourceSufficiency,
+			environmentHealth: scoredBreakdown.environmentHealth,
 		},
 		runBadges,
 	);
+
+	gameRun = issueMandateForYear(gameRun, stats.year + 1);
 
 	if (evaluation.status !== "active") {
 		gameRun = {
@@ -473,13 +504,24 @@ async function runAnnualCycle(
 		industrialWorkersBySubSector,
 		sectorAssignments,
 		settings,
-		getCalamityEfficiency: (regionId, subSectorId) =>
-			getCalamityExtractionEfficiency({
+		getCalamityEfficiency: (regionId, subSectorId) => {
+			let factor = getCalamityExtractionEfficiency({
 				activeCalamities: gameRun?.activeCalamities ?? [],
 				gameDay: meta.gameDay,
 				regionId,
 				subSectorId,
-			}),
+			});
+			for (const modifier of gameRun?.temporaryModifiers ?? []) {
+				if (modifier.expiresOnGameDay <= meta.gameDay) continue;
+				if (
+					modifier.extractionEfficiencyFactor != null &&
+					(!modifier.regionId || modifier.regionId === regionId)
+				) {
+					factor *= modifier.extractionEfficiencyFactor;
+				}
+			}
+			return factor;
+		},
 	});
 	await saveWorldRegions(extraction.regions);
 	await saveRegionResourceStates(extraction.resourceStates);
@@ -518,6 +560,44 @@ async function runAnnualCycle(
 		settings,
 	);
 
+	let runAfterYear = await loadGameRunState();
+	if (runAfterYear) {
+		const yearEvents: GameEvent[] = [
+			{
+				id: `year-${stats.year}-${meta.gameDay}`,
+				gameDay: meta.gameDay,
+				type: "year_end",
+				title: `Year ${stats.year} closed`,
+				detail: `Pop ${stats.populationBefore.toLocaleString()} → ${stats.populationAfter.toLocaleString()} · QoL ${stats.averageQualityOfLife.toFixed(1)}`,
+			},
+		];
+		const emigrationRate =
+			stats.emigrations / Math.max(stats.populationAfter, 1);
+		if (emigrationRate > settings.progression.lose.massExodusRate) {
+			yearEvents.push({
+				id: `exodus-${stats.year}-${meta.gameDay}`,
+				gameDay: meta.gameDay,
+				type: "emigration_spike",
+				title: "Mass emigration warning",
+				detail: `${stats.emigrations.toLocaleString()} citizens left (${(emigrationRate * 100).toFixed(1)}% of the living).`,
+			});
+		}
+		const shortfallSectors = Object.entries(
+			extraction.ledger.shortfallHappinessPenaltyBySubSector,
+		).filter(([, penalty]) => penalty > 0);
+		if (shortfallSectors.length > 0) {
+			yearEvents.push({
+				id: `shortfall-${stats.year}-${meta.gameDay}`,
+				gameDay: meta.gameDay,
+				type: "resource_shortfall",
+				title: "Resource shortfalls",
+				detail: `${shortfallSectors.length} industrial sub-sector(s) face unmet demand.`,
+			});
+		}
+		runAfterYear = appendGameEvents(runAfterYear, yearEvents);
+		await saveGameRunState(runAfterYear);
+	}
+
 	return stats;
 }
 
@@ -526,19 +606,29 @@ async function advanceGameDay(
 	onAnnualProgress?: (processed: number, total: number) => void,
 	random: RandomFn = Math.random,
 	settings: GameSettings = gameSettings,
-): Promise<PopulationMeta | null> {
+): Promise<AdvanceGameDayResult> {
+	const emptyResult = (meta: PopulationMeta | null): AdvanceGameDayResult => ({
+		meta,
+		onsets: [],
+		weeklyReport: null,
+		aideProposal: null,
+		yearReview: null,
+	});
+
 	const meta = await loadMeta();
-	if (!meta) return null;
+	if (!meta) return emptyResult(null);
 
 	let gameRun = await loadGameRunState();
 	if (gameRun && (gameRun.status !== "active" || gameRun.phase !== "active")) {
-		return meta;
+		return emptyResult(meta);
 	}
 
 	const regions = await ensureWorld(random);
 	let resourceStates = await ensureRegionResourceStates(regions);
+	let onsets: CalamityOnsetSummary[] = [];
 
 	if (gameRun) {
+		gameRun = pruneExpiredModifiers(gameRun, meta.gameDay);
 		const calamityResult = processCalamitiesForDay({
 			run: toCalamityRunSlice(gameRun),
 			gameDay: meta.gameDay,
@@ -547,6 +637,45 @@ async function advanceGameDay(
 			settings,
 		});
 		gameRun = mergeCalamityRunSlice(gameRun, calamityResult.run);
+
+		// Apply prep buff to newly started calamities' happiness scales.
+		const prepScale = (gameRun.temporaryModifiers ?? [])
+			.filter(
+				(modifier) =>
+					modifier.nextCalamityHappinessScale != null &&
+					modifier.expiresOnGameDay > meta.gameDay,
+			)
+			.reduce(
+				(scale, modifier) => scale * (modifier.nextCalamityHappinessScale ?? 1),
+				1,
+			);
+		if (prepScale !== 1 && calamityResult.onsets.length > 0) {
+			const onsetIds = new Set(
+				calamityResult.onsets.map((onset) => onset.calamity.instanceId),
+			);
+			gameRun = {
+				...gameRun,
+				activeCalamities: gameRun.activeCalamities.map((calamity) =>
+					onsetIds.has(calamity.instanceId)
+						? {
+								...calamity,
+								happinessPenaltyScale:
+									(calamity.happinessPenaltyScale ?? 1) * prepScale,
+							}
+						: calamity,
+				),
+			};
+		}
+
+		onsets = calamityResult.onsets.map((onset) => ({
+			instanceId: onset.calamity.instanceId,
+			calamityId: onset.calamity.calamityId,
+			name: onset.calamity.name,
+			severity: onset.calamity.severity,
+			regionIds: onset.calamity.regionIds,
+			midTermEndsOnGameDay: onset.calamity.midTermEndsOnGameDay,
+			fromCascade: onset.calamity.fromCascade,
+		}));
 		if (calamityResult.onsets.length > 0) {
 			const mutations = calamityResult.onsets.flatMap(
 				(onset) => onset.mutations,
@@ -559,6 +688,15 @@ async function advanceGameDay(
 			resourceStates = applied.resourceStates;
 			await saveWorldRegions(applied.regions);
 			await saveRegionResourceStates(resourceStates);
+
+			const onsetEvents: GameEvent[] = onsets.map((onset) => ({
+				id: `onset-${onset.instanceId}`,
+				gameDay: meta.gameDay,
+				type: "calamity_onset",
+				title: onset.name,
+				detail: `${onset.severity} · ${onset.regionIds.length} region(s) struck`,
+			}));
+			gameRun = appendGameEvents(gameRun, onsetEvents);
 		}
 		await saveGameRunState(gameRun);
 	}
@@ -629,10 +767,122 @@ async function advanceGameDay(
 	const nextGameDay = meta.gameDay + 1;
 	const completedFullYear = nextGameDay % settings.calendar.daysPerYear === 0;
 
+	let weeklyReport: WeeklyReportSummary | null = null;
+	let aideProposal: AideProposalSummary | null = null;
+
+	if (gameRun && isWeekBoundary(nextGameDay)) {
+		const namedRegions = await ensureRegionPool(random);
+		const stats = await computeRegionStats();
+		weeklyReport = buildWeeklyReport({
+			gameDay: nextGameDay,
+			stats,
+			regions: namedRegions,
+			activeCalamities: gameRun.activeCalamities,
+		});
+		if (weeklyReport) {
+			gameRun = appendGameEvents(gameRun, [
+				{
+					id: `weekly-${nextGameDay}`,
+					gameDay: nextGameDay,
+					type: "weekly_report",
+					title: `Weekly briefing: ${weeklyReport.regions[0]?.name ?? "provinces"}`,
+					detail: weeklyReport.prompt,
+				},
+			]);
+			gameRun = {
+				...gameRun,
+				lastWeeklyReportGameDay: nextGameDay,
+			};
+			await saveGameRunState(gameRun);
+		}
+	}
+
+	if (gameRun && isAideProposalDay(nextGameDay)) {
+		aideProposal = buildAideProposalSummary(gameRun, nextGameDay, random);
+		if (aideProposal) {
+			gameRun = appendGameEvents(gameRun, [
+				{
+					id: `aide-${nextGameDay}-${aideProposal.proposalId}`,
+					gameDay: nextGameDay,
+					type: "aide_proposal",
+					title: `${aideProposal.aideName}: ${aideProposal.title}`,
+					detail: aideProposal.dialog,
+				},
+			]);
+			gameRun = {
+				...gameRun,
+				lastAideProposalGameDay: nextGameDay,
+			};
+			await saveGameRunState(gameRun);
+		}
+	}
+
 	if (completedFullYear) {
+		const yearStartDay = nextGameDay - settings.calendar.daysPerYear;
 		await saveMeta({ ...meta, gameDay: nextGameDay });
-		await runAnnualCycle(onAnnualProgress, random, settings);
-		return loadMeta();
+		const yearStats = await runAnnualCycle(onAnnualProgress, random, settings);
+		const nextMeta = await loadMeta();
+		const runAfter = await loadGameRunState();
+		let yearReview: YearReviewSummary | null = null;
+		if (yearStats && runAfter) {
+			const latestScore = runAfter.scoreHistory.at(-1)?.total ?? 0;
+			const previousScore = runAfter.scoreHistory.at(-2)?.total ?? null;
+			const calamitiesThisYear = runAfter.calamityHistory
+				.filter(
+					(entry) =>
+						entry.startedOnGameDay >= yearStartDay &&
+						entry.startedOnGameDay < nextGameDay,
+				)
+				.map((entry) => ({
+					name: entry.name,
+					severity: entry.severity,
+					instanceId: entry.instanceId,
+				}));
+			const activeStartedThisYear = runAfter.activeCalamities
+				.filter(
+					(entry) =>
+						entry.startedOnGameDay >= yearStartDay &&
+						entry.startedOnGameDay < nextGameDay,
+				)
+				.map((entry) => ({
+					name: entry.name,
+					severity: entry.severity,
+					instanceId: entry.instanceId,
+				}));
+			const mandateEvent = [...runAfter.eventLog]
+				.reverse()
+				.find(
+					(event) =>
+						event.type === "mandate_completed" ||
+						event.type === "mandate_failed",
+				);
+			yearReview = {
+				stats: yearStats,
+				nationScore: latestScore,
+				previousNationScore: previousScore,
+				calamitiesThisYear: [...calamitiesThisYear, ...activeStartedThisYear],
+				mandateResult: mandateEvent
+					? {
+							label: mandateEvent.title.replace(
+								/^(Mandate fulfilled|Mandate missed): /,
+								"",
+							),
+							fulfilled: mandateEvent.type === "mandate_completed",
+							scoreBonus: (() => {
+								const match = mandateEvent.detail.match(/\+(\d+)/);
+								return match ? Number(match[1]) : 0;
+							})(),
+						}
+					: null,
+			};
+		}
+		return {
+			meta: nextMeta,
+			onsets,
+			weeklyReport,
+			aideProposal,
+			yearReview,
+		};
 	}
 
 	const nextMeta: PopulationMeta = {
@@ -640,9 +890,14 @@ async function advanceGameDay(
 		gameDay: nextGameDay,
 	};
 	await saveMeta(nextMeta);
-	return nextMeta;
+	return {
+		meta: nextMeta,
+		onsets,
+		weeklyReport,
+		aideProposal,
+		yearReview: null,
+	};
 }
-
 async function hasPopulation(): Promise<boolean> {
 	const meta = await loadMeta();
 	if (!meta) return false;
@@ -1101,6 +1356,7 @@ async function computeSectorStats(
 }
 
 export type {
+	AdvanceGameDayResult,
 	AgeSexBucket,
 	AnnualCycleStats,
 	DemographicStats,

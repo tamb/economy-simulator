@@ -1,12 +1,25 @@
 import { appConfig } from "economy-simulator-data";
+import { getVisibleActiveCalamities } from "economy-simulator-simulation";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { usePopulation } from "../context/PopulationContext";
 import { appVersion } from "../data/app-version";
+import { AideProposalModal } from "./AideProposalModal";
 import { CalamityDebuffStrip } from "./CalamityDebuffStrip";
+import { CalamityOnsetModal } from "./CalamityOnsetModal";
 import { CalculationModal } from "./CalculationModal";
+import { DispatchLog } from "./DispatchLog";
 import { GameEndModal } from "./GameEndModal";
+import { HowToRulePanel } from "./HowToRulePanel";
+import { ThroneHud } from "./ThroneHud";
+import { WeeklyReportModal } from "./WeeklyReportModal";
+import { YearReviewModal } from "./YearReviewModal";
 
 const pages: { path: string; label: string; subtitle: string }[] = [
+	{
+		path: "/map",
+		label: "Country Map",
+		subtitle: "Regional Atlas",
+	},
 	{
 		path: "/atlas",
 		label: "Sector Atlas",
@@ -16,11 +29,6 @@ const pages: { path: string; label: string; subtitle: string }[] = [
 		path: "/population",
 		label: "Population",
 		subtitle: "Population Registry",
-	},
-	{
-		path: "/map",
-		label: "Country Map",
-		subtitle: "Regional Atlas",
 	},
 	{
 		path: "/dashboards",
@@ -44,9 +52,10 @@ const pages: { path: string; label: string; subtitle: string }[] = [
 	},
 ];
 
-const PHASE_LABELS: Record<"daily" | "annual", string> = {
+const PHASE_LABELS: Record<"daily" | "annual" | "mutation", string> = {
 	daily: "Updating today's cohort",
 	annual: "Running the annual population cycle",
+	mutation: "Applying throne decree to the population",
 };
 
 /**
@@ -56,12 +65,35 @@ const PHASE_LABELS: Record<"daily" | "annual", string> = {
  */
 function AppShell() {
 	const location = useLocation();
-	const { isAdvancingDay, dayAdvanceProgress, gameRun, restartNation, total } =
-		usePopulation();
+	const {
+		isAdvancingDay,
+		dayAdvanceProgress,
+		gameRun,
+		restartNation,
+		total,
+		pendingCalamityOnsets,
+		respondToCalamityOnsets,
+		pendingWeeklyReport,
+		respondToWeeklyReport,
+		pendingAideProposal,
+		respondToAideProposal,
+		pendingYearReview,
+		dismissYearReview,
+		gameDay,
+	} = usePopulation();
 	const activePage =
 		pages.find((item) => location.pathname.startsWith(item.path)) ?? pages[0];
 	const showGameEndModal =
 		gameRun != null && (gameRun.status === "won" || gameRun.status === "lost");
+	const activeCalamityCount = getVisibleActiveCalamities(
+		gameRun?.activeCalamities ?? [],
+		gameDay,
+	).length;
+
+	const daysLabel =
+		dayAdvanceProgress?.daysTotal != null && dayAdvanceProgress.daysTotal > 1
+			? ` · day ${(dayAdvanceProgress.daysCompleted ?? 0) + 1} of ${dayAdvanceProgress.daysTotal}`
+			: "";
 
 	return (
 		<main className="min-h-screen p-4 font-sans sm:p-6">
@@ -77,6 +109,12 @@ function AppShell() {
 						<p className="mt-1 text-[10px] leading-relaxed sm:text-xs">
 							economy-simulator
 						</p>
+						{activeCalamityCount > 0 && (
+							<p className="mt-2 font-label text-[10px] tracking-overline text-highlight">
+								{activeCalamityCount} active calamit
+								{activeCalamityCount === 1 ? "y" : "ies"}
+							</p>
+						)}
 					</div>
 					<ul className="p-2">
 						{pages.map((item) => (
@@ -113,7 +151,16 @@ function AppShell() {
 						</p>
 					</header>
 
-					<div className="border-b border-primary px-6 py-1 sm:px-8" />
+					<ThroneHud />
+
+					<div className="border-b border-primary px-4 py-3 sm:px-6">
+						<p className="font-label text-[10px] tracking-overline text-muted-foreground">
+							Recent dispatches
+						</p>
+						<div className="mt-2">
+							<DispatchLog limit={3} />
+						</div>
+					</div>
 
 					<CalamityDebuffStrip />
 
@@ -123,7 +170,7 @@ function AppShell() {
 
 					<footer className="border-t-2 border-primary bg-surface-muted px-6 py-3 sm:px-8">
 						<p className="font-label text-center text-xs text-muted-foreground tracking-overline">
-							Reference: economic-sectors.md · {new Date().getFullYear()}
+							Monarch command desk · {new Date().getFullYear()}
 						</p>
 						<p className="mt-1 text-center text-[10px] text-muted-foreground/70">
 							v{appVersion}
@@ -133,10 +180,16 @@ function AppShell() {
 			</div>
 
 			<CalculationModal
-				isOpen={isAdvancingDay}
+				isOpen={
+					isAdvancingDay &&
+					pendingCalamityOnsets.length === 0 &&
+					!pendingWeeklyReport &&
+					!pendingAideProposal &&
+					!pendingYearReview
+				}
 				title={
 					dayAdvanceProgress
-						? PHASE_LABELS[dayAdvanceProgress.phase]
+						? `${PHASE_LABELS[dayAdvanceProgress.phase]}${daysLabel}`
 						: "Advancing the game day"
 				}
 				subtitle={
@@ -147,6 +200,47 @@ function AppShell() {
 				processed={dayAdvanceProgress?.processed ?? 0}
 				total={dayAdvanceProgress?.total ?? 0}
 			/>
+
+			{pendingCalamityOnsets.length > 0 && (
+				<CalamityOnsetModal
+					onsets={pendingCalamityOnsets}
+					onRespond={(response) => {
+						respondToCalamityOnsets(response).catch(() => undefined);
+					}}
+				/>
+			)}
+
+			{pendingWeeklyReport && pendingCalamityOnsets.length === 0 && (
+				<WeeklyReportModal
+					report={pendingWeeklyReport}
+					onRespond={(choiceId) => {
+						respondToWeeklyReport(choiceId).catch(() => undefined);
+					}}
+				/>
+			)}
+
+			{pendingAideProposal &&
+				pendingCalamityOnsets.length === 0 &&
+				!pendingWeeklyReport && (
+					<AideProposalModal
+						proposal={pendingAideProposal}
+						onRespond={(choice) => {
+							respondToAideProposal(choice).catch(() => undefined);
+						}}
+					/>
+				)}
+
+			{pendingYearReview &&
+				pendingCalamityOnsets.length === 0 &&
+				!pendingWeeklyReport &&
+				!pendingAideProposal && (
+					<YearReviewModal
+						review={pendingYearReview}
+						onContinue={dismissYearReview}
+					/>
+				)}
+
+			<HowToRulePanel />
 
 			{showGameEndModal && gameRun && (
 				<GameEndModal

@@ -12,12 +12,22 @@ orchestrating the national resource ledger through per-sub-sector economic
 system choices and role structures, and watching your choices play out over in-game years. People are born, age, and die; they flee a struggling nation and
 immigrate to a thriving one. Before the simulation begins, the monarch must assign an economic system and role quotas to every sub-sector; citizens then receive a `roleId` (e.g. feudal serf = 65) that affects quality of life and extraction efficiency. Occasional **calamities** (fires, storms, quakes,
 disease, and more) strike regions as timed nation debuffs with immediate,
-mid-term, and long-term economic scars. All of this is driven by each citizen's
+mid-term, and long-term economic scars — the monarch chooses **Relief**,
+**Rebuild**, or **Endure** at onset. Calamities land at least once per
+28-day month. Each week a **regional briefing** highlights the worst
+provinces and offers a decision tree. Twice a month the **inner circle**
+(Steward, Marshal, Chancellor, Vizier) brings an executive-order proposal
+with Approve / Compromise / Reject. Mid-game **labor edicts** and **role reforms**
+let the monarch reshuffle workers between sectors or re-roll roles when the
+economy stalls. Each in-game year brings a **royal mandate** — fulfill it for
+bonus score and badges. All of this is driven by each citizen's
 **quality of life**, which is a function of their happiness (work hours,
 personality-to-job fit) and health (which follows happiness). The player
-gets population, sector, country-health, and resource-ledger dashboards, an
+gets a persistent **throne HUD** (advance day/week/year, nation score, win/lose
+streaks), a dispatch log, a slide-up How to rule briefing, population, sector, country-health, and resource-ledger dashboards, an
 interactive map of a procedurally generated island (biomes, resource overlays,
-ocean surround), and chart-driven feedback to steer the economy — styled with
+ocean surround; calamity regions highlighted), calamity onset alerts and a year-in-review
+briefing, and chart-driven feedback to steer the economy — styled with
 a retro, "Track and Field arcade game" aesthetic.
 
 See [research/index.md](../research/index.md) for sourced design rules; the

@@ -4,7 +4,9 @@ import {
 	getResourceOverlay,
 	isLand,
 } from "economy-simulator-data";
-import { useEffect, useState } from "react";
+import { getVisibleActiveCalamities } from "economy-simulator-simulation";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
 import { CountryMap } from "../components/CountryMap";
 import { usePopulation } from "../context/PopulationContext";
 import { useRegions } from "../context/RegionContext";
@@ -26,7 +28,12 @@ function formatReservePercent(fraction: number | undefined): string {
 }
 
 function CountryMapPage() {
-	const { isReady: isPopulationReady, gameDay, total } = usePopulation();
+	const {
+		isReady: isPopulationReady,
+		gameDay,
+		total,
+		gameRun,
+	} = usePopulation();
 	const { regions, isReady: isRegionsReady } = useRegions();
 	const [stats, setStats] = useState<Map<string, RegionStats>>(new Map());
 	const [isComputing, setIsComputing] = useState(false);
@@ -63,6 +70,26 @@ function CountryMapPage() {
 	const landRegionCount = regions.filter((region) =>
 		isLand(region.terrain),
 	).length;
+	const calamityRegionIds = useMemo(() => {
+		const active = getVisibleActiveCalamities(
+			gameRun?.activeCalamities ?? [],
+			gameDay,
+		);
+		const ids = new Set<string>();
+		for (const calamity of active) {
+			for (const regionId of calamity.regionIds) {
+				ids.add(regionId);
+			}
+		}
+		return ids;
+	}, [gameRun?.activeCalamities, gameDay]);
+	const selectedCalamities = useMemo(() => {
+		if (!selectedRegionId) return [];
+		return getVisibleActiveCalamities(
+			gameRun?.activeCalamities ?? [],
+			gameDay,
+		).filter((calamity) => calamity.regionIds.includes(selectedRegionId));
+	}, [gameRun?.activeCalamities, gameDay, selectedRegionId]);
 
 	if (!isReady) {
 		return (
@@ -85,6 +112,7 @@ function CountryMapPage() {
 					{total.toLocaleString()} citizens across{" "}
 					{regions.length.toLocaleString()} hex tiles (including ocean). Select
 					a metric to color the map, then click a land tile to inspect it.
+					Regions under active calamities glow red.
 				</p>
 			</header>
 
@@ -118,6 +146,7 @@ function CountryMapPage() {
 					metric={metric}
 					selectedRegionId={selectedRegionId}
 					onSelect={setSelectedRegionId}
+					calamityRegionIds={calamityRegionIds}
 				/>
 
 				<aside className="border-2 border-primary bg-surface-muted px-4 py-3">
@@ -213,6 +242,33 @@ function CountryMapPage() {
 										</p>
 									)}
 								</div>
+							)}
+
+							{selectedCalamities.length > 0 && (
+								<div className="border-t border-primary/20 pt-3">
+									<p className="font-label text-[10px] tracking-overline text-destructive">
+										Active calamities
+									</p>
+									<ul className="mt-2 space-y-1 text-sm">
+										{selectedCalamities.map((calamity) => (
+											<li key={calamity.instanceId}>
+												{calamity.name}{" "}
+												<span className="text-muted-foreground">
+													({calamity.severity})
+												</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+
+							{selectedRegion.terrain !== "ocean" && (
+								<Link
+									to={`/population?region=${selectedRegion.id}`}
+									className="mt-2 inline-block border-2 border-primary bg-surface px-3 py-1.5 font-label text-[10px] tracking-overline text-foreground hover:bg-primary hover:text-primary-foreground"
+								>
+									View citizens here →
+								</Link>
 							)}
 
 							{selectedRegion.terrain !== "ocean" &&

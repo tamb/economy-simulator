@@ -1,0 +1,44 @@
+{
+	"steps": [
+		{
+			"title": "Throne controls",
+			"body": "Advance day, week, or year from the bar at the top. Calamities, weekly briefings, aide proposals, and year-end reviews pause the clock until you respond."
+		},
+		{
+			"title": "Country map",
+			"body": "The map is your home base. Pulsing red regions signal active calamities — click a tile, then jump to its population."
+		},
+		{
+			"title": "Weekly reports",
+			"body": "Every seven days you get a cabinet briefing on the worst-performing regions. Choose relief, reform, or endurance for the primary province."
+		},
+		{
+			"title": "Inner circle",
+			"body": "Twice each 28-day month an aide proposes an executive order. Approve, compromise, or reject — effects are local and time-boxed."
+		},
+		{
+			"title": "Dispatch log",
+			"body": "Recent dispatches under the throne bar and on Records summarize calamities, edicts, mandates, and year-end milestones."
+		},
+		{
+			"title": "Sector levers",
+			"body": "During play, open the Sector Atlas, pick a sub-sector, and issue a labor edict or reform roles to rebalance workers mid-run."
+		},
+		{
+			"title": "Citizen dossier",
+			"body": "On the Population page, click a citizen card to open their dossier and see what is driving their quality of life."
+		},
+		{
+			"title": "Calamity responses",
+			"body": "When disaster strikes, choose Relief (softer happiness hit), Rebuild (shorter mid-term drag), or Endure (default severity). Expect at least one calamity per month."
+		},
+		{
+			"title": "Royal mandates",
+			"body": "Each year brings a mandate in the throne bar. Fulfill it before year-end for bonus score and the Royal Mandate badge."
+		},
+		{
+			"title": "Year in review",
+			"body": "After each annual cycle, a cabinet briefing summarizes population change, score, calamities, and your mandate result."
+		}
+	]
+}

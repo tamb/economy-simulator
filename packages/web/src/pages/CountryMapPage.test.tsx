@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../context/PopulationContext", () => ({
@@ -11,6 +12,7 @@ vi.mock("../context/PopulationContext", () => ({
 		gameDay: 0,
 		advanceDay: vi.fn(),
 		getPersonRange: vi.fn(),
+		gameRun: null,
 	}),
 }));
 
@@ -61,13 +63,21 @@ vi.mock("../storage/population", () => ({
 
 import { CountryMapPage } from "./CountryMapPage";
 
+function renderPage() {
+	return render(
+		<MemoryRouter>
+			<CountryMapPage />
+		</MemoryRouter>,
+	);
+}
+
 describe("CountryMapPage", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
 	it("renders the map and a hint before a region is selected", async () => {
-		render(<CountryMapPage />);
+		renderPage();
 
 		expect(await screen.findByRole("img")).toBeInTheDocument();
 		expect(
@@ -76,7 +86,7 @@ describe("CountryMapPage", () => {
 	});
 
 	it("shows region details after selecting a populated region", async () => {
-		render(<CountryMapPage />);
+		renderPage();
 
 		fireEvent.click(await screen.findByRole("button", { name: /Alpha/ }));
 
@@ -86,7 +96,7 @@ describe("CountryMapPage", () => {
 	});
 
 	it("shows a no-citizens message for an empty selected region", async () => {
-		render(<CountryMapPage />);
+		renderPage();
 
 		fireEvent.click(await screen.findByRole("button", { name: /Beta/ }));
 
@@ -96,7 +106,7 @@ describe("CountryMapPage", () => {
 	});
 
 	it("recolors land tiles when switching map metrics", async () => {
-		render(<CountryMapPage />);
+		renderPage();
 
 		await screen.findByRole("img");
 		const alphaFill = () =>

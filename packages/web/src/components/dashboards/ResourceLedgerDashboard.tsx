@@ -57,6 +57,7 @@ function ResourceLedgerDashboard() {
 			) : (
 				<>
 					<ChartCard
+						variant="briefing"
 						title="National Production vs. Demand"
 						description="Total extraction output compared to what industrial sub-sectors consumed this year."
 					>
@@ -71,6 +72,7 @@ function ResourceLedgerDashboard() {
 					</ChartCard>
 
 					<ChartCard
+						variant="briefing"
 						title="Resource Sufficiency"
 						description="Production as a percentage of demand (100% = balanced; below 100% triggers industrial shortfall penalties)."
 					>

@@ -95,7 +95,7 @@ describe("population storage", () => {
 		const cohortOneBefore = await getPerson(1);
 
 		const meta = await advanceGameDay();
-		expect(meta?.gameDay).toBe(1);
+		expect(meta?.meta?.gameDay).toBe(1);
 
 		const cohortOneAfter = await getPerson(1);
 		expect(cohortOneAfter?.getOverallHealth()).toBe(
@@ -284,9 +284,9 @@ describe("advanceGameDay year-boundary trigger", () => {
 		);
 
 		expect(computeExpectedImmigrantCount).toHaveBeenCalledTimes(1);
-		expect(meta?.gameDay).toBe(2);
-		expect(meta?.size).toBe(TEST_SIZE + 2);
-		expect(meta?.yearlyStats).toHaveLength(1);
+		expect(meta.meta?.gameDay).toBe(2);
+		expect(meta.meta?.size).toBe(TEST_SIZE + 2);
+		expect(meta.meta?.yearlyStats).toHaveLength(1);
 	});
 });
 

@@ -6,6 +6,7 @@ import {
 	setStorageDriver,
 } from "economy-simulator-persistence";
 import { advanceGameDay } from "../game/population-cycle";
+import { applyLaborEdict, applyRoleReform } from "../game/population-mutations";
 import type {
 	PopulationWorkerRequest,
 	PopulationWorkerResponse,
@@ -20,19 +21,58 @@ function post(message: PopulationWorkerResponse): void {
 }
 
 self.onmessage = (event: MessageEvent<PopulationWorkerRequest>) => {
-	if (event.data.type !== "advance-day") return;
+	const request = event.data;
 
-	advanceGameDay(
-		(processed, total) =>
-			post({ type: "progress", phase: "daily", processed, total }),
-		(processed, total) =>
-			post({ type: "progress", phase: "annual", processed, total }),
-	)
-		.then((meta) => post({ type: "done", meta }))
-		.catch((error: unknown) =>
-			post({
-				type: "error",
-				message: error instanceof Error ? error.message : String(error),
-			}),
-		);
+	if (request.type === "advance-day") {
+		advanceGameDay(
+			(processed, total) =>
+				post({ type: "progress", phase: "daily", processed, total }),
+			(processed, total) =>
+				post({ type: "progress", phase: "annual", processed, total }),
+		)
+			.then((result) => post({ type: "done", result }))
+			.catch((error: unknown) =>
+				post({
+					type: "error",
+					message: error instanceof Error ? error.message : String(error),
+				}),
+			);
+		return;
+	}
+
+	if (request.type === "apply-labor-edict") {
+		applyLaborEdict({
+			source: request.source,
+			target: request.target,
+			percent: request.percent,
+			gameDay: request.gameDay,
+			onProgress: (processed, total) =>
+				post({ type: "progress", phase: "mutation", processed, total }),
+		})
+			.then((result) => post({ type: "mutation-done", result }))
+			.catch((error: unknown) =>
+				post({
+					type: "error",
+					message: error instanceof Error ? error.message : String(error),
+				}),
+			);
+		return;
+	}
+
+	if (request.type === "apply-role-reform") {
+		applyRoleReform({
+			categoryId: request.categoryId,
+			subSectorId: request.subSectorId,
+			gameDay: request.gameDay,
+			onProgress: (processed, total) =>
+				post({ type: "progress", phase: "mutation", processed, total }),
+		})
+			.then((result) => post({ type: "mutation-done", result }))
+			.catch((error: unknown) =>
+				post({
+					type: "error",
+					message: error instanceof Error ? error.message : String(error),
+				}),
+			);
+	}
 };

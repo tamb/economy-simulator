@@ -6,6 +6,7 @@ import {
 } from "economy-simulator-persistence";
 import { useEffect, useState } from "react";
 import { BadgeGallery } from "../components/BadgeGallery";
+import { DispatchLog } from "../components/DispatchLog";
 import { ScoreDashboard } from "../components/dashboards/ScoreDashboard";
 import { formatEndReason } from "../data/score-dashboard";
 
@@ -75,6 +76,13 @@ function RecordsPage() {
 					Badges
 				</h3>
 				<BadgeGallery profile={profile} runBadges={gameRun?.unlockedThisRun} />
+			</section>
+
+			<section className="space-y-3">
+				<h3 className="font-label text-[10px] tracking-overline text-muted-foreground">
+					Recent dispatches
+				</h3>
+				<DispatchLog limit={8} />
 			</section>
 
 			<section className="space-y-3">

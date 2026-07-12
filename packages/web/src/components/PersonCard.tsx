@@ -17,6 +17,7 @@ const traitLabels: Record<
 interface PersonCardProps {
 	person: Person;
 	onOpenGlossary?: () => void;
+	onOpenDossier?: (person: Person) => void;
 }
 
 function formatPercentStat(value: number | undefined): string {
@@ -24,7 +25,11 @@ function formatPercentStat(value: number | undefined): string {
 	return `${Math.ceil(value)}%`;
 }
 
-function PersonCard({ person, onOpenGlossary }: PersonCardProps) {
+function PersonCard({
+	person,
+	onOpenGlossary,
+	onOpenDossier,
+}: PersonCardProps) {
 	const { getFace } = useFacePool();
 	const face = getFace(person.getFaceId());
 	const isAlive = person.isLiving();
@@ -35,7 +40,16 @@ function PersonCard({ person, onOpenGlossary }: PersonCardProps) {
 				isAlive
 					? "border-primary/30 bg-surface-muted"
 					: "border-primary/15 bg-surface-muted/60 opacity-70"
-			}`}
+			} ${onOpenDossier ? "cursor-pointer hover:border-primary" : ""}`}
+			onClick={() => onOpenDossier?.(person)}
+			onKeyDown={(event) => {
+				if (!onOpenDossier) return;
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					onOpenDossier(person);
+				}
+			}}
+			{...(onOpenDossier ? { role: "button" as const, tabIndex: 0 } : {})}
 		>
 			{face && (
 				<div className="shrink-0 border-2 border-primary bg-surface p-1">
@@ -58,7 +72,10 @@ function PersonCard({ person, onOpenGlossary }: PersonCardProps) {
 						{onOpenGlossary && (
 							<button
 								type="button"
-								onClick={onOpenGlossary}
+								onClick={(event) => {
+									event.stopPropagation();
+									onOpenGlossary();
+								}}
 								className="shrink-0 border border-primary/30 bg-surface px-1.5 py-0.5 font-label text-[10px] tracking-overline text-muted-foreground hover:border-primary hover:text-primary"
 								aria-label="What do these stats mean?"
 							>

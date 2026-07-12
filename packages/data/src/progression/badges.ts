@@ -51,6 +51,12 @@ const badgeDefinitions: BadgeDefinition[] = [
 		scope: "run",
 	},
 	{
+		id: "royal_mandate",
+		title: "Royal Mandate",
+		description: "Complete a yearly royal mandate.",
+		scope: "run",
+	},
+	{
 		id: "career_10_wins",
 		title: "Dynasty",
 		description: "Win 10 nation runs across your career.",

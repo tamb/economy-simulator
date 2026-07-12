@@ -155,7 +155,16 @@ vi.mock("facesjs/react", () => ({
 	Face: () => null,
 }));
 
+import { MemoryRouter } from "react-router";
 import { PopulationPage } from "./PopulationPage";
+
+function renderPage() {
+	return render(
+		<MemoryRouter>
+			<PopulationPage />
+		</MemoryRouter>,
+	);
+}
 
 describe("PopulationPage", () => {
 	beforeEach(() => {
@@ -169,7 +178,7 @@ describe("PopulationPage", () => {
 	});
 
 	it("indexes citizens and shows search controls", async () => {
-		render(<PopulationPage />);
+		renderPage();
 
 		expect(
 			await screen.findByText("2 of 2 citizens match", { exact: false }),
@@ -188,7 +197,8 @@ describe("PopulationPage", () => {
 	});
 
 	it("filters by living status", async () => {
-		render(<PopulationPage />);
+		renderPage();
+
 		await screen.findByText("Alice Smith");
 
 		fireEvent.click(screen.getByRole("button", { name: "Deceased" }));
@@ -203,7 +213,7 @@ describe("PopulationPage", () => {
 	});
 
 	it("opens the stats glossary modal", async () => {
-		render(<PopulationPage />);
+		renderPage();
 		await screen.findByText("Alice Smith");
 
 		fireEvent.click(screen.getByText("What do these stats mean?"));
@@ -220,7 +230,7 @@ describe("PopulationPage", () => {
 	});
 
 	it("shows an empty state when nothing matches", async () => {
-		render(<PopulationPage />);
+		renderPage();
 		await screen.findByText("Alice Smith");
 
 		fireEvent.change(

@@ -1,0 +1,18 @@
+{
+	"steward": {
+		"label": "Steward",
+		"name": "Aldric"
+	},
+	"marshal": {
+		"label": "Marshal",
+		"name": "Brenna"
+	},
+	"chancellor": {
+		"label": "Chancellor",
+		"name": "Caius"
+	},
+	"vizier": {
+		"label": "Vizier",
+		"name": "Daria"
+	}
+}

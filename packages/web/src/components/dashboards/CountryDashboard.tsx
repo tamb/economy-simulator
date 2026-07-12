@@ -66,6 +66,7 @@ function CountryDashboard() {
 			)}
 
 			<ChartCard
+				variant="briefing"
 				title="National Quality of Life Trend"
 				description="Mean of average happiness and health across the whole population, recorded each completed game year."
 			>

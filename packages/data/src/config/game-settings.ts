@@ -156,12 +156,22 @@ const gameSettings = {
 	 * controls frequency, stacking, and which tiers are eligible to roll.
 	 */
 	calamities: {
-		/** Average expected calamity onsets per game year (before cooldowns/caps). */
-		expectedPerYear: 1.1,
+		/**
+		 * Average expected primary calamity onsets per game year (before
+		 * cooldowns/caps). Tuned for ~1.5 random pressure events per 28-day
+		 * month (364-day year / 13 months).
+		 */
+		expectedPerYear: 18,
 		/** Soft cooldown in days after any onset before another primary roll. */
-		cooldownDaysAfterOnset: 28,
+		cooldownDaysAfterOnset: 14,
 		/** Extra cooldown after a severe onset. */
-		cooldownDaysAfterSevere: 60,
+		cooldownDaysAfterSevere: 28,
+		/**
+		 * If no primary onset has occurred within this many days, force one
+		 * when the mid-term cap allows (guarantees at least one per month).
+		 * A game month is 28 days (13 months per 364-day year).
+		 */
+		guaranteedOnsetIntervalDays: 28,
 		/** Max concurrent mid-term (visible) debuffs. */
 		maxActiveMidTerm: 4,
 		/** Inclusive tiers eligible for primary rolls (cascades may still fire). */

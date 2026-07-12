@@ -1,0 +1,146 @@
+{
+	"steward_labor_shift": {
+		"title": "Labor shift",
+		"dialog": "My liege, industrial shortfalls are biting. Permit me to reassign a share of idle hands toward the starving workshops.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Reassign 10% toward shortfall work"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Reassign 5%"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Leave the roster alone"
+			}
+		}
+	},
+	"steward_role_reshuffle": {
+		"title": "Role reshuffle",
+		"dialog": "The role mix no longer matches the quotas you set. A controlled reform will sting, but inefficiency will sting more.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Full role reform in one sector"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Reform half the workforce"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Avoid unrest"
+			}
+		}
+	},
+	"marshal_hardening": {
+		"title": "Hardening drills",
+		"dialog": "We can drill the provinces before the next calamity. It costs little now and softens the blow later.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "Next calamity happiness hit ×0.85 for 28 days"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Softer prep ×0.92"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "No drills"
+			}
+		}
+	},
+	"marshal_martial_order": {
+		"title": "Martial order",
+		"dialog": "A distressed region needs lockdown corridors. Health may stabilize — happiness will not.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+health, −happiness in the worst region"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Softer lockdown"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Keep free movement"
+			}
+		}
+	},
+	"chancellor_restoration_levy": {
+		"title": "Restoration levy",
+		"dialog": "The worst soil and timber stands need a levy for restoration. Yields will dip while the land heals.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+environment; extraction −10% for 14 days"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Half the restoration"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Let the land wait"
+			}
+		}
+	},
+	"chancellor_extraction_surge": {
+		"title": "Extraction surge",
+		"dialog": "Open the reserves for a short surge. The ledger will smile — the land will not.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+yield 14 days; −environment"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Smaller surge"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Conserve the land"
+			}
+		}
+	},
+	"vizier_mandate_focus": {
+		"title": "Mandate focus",
+		"dialog": "Your royal mandate still hangs over the year. A focused push can buy progress — if you authorize it.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "National happiness nudge toward the mandate"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Smaller nudge"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "No special focus"
+			}
+		}
+	},
+	"vizier_public_triumph": {
+		"title": "Public triumph",
+		"dialog": "A modest triumph parade would lift spirits and burnish the score — unless the people are already too weary to cheer.",
+		"choices": {
+			"approve": {
+				"label": "Approve",
+				"hint": "+happiness and a small pending score bonus"
+			},
+			"compromise": {
+				"label": "Compromise",
+				"hint": "Quieter celebration"
+			},
+			"reject": {
+				"label": "Reject",
+				"hint": "Thrift over spectacle"
+			}
+		}
+	}
+}

@@ -60,13 +60,7 @@ function App() {
 	return (
 		<Routes>
 			<Route element={<AppShell />}>
-				<Route index element={<Navigate to="/atlas" replace />} />
-				<Route path="atlas" element={<EconomicAtlasPage />}>
-					<Route index element={<AtlasCategoriesPage />} />
-					<Route path=":categoryId" element={<AtlasSectorPage />} />
-					<Route path=":categoryId/:sectorId" element={<AtlasSectorPage />} />
-				</Route>
-				<Route path="population" element={<PopulationPage />} />
+				<Route index element={<Navigate to="/map" replace />} />
 				<Route
 					path="map"
 					element={
@@ -75,6 +69,12 @@ function App() {
 						</Suspense>
 					}
 				/>
+				<Route path="atlas" element={<EconomicAtlasPage />}>
+					<Route index element={<AtlasCategoriesPage />} />
+					<Route path=":categoryId" element={<AtlasSectorPage />} />
+					<Route path=":categoryId/:sectorId" element={<AtlasSectorPage />} />
+				</Route>
+				<Route path="population" element={<PopulationPage />} />
 				<Route
 					path="dashboards"
 					element={
@@ -86,7 +86,7 @@ function App() {
 				<Route path="instructions" element={<InstructionsPage />} />
 				<Route path="records" element={<RecordsPage />} />
 				<Route path="credits" element={<CreditsPage />} />
-				<Route path="*" element={<Navigate to="/atlas" replace />} />
+				<Route path="*" element={<Navigate to="/map" replace />} />
 			</Route>
 		</Routes>
 	);

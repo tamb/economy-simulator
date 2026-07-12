@@ -1,0 +1,18 @@
+{
+	"resource_security": {
+		"label": "Secure the ledger",
+		"description": "Keep average resource sufficiency at 70% or higher."
+	},
+	"stem_emigration": {
+		"label": "Stem the exodus",
+		"description": "End the year with immigration meeting or beating emigration."
+	},
+	"raise_qol": {
+		"label": "Lift the people",
+		"description": "Raise national average quality of life to 55 or higher."
+	},
+	"heal_land": {
+		"label": "Heal the land",
+		"description": "Restore environment health to 60 or higher."
+	}
+}

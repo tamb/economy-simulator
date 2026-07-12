@@ -64,6 +64,7 @@ function SectorDashboard() {
 			)}
 
 			<ChartCard
+				variant="briefing"
 				title="Employment Share by Sub-Sector"
 				description="Working-age citizens currently assigned to each sub-sector."
 				height={360}
@@ -81,6 +82,7 @@ function SectorDashboard() {
 
 			<div className="grid gap-4 sm:grid-cols-2">
 				<ChartCard
+					variant="briefing"
 					title="Average Happiness by Sub-Sector"
 					description="Higher bars mean citizens in that sub-sector are happier on average."
 					height={320}
@@ -97,6 +99,7 @@ function SectorDashboard() {
 				</ChartCard>
 
 				<ChartCard
+					variant="briefing"
 					title="Economic System Mix"
 					description="Employed citizens grouped by the economic system assigned to their sub-sector."
 					height={320}

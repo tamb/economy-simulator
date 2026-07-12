@@ -1,0 +1,70 @@
+{
+	"low_happiness": {
+		"prompt": "Morale is collapsing. How do you answer the provinces?",
+		"choices": {
+			"relief_convoy": {
+				"label": "Relief convoy",
+				"hint": "+happiness nationwide signal in the region"
+			},
+			"work_hour_reform": {
+				"label": "Work-hour reform",
+				"hint": "Modest +happiness; extraction −12% for 14 days"
+			},
+			"let_them_endure": {
+				"label": "Let them endure",
+				"hint": "No aid; emigration risk rises"
+			}
+		}
+	},
+	"low_health": {
+		"prompt": "Illness and fatigue are spreading. Choose a public-health response.",
+		"choices": {
+			"medical_campaign": {
+				"label": "Medical campaign",
+				"hint": "+health and a brief happiness lift"
+			},
+			"quarantine_corridors": {
+				"label": "Quarantine corridors",
+				"hint": "Smaller +health; −happiness from restrictions"
+			},
+			"defer_health": {
+				"label": "Defer",
+				"hint": "No intervention this week"
+			}
+		}
+	},
+	"low_environment": {
+		"prompt": "The land is failing. How hard do you pull back extraction?",
+		"choices": {
+			"restoration_crews": {
+				"label": "Restoration crews",
+				"hint": "+environment; extraction −15% for 14 days"
+			},
+			"cap_extraction": {
+				"label": "Cap extraction",
+				"hint": "Smaller env recovery; milder yield hit"
+			},
+			"keep_digging": {
+				"label": "Keep digging",
+				"hint": "−environment; short-term yield surge"
+			}
+		}
+	},
+	"calamity_hit": {
+		"prompt": "This region is still under an active calamity. Reinforce, evacuate, or hold?",
+		"choices": {
+			"reinforce_relief": {
+				"label": "Reinforce relief",
+				"hint": "Softens active calamity happiness pressure"
+			},
+			"evacuate_labor": {
+				"label": "Evacuate labor",
+				"hint": "Move 15% of extractive workers out of the region’s jobs"
+			},
+			"hold_the_line": {
+				"label": "Hold the line",
+				"hint": "No change to the crisis response"
+			}
+		}
+	}
+}

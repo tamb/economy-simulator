@@ -73,6 +73,7 @@ export type {
 	ActiveCalamity,
 	CalamityHistoryEntry,
 	CalamityPhase,
+	CalamityPlayerResponse,
 } from "./types/calamities";
 export { createEmptyCalamityState } from "./types/calamities";
 export type {
@@ -86,15 +87,25 @@ export {
 } from "./types/player-profile";
 export type { AnnualCycleStats, PopulationMeta } from "./types/population";
 export type {
+	ActiveMandate,
+	AideRole,
+	GameEvent,
+	GameEventType,
 	GameRunPhase,
 	GameRunState,
 	GameRunStatus,
+	InnerCircleAide,
+	MandateId,
+	TemporaryRunModifier,
 	WinLoseStreaks,
 	YearlyNationScore,
 } from "./types/progression";
 export {
+	appendGameEvents,
 	createInitialGameRunState,
 	createInitialWinLoseStreaks,
+	EVENT_LOG_LIMIT,
+	pruneExpiredModifiers,
 } from "./types/progression";
 export type { SectorRoleConfigs } from "./types/sector-role-config";
 export {

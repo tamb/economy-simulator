@@ -23,6 +23,15 @@ function withDefaults(state: GameRunState): GameRunState {
 	return {
 		...withCalamityDefaults(state),
 		phase: state.phase ?? "active",
+		eventLog: state.eventLog ?? [],
+		activeMandate: state.activeMandate ?? null,
+		mandateCompletions: state.mandateCompletions ?? 0,
+		coachMarksDismissed: state.coachMarksDismissed ?? false,
+		innerCircle: state.innerCircle ?? [],
+		temporaryModifiers: state.temporaryModifiers ?? [],
+		pendingScoreBonus: state.pendingScoreBonus ?? 0,
+		lastWeeklyReportGameDay: state.lastWeeklyReportGameDay ?? null,
+		lastAideProposalGameDay: state.lastAideProposalGameDay ?? null,
 	};
 }
 

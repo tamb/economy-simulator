@@ -26,6 +26,8 @@ import {
 	saveSectorRoleConfigs,
 } from "../storage/sector-role-config";
 import type { ensureWorld } from "../storage/world";
+import { assignInnerCircle } from "./aide-proposals";
+import { issueMandateForYear } from "./mandates";
 
 async function loadNationSetupState(): Promise<{
 	assignments: SectorAssignments;
@@ -132,7 +134,9 @@ async function startGame(
 		phase: "active",
 		startedAt: Date.now(),
 		startingPopulation: size,
+		innerCircle: assignInnerCircle(faceIds),
 	};
+	gameRun = issueMandateForYear(gameRun, 1);
 	await saveGameRunState(gameRun);
 
 	await generateAndSavePopulation(

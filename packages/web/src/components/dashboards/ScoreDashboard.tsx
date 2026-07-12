@@ -48,6 +48,7 @@ function ScoreDashboard({ gameRun }: ScoreDashboardProps) {
 			</div>
 
 			<ChartCard
+				variant="briefing"
 				title="Nation Score Trend"
 				description="Composite score from quality of life, population growth, migration, resources, and environment."
 			>

@@ -54,7 +54,7 @@ function NationSetupPage() {
 							.then(() => refresh())
 							.catch(() => undefined);
 					}}
-					className="border-2 border-primary bg-surface px-4 py-2 text-xs"
+					className="border-2 border-primary bg-surface px-4 py-2 text-xs text-foreground"
 				>
 					Auto-assign all
 				</button>

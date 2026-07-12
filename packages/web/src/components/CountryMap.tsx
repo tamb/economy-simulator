@@ -13,6 +13,8 @@ interface CountryMapProps {
 	metric: MapMetric;
 	selectedRegionId: string | null;
 	onSelect: (regionId: string) => void;
+	/** Region ids currently under an active mid-term calamity. */
+	calamityRegionIds?: ReadonlySet<string>;
 }
 
 const OVERLAY_ABBREVIATIONS: Record<string, string> = {
@@ -107,6 +109,7 @@ function CountryMap({
 	metric,
 	selectedRegionId,
 	onSelect,
+	calamityRegionIds,
 }: CountryMapProps) {
 	const [hoveredRegionId, setHoveredRegionId] = useState<string | null>(null);
 	const [tooltipPosition, setTooltipPosition] = useState<{
@@ -193,6 +196,20 @@ function CountryMap({
 							floodColor="var(--color-highlight)"
 						/>
 					</filter>
+					<filter
+						id="calamity-glow"
+						x="-50%"
+						y="-50%"
+						width="200%"
+						height="200%"
+					>
+						<feDropShadow
+							dx="0"
+							dy="0"
+							stdDeviation="2.5"
+							floodColor="var(--color-red)"
+						/>
+					</filter>
 				</defs>
 
 				{tiles.map(({ region, layout, isLand }) => {
@@ -207,6 +224,7 @@ function CountryMap({
 					);
 					const isSelected = region.id === selectedRegionId;
 					const isHovered = region.id === hoveredRegionId;
+					const isCalamity = calamityRegionIds?.has(region.id) ?? false;
 					const points = layout.corners
 						.map((corner) => `${corner.x},${corner.y}`)
 						.join(" ");
@@ -222,17 +240,28 @@ function CountryMap({
 							data-region-id={region.id}
 							data-metric={metric}
 							data-fill={fill}
+							className={isCalamity ? "animate-calamity-pulse" : undefined}
 							stroke={
 								isSelected
 									? "var(--color-highlight)"
-									: isHovered
-										? "var(--color-cyan-light)"
-										: isLand
-											? "var(--color-cyan-dark)"
-											: "#145070"
+									: isCalamity
+										? "var(--color-red)"
+										: isHovered
+											? "var(--color-cyan-light)"
+											: isLand
+												? "var(--color-cyan-dark)"
+												: "#145070"
 							}
-							strokeWidth={isSelected ? 3 : isHovered ? 2 : 1}
-							filter={isSelected ? "url(#region-glow)" : undefined}
+							strokeWidth={
+								isSelected ? 3 : isCalamity ? 2.5 : isHovered ? 2 : 1
+							}
+							filter={
+								isSelected
+									? "url(#region-glow)"
+									: isCalamity
+										? "url(#calamity-glow)"
+										: undefined
+							}
 							opacity={isLand ? 1 : 0.9}
 						/>
 					);

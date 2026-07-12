@@ -1,4 +1,7 @@
+import type { CategoryId } from "economy-simulator-data";
+import { getEconomicSystemEffect } from "economy-simulator-data";
 import type { ChangeEvent } from "react";
+import { useMemo, useState } from "react";
 import { usePopulation } from "../context/PopulationContext";
 import { useSectorAssignments } from "../context/SectorAssignmentContext";
 import {
@@ -8,9 +11,15 @@ import {
 	getRolesForSystem,
 	isEconomicSystemId,
 } from "../data/economic-systems";
-import type { Category, SubSector } from "../data/taxonomy";
-import { categoryColorClasses } from "../data/taxonomy";
+import {
+	type Category,
+	categories,
+	categoryColorClasses,
+	type SubSector,
+} from "../data/taxonomy";
 import { autoAssignCategory, autoAssignSector } from "../game/nation-setup";
+
+const LABOR_EDICT_PERCENTS = [5, 10, 25, 50] as const;
 
 interface SectorMapProps {
 	category: Category;
@@ -46,7 +55,7 @@ function SectorMap({ category, selectedSectorId, onSelect }: SectorMapProps) {
 								.then(() => refresh())
 								.catch(() => undefined);
 						}}
-						className="border-2 border-primary bg-surface px-3 py-1.5 text-xs"
+						className="border-2 border-primary bg-surface px-3 py-1.5 text-xs text-foreground"
 					>
 						Auto-assign category
 					</button>
@@ -78,6 +87,144 @@ function SectorMap({ category, selectedSectorId, onSelect }: SectorMapProps) {
 							.catch(() => undefined);
 					}}
 				/>
+			)}
+		</div>
+	);
+}
+
+function MidGameLevers({
+	category,
+	sector,
+}: {
+	category: Category;
+	sector: SubSector;
+}) {
+	const { applyLaborEdict, applyRoleReform, isAdvancingDay, isGameActive } =
+		usePopulation();
+	const [targetKey, setTargetKey] = useState("");
+	const [percent, setPercent] = useState<number>(10);
+	const [lastResult, setLastResult] = useState<string | null>(null);
+
+	const targetOptions = useMemo(() => {
+		return categories.flatMap((entry) =>
+			entry.subSectors.map((sub) => ({
+				key: `${entry.id}:${sub.id}`,
+				label: `${entry.shortLabel} / ${sub.label}`,
+				categoryId: entry.id,
+				subSectorId: sub.id,
+			})),
+		);
+	}, []);
+
+	const disabled = isAdvancingDay || !isGameActive;
+
+	return (
+		<div className="mt-6 space-y-4 border-t-2 border-primary/40 pt-5">
+			<p className="font-label text-[10px] tracking-overline opacity-80">
+				Mid-game levers
+			</p>
+
+			<div className="space-y-2">
+				<p className="text-xs font-medium">Labor edict</p>
+				<p className="text-xs leading-relaxed opacity-90">
+					Reassign a share of workers from this sector. Citizens lose a little
+					happiness from the disruption.
+				</p>
+				<label className="block space-y-1">
+					<span className="text-xs">Destination sector</span>
+					<select
+						value={targetKey}
+						onChange={(event) => setTargetKey(event.target.value)}
+						disabled={disabled}
+						className="w-full border-2 border-primary bg-surface px-2 py-1 text-sm"
+					>
+						<option value="">Select destination…</option>
+						{targetOptions
+							.filter(
+								(option) =>
+									!(
+										option.categoryId === category.id &&
+										option.subSectorId === sector.id
+									),
+							)
+							.map((option) => (
+								<option key={option.key} value={option.key}>
+									{option.label}
+								</option>
+							))}
+					</select>
+				</label>
+				<label className="block space-y-1">
+					<span className="text-xs">Share to move</span>
+					<select
+						value={percent}
+						onChange={(event) => setPercent(Number(event.target.value))}
+						disabled={disabled}
+						className="w-full border-2 border-primary bg-surface px-2 py-1 text-sm"
+					>
+						{LABOR_EDICT_PERCENTS.map((value) => (
+							<option key={value} value={value}>
+								{value}%
+							</option>
+						))}
+					</select>
+				</label>
+				<button
+					type="button"
+					disabled={disabled || !targetKey}
+					onClick={() => {
+						const [categoryId, subSectorId] = targetKey.split(":");
+						if (!categoryId || !subSectorId) return;
+						applyLaborEdict(
+							{ categoryId: category.id, subSectorId: sector.id },
+							{ categoryId: categoryId as CategoryId, subSectorId },
+							percent,
+						)
+							.then((result) => {
+								setLastResult(
+									result.affected > 0
+										? `${result.affected.toLocaleString()} workers reassigned.`
+										: "No eligible workers found.",
+								);
+							})
+							.catch(() => setLastResult("Edict failed."));
+					}}
+					className="border-2 border-primary bg-surface px-3 py-1.5 text-xs disabled:opacity-50"
+				>
+					Issue labor edict
+				</button>
+			</div>
+
+			<div className="space-y-2">
+				<p className="text-xs font-medium">Role reform</p>
+				<p className="text-xs leading-relaxed opacity-90">
+					Re-roll roles for living workers in this sector using your current
+					role mix.
+				</p>
+				<button
+					type="button"
+					disabled={disabled}
+					onClick={() => {
+						applyRoleReform(category.id, sector.id)
+							.then((result) => {
+								setLastResult(
+									result.affected > 0
+										? `${result.affected.toLocaleString()} roles reformed.`
+										: "No workers to reform.",
+								);
+							})
+							.catch(() => setLastResult("Reform failed."));
+					}}
+					className="border-2 border-primary bg-surface px-3 py-1.5 text-xs disabled:opacity-50"
+				>
+					Reform roles
+				</button>
+			</div>
+
+			{lastResult && (
+				<p className="text-xs text-muted-foreground" aria-live="polite">
+					{lastResult}
+				</p>
 			)}
 		</div>
 	);
@@ -142,6 +289,7 @@ function SectorDetail({
 	requireAssignment: boolean;
 	onAutoAssignSector: () => void;
 }) {
+	const { isGameActive } = usePopulation();
 	const {
 		getAssignment,
 		getRoleConfig,
@@ -176,10 +324,6 @@ function SectorDetail({
 		}));
 		void setRoleConfig(category.id, sector.id, { quotas: normalized });
 	};
-
-	const simulationPath = assignedSystemId
-		? `sectors/${category.id}/${sector.id}/${assignedSystemId}`
-		: `sectors/${category.id}/${sector.id}/`;
 
 	const quotaTotal = (roleConfig?.quotas ?? []).reduce(
 		(sum, quota) => sum + quota.share,
@@ -222,9 +366,28 @@ function SectorDetail({
 					))}
 				</select>
 				{assignedSystem && (
-					<p className="text-xs leading-relaxed opacity-90">
-						{assignedSystem.description}
-					</p>
+					<>
+						<p className="text-xs leading-relaxed opacity-90">
+							{assignedSystem.description}
+						</p>
+						{(() => {
+							const effect = getEconomicSystemEffect(assignedSystem.id);
+							if (!effect) return null;
+							return (
+								<ul className="mt-2 space-y-1 border border-primary/30 bg-surface px-2 py-2 text-xs">
+									<li>
+										Extraction efficiency ×
+										{effect.efficiencyMultiplier.toFixed(2)}
+									</li>
+									<li>
+										Environmental impact ×
+										{effect.environmentalImpactMultiplier.toFixed(2)}
+									</li>
+									<li>Worker morale ×{effect.moraleMultiplier.toFixed(2)}</li>
+								</ul>
+							);
+						})()}
+					</>
 				)}
 			</div>
 
@@ -238,7 +401,7 @@ function SectorDetail({
 							<button
 								type="button"
 								onClick={onAutoAssignSector}
-								className="border border-primary bg-surface px-2 py-1 text-[10px]"
+								className="border border-primary bg-surface px-2 py-1 text-[10px] text-foreground"
 							>
 								Auto-assign roles
 							</button>
@@ -267,15 +430,15 @@ function SectorDetail({
 							</label>
 						);
 					})}
-					<p className="text-xs opacity-80">
+					<p className="mt-4 font-label text-[10px] tracking-overline opacity-70">
 						Total: {Math.round(quotaTotal * 100)}%
 					</p>
 				</div>
 			)}
 
-			<p className="mt-4 font-label text-[10px] tracking-overline opacity-70">
-				Path: {simulationPath}
-			</p>
+			{!requireAssignment && isGameActive && (
+				<MidGameLevers category={category} sector={sector} />
+			)}
 		</aside>
 	);
 }

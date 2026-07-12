@@ -1,6 +1,8 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { isLand } from "economy-simulator-data";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router";
+import { CitizenDossierModal } from "../components/CitizenDossierModal";
 import { PersonCard } from "../components/PersonCard";
 import { StatGlossaryModal } from "../components/StatGlossaryModal";
 import { usePopulation } from "../context/PopulationContext";
@@ -38,16 +40,13 @@ function PopulationPage() {
 		total,
 		isReady,
 		isGenerating,
-		isAdvancingDay,
 		loadProgress,
 		gameDay,
-		advanceDay,
 		getPeopleByIndices,
 		buildDirectory,
-		isGameActive,
-		gameRun,
 	} = usePopulation();
 	const { regions } = useRegions();
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const [directory, setDirectory] = useState<PopulationDirectoryEntry[]>([]);
 	const [directoryReady, setDirectoryReady] = useState(false);
@@ -61,8 +60,11 @@ function PopulationPage() {
 	const [sortKey, setSortKey] = useState<PopulationSortKey>("index");
 	const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 	const [livingStatus, setLivingStatus] = useState<LivingStatusFilter>("all");
-	const [regionId, setRegionId] = useState("");
+	const [regionId, setRegionId] = useState(
+		() => searchParams.get("region") ?? "",
+	);
 	const [glossaryOpen, setGlossaryOpen] = useState(false);
+	const [dossierPerson, setDossierPerson] = useState<Person | null>(null);
 
 	const listRef = useRef<HTMLDivElement>(null);
 	const loadedMatchRangeRef = useRef({ start: -1, end: -1 });
@@ -82,6 +84,25 @@ function PopulationPage() {
 		}, SEARCH_DEBOUNCE_MS);
 		return () => window.clearTimeout(timer);
 	}, [searchInput]);
+
+	useEffect(() => {
+		const fromUrl = searchParams.get("region") ?? "";
+		setRegionId(fromUrl);
+	}, [searchParams]);
+
+	const updateRegionFilter = useCallback(
+		(nextRegionId: string) => {
+			setRegionId(nextRegionId);
+			const next = new URLSearchParams(searchParams);
+			if (nextRegionId) {
+				next.set("region", nextRegionId);
+			} else {
+				next.delete("region");
+			}
+			setSearchParams(next, { replace: true });
+		},
+		[searchParams, setSearchParams],
+	);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: rebuild directory when gameDay advances
 	useEffect(() => {
@@ -239,7 +260,7 @@ function PopulationPage() {
 						<h2 className="text-xs sm:text-sm">Citizen Registry</h2>
 						<p className="text-sm leading-relaxed text-muted-foreground">
 							{matches.length.toLocaleString()} of {total.toLocaleString()}{" "}
-							citizens match. Only the visible window is loaded into memory.
+							citizens match your filters.
 						</p>
 					</div>
 					<button
@@ -250,27 +271,10 @@ function PopulationPage() {
 						What do these stats mean?
 					</button>
 				</div>
-				<div className="flex flex-wrap items-center gap-3">
-					<p className="text-sm text-muted-foreground">
-						Game day {gameDay.toLocaleString()} · updating cohort {gameDay % 7}{" "}
-						today
-					</p>
-					{!isGameActive && gameRun && (
-						<p className="font-label text-[10px] tracking-overline text-destructive">
-							Run ended — {gameRun.status}
-						</p>
-					)}
-					<button
-						type="button"
-						onClick={() => {
-							advanceDay().catch(() => undefined);
-						}}
-						disabled={isAdvancingDay || !isGameActive}
-						className="border-2 border-primary bg-surface px-3 py-1.5 text-xs disabled:opacity-50"
-					>
-						{isAdvancingDay ? "Advancing day…" : "Advance day"}
-					</button>
-				</div>
+				<p className="text-sm text-muted-foreground">
+					Use the throne controls above to advance time. Today updates cohort{" "}
+					{gameDay % 7}.
+				</p>
 			</header>
 
 			<div className="flex flex-col gap-3 border-2 border-primary/30 bg-surface-muted p-4">
@@ -356,7 +360,7 @@ function PopulationPage() {
 						</span>
 						<select
 							value={regionId}
-							onChange={(event) => setRegionId(event.target.value)}
+							onChange={(event) => updateRegionFilter(event.target.value)}
 							className="block max-w-[14rem] border-2 border-primary/30 bg-surface px-3 py-1.5 text-xs"
 							aria-label="Filter by region"
 						>
@@ -417,6 +421,7 @@ function PopulationPage() {
 												key={matchIndex}
 												person={person}
 												onOpenGlossary={openGlossary}
+												onOpenDossier={setDossierPerson}
 											/>
 										);
 									})}
@@ -431,6 +436,12 @@ function PopulationPage() {
 				isOpen={glossaryOpen}
 				onClose={() => setGlossaryOpen(false)}
 			/>
+			{dossierPerson && (
+				<CitizenDossierModal
+					person={dossierPerson}
+					onClose={() => setDossierPerson(null)}
+				/>
+			)}
 		</div>
 	);
 }

@@ -1,4 +1,29 @@
 export type {
+	AideProposalChoice,
+	AideProposalChoiceEffect,
+	AideProposalChoiceKind,
+	AideProposalDefinition,
+	AideRole,
+} from "./briefings/aide-proposals";
+export {
+	AIDE_DEFAULT_NAMES,
+	AIDE_ROLE_LABELS,
+	aideProposalDefinitions,
+	getAideProposalDefinition,
+	pickAideProposal,
+} from "./briefings/aide-proposals";
+export type {
+	RegionDistressKind,
+	WeeklyChoiceDefinition,
+	WeeklyChoiceEffect,
+	WeeklyChoiceId,
+	WeeklyDecisionTree,
+} from "./briefings/weekly-reports";
+export {
+	getWeeklyDecisionTree,
+	weeklyDecisionTrees,
+} from "./briefings/weekly-reports";
+export type {
 	CalamityCascadeRule,
 	CalamityCategory,
 	CalamityDefinition,
@@ -21,6 +46,8 @@ export type { AppConfig } from "./config/app-config";
 export { appConfig } from "./config/app-config";
 export type { GameSettings } from "./config/game-settings";
 export { gameSettings } from "./config/game-settings";
+export type { HowToRuleStep } from "./copy/how-to-rule";
+export { HOW_TO_RULE_STEPS } from "./copy/how-to-rule";
 export type { LifeTableRow, Sex } from "./demographics/life-tables";
 export {
 	femaleLifeTable,
@@ -122,3 +149,9 @@ export {
 export { getViableExtractiveSubSectorIds } from "./geography/viable-sub-sectors";
 export type { BadgeDefinition, BadgeScope } from "./progression/badges";
 export { badgeDefinitions, getBadgeDefinition } from "./progression/badges";
+export type { MandateDefinition, MandateId } from "./progression/mandates";
+export {
+	getMandateDefinition,
+	mandateDefinitions,
+	pickMandateForYear,
+} from "./progression/mandates";

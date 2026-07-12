@@ -32,6 +32,9 @@ interface ActiveCalamityState {
 	midTermEndsOnGameDay: number;
 	longTermEndsOnGameDay: number;
 	fromCascade: boolean;
+	playerResponse?: "relief" | "rebuild" | "endure";
+	happinessPenaltyScale?: number;
+	extractionHitScale?: number;
 }
 
 interface CalamityHistoryEntryState {
@@ -212,6 +215,19 @@ function dailyOnsetProbability(settings: GameSettings): number {
 	return settings.calamities.expectedPerYear / daysPerYear;
 }
 
+/** True when no primary onset has landed within the monthly guarantee window. */
+function isMonthlyOnsetOverdue(
+	run: CalamityRunSlice,
+	gameDay: number,
+	settings: GameSettings,
+): boolean {
+	const interval = settings.calamities.guaranteedOnsetIntervalDays;
+	if (run.lastCalamityOnsetGameDay == null) {
+		return gameDay >= interval - 1;
+	}
+	return gameDay - run.lastCalamityOnsetGameDay >= interval;
+}
+
 function buildImmediateMutations(
 	definition: CalamityDefinition,
 	severity: CalamitySeverity,
@@ -354,9 +370,13 @@ function processCalamitiesForDay(input: {
 		midTermCount < settings.calamities.maxActiveMidTerm &&
 		isCooldownClear(run, input.gameDay, settings);
 
+	const forceMonthly =
+		canRollPrimary && isMonthlyOnsetOverdue(run, input.gameDay, settings);
+
 	const shouldRoll =
 		canRollPrimary &&
 		(input.forceCalamityId != null ||
+			forceMonthly ||
 			random() < dailyOnsetProbability(settings));
 
 	if (shouldRoll) {
@@ -490,15 +510,19 @@ function getCalamityModifiersForCitizen(input: {
 		if (!appliesToRegion) continue;
 
 		happinessPenaltyPerDay +=
-			modifiers.happinessPenaltyPerDay[calamity.severity];
+			modifiers.happinessPenaltyPerDay[calamity.severity] *
+			(calamity.happinessPenaltyScale ?? 1);
 
 		const subSectors = modifiers.affectedSubSectors;
 		const appliesToSector =
 			subSectors.length === 0 ||
 			(input.subSectorId != null && subSectors.includes(input.subSectorId));
 		if (appliesToSector) {
-			extractionEfficiencyFactor *=
+			const catalogFactor =
 				modifiers.extractionEfficiencyFactor[calamity.severity];
+			const hitScale = calamity.extractionHitScale ?? 1;
+			const effectiveFactor = 1 - (1 - catalogFactor) * hitScale;
+			extractionEfficiencyFactor *= effectiveFactor;
 		}
 	}
 
