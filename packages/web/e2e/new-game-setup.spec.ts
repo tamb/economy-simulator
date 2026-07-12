@@ -8,7 +8,7 @@ test.describe("New game setup", () => {
 		await page.goto("/");
 
 		await expect(
-			page.getByRole("heading", { name: "economy-simulator" }),
+			page.getByRole("heading", { name: "The Benevolent Monarch" }),
 		).toBeVisible();
 		await expect(page.getByText("Found a New Nation")).toBeVisible();
 

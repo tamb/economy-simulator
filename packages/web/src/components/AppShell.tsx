@@ -107,7 +107,7 @@ function AppShell() {
 							Navigation
 						</p>
 						<p className="mt-1 text-[10px] leading-relaxed sm:text-xs">
-							economy-simulator
+							{appConfig.productName}
 						</p>
 						{activeCalamityCount > 0 && (
 							<p className="mt-2 font-label text-[10px] tracking-overline text-highlight">
@@ -144,7 +144,7 @@ function AppShell() {
 							Executive Office of the President
 						</p>
 						<h1 className="mt-2 text-base text-highlight sm:text-lg">
-							economy-simulator
+							{appConfig.productName}
 						</h1>
 						<p className="mt-1 font-label text-xs text-on-dark-muted tracking-overline">
 							{activePage.subtitle}

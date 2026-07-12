@@ -1,6 +1,6 @@
 # Economic Sectors — Definitions, Rules & Success Parameters
 
-Reference for **economy-simulator**: how the economy divides into productive sectors, what each sector does, how they depend on one another, and what measurable outcomes indicate health or failure.
+Reference for **The Benevolent Monarch**: how the economy divides into productive sectors, what each sector does, how they depend on one another, and what measurable outcomes indicate health or failure.
 
 Companion document: [economic-systems.md](./economic-systems.md)
 
@@ -563,4 +563,4 @@ Adjust quinary influence separately via `regulationLevel` and policy multipliers
 
 ---
 
-*Last updated: July 2026 — economy-simulator reference document*
+*Last updated: July 2026 — The Benevolent Monarch reference document*
