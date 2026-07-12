@@ -28,9 +28,9 @@ function CalculationModal({
 			role="dialog"
 			aria-modal="true"
 			aria-label={title}
-			className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/70 p-4"
+			className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-neutral-950/70 p-4"
 		>
-			<div className="w-full max-w-sm border-2 border-primary bg-surface px-6 py-5 shadow-lg shadow-surface-shadow">
+			<div className="my-auto w-full max-w-sm border-2 border-primary bg-surface px-6 py-5 shadow-lg shadow-surface-shadow">
 				<p className="font-label text-[10px] text-muted-foreground tracking-overline">
 					Calculating
 				</p>

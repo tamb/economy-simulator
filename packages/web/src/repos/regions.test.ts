@@ -8,7 +8,7 @@ import {
 	loadRegionPool,
 	saveRegionName,
 } from "./regions";
-import { ensureWorld } from "./world";
+import { clearWorld, ensureWorld, loadWorldMeta } from "./world";
 
 function sequenceRandom(values: number[]): () => number {
 	let index = 0;
@@ -20,7 +20,13 @@ describe("region storage", () => {
 		setupMemoryStorage();
 	});
 
-	it("generates and persists a name, terrain, and resource state for every region on first startup", async () => {
+	it("does not create a world when none has been founded yet", async () => {
+		await expect(ensureRegionPool()).resolves.toEqual([]);
+		await expect(loadWorldMeta()).resolves.toBeNull();
+	});
+
+	it("generates and persists a name, terrain, and resource state for every region once a world exists", async () => {
+		await ensureWorld(sequenceRandom([0.1, 0.5, 0.9]));
 		const regions = await ensureRegionPool(sequenceRandom([0.1, 0.5, 0.9]));
 
 		expect(regions).toHaveLength(getRegionCount());
@@ -40,6 +46,7 @@ describe("region storage", () => {
 	});
 
 	it("reuses an existing region name and terrain without regenerating either", async () => {
+		await ensureWorld(() => 0.2);
 		const first = await ensureRegionPool(sequenceRandom([0.2, 0.4]));
 		const second = await ensureRegionPool(sequenceRandom([0.9, 0.1]));
 
@@ -57,6 +64,7 @@ describe("region storage", () => {
 	});
 
 	it("clears all stored region names", async () => {
+		await ensureWorld(() => 0.5);
 		await ensureRegionPool();
 		await clearRegionPool();
 
@@ -79,5 +87,18 @@ describe("region storage", () => {
 
 	it("returns an empty pool from loadRegionPool when no world has been generated yet", async () => {
 		await expect(loadRegionPool()).resolves.toEqual([]);
+	});
+
+	it("honors a smaller bounding radius after clearing a prior world", async () => {
+		await ensureWorld(() => 0.5, 5);
+		expect((await ensureRegionPool()).length).toBe(getRegionCount(5));
+
+		await clearRegionPool();
+		await clearWorld();
+		await ensureWorld(() => 0.5, 3);
+
+		const regions = await ensureRegionPool();
+		expect(regions).toHaveLength(getRegionCount(3));
+		expect(await loadWorldMeta()).toMatchObject({ boundingRadius: 3 });
 	});
 });

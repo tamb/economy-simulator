@@ -1,3 +1,4 @@
+import { appConfig } from "economy-simulator-data";
 import {
 	ensurePlayerProfile,
 	type GameRunState,
@@ -10,6 +11,13 @@ import { DispatchLog } from "../components/DispatchLog";
 import { ScoreDashboard } from "../components/dashboards/ScoreDashboard";
 import { formatEndReason } from "../lib/score-dashboard";
 
+function regionScaleLabel(boundingRadius: number | undefined): string | null {
+	if (boundingRadius == null) return null;
+	const match = appConfig.regions.regionScaleOptions.find(
+		(option) => option.boundingRadius === boundingRadius,
+	);
+	return match?.label ?? `radius ${boundingRadius}`;
+}
 function RecordsPage() {
 	const [profile, setProfile] = useState<PlayerProfile | null>(null);
 	const [gameRun, setGameRun] = useState<GameRunState | null>(null);
@@ -162,6 +170,7 @@ function RecordsPage() {
 									<th className="px-3 py-2">Score</th>
 									<th className="px-3 py-2">Years</th>
 									<th className="px-3 py-2">Population</th>
+									<th className="px-3 py-2">Provinces</th>
 									<th className="px-3 py-2">Reason</th>
 								</tr>
 							</thead>
@@ -174,6 +183,9 @@ function RecordsPage() {
 										<td className="px-3 py-2">
 											{run.startingPopulation.toLocaleString()} →{" "}
 											{run.endingPopulation.toLocaleString()}
+										</td>
+										<td className="px-3 py-2">
+											{regionScaleLabel(run.boundingRadius) ?? "—"}
 										</td>
 										<td className="px-3 py-2">
 											{formatEndReason(run.endReason)}

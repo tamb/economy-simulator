@@ -158,10 +158,13 @@ async function clearPopulationData(): Promise<void> {
 
 function computeAverageEnvironmentQuality(
 	resourceStates: Record<string, { environmentQuality: number }>,
+	landRegionIds: ReadonlySet<string>,
 ): number {
-	const values = Object.values(resourceStates).map(
-		(state) => state.environmentQuality,
-	);
+	const values: number[] = [];
+	for (const [regionId, state] of Object.entries(resourceStates)) {
+		if (!landRegionIds.has(regionId)) continue;
+		values.push(state.environmentQuality);
+	}
 	if (values.length === 0) return 100;
 	return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
@@ -226,6 +229,7 @@ async function processProgressionAfterYear(
 	stats: AnnualCycleStats,
 	ledger: Awaited<ReturnType<typeof loadNationalLedger>>,
 	resourceStates: Record<string, { environmentQuality: number }>,
+	landRegionIds: ReadonlySet<string>,
 	settings: GameSettings,
 ): Promise<void> {
 	const meta = await loadMeta();
@@ -234,8 +238,10 @@ async function processProgressionAfterYear(
 	let gameRun = await ensureGameRunState(meta.size);
 	if (gameRun.status !== "active") return;
 
-	const averageEnvironmentQuality =
-		computeAverageEnvironmentQuality(resourceStates);
+	const averageEnvironmentQuality = computeAverageEnvironmentQuality(
+		resourceStates,
+		landRegionIds,
+	);
 
 	const scoreBreakdown = computeNationScore({
 		year: stats.year,
@@ -557,6 +563,11 @@ async function runAnnualCycle(
 		stats,
 		extraction.ledger,
 		extraction.resourceStates,
+		new Set(
+			regions
+				.filter((region) => region.terrain !== "ocean")
+				.map((region) => region.id),
+		),
 		settings,
 	);
 

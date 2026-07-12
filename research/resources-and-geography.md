@@ -28,8 +28,17 @@ flowchart TD
 irregular in shape, fully surrounded by ocean, different every game.
 
 **Approach:** grow the island on a larger *bounding* hex grid
-(`AppConfig.regions.boundingRadius`) rather than making every hex in the grid
-land (the old fixed-hexagon map). A seeded pseudo-random generator:
+(`AppConfig.regions.boundingRadius`, or the radius chosen at new-game
+setup via Few / Medium / More — default **More** = radius 5 ≈ 91 tiles)
+rather than making every hex in the grid land (the old fixed-hexagon map).
+
+| Province scale | `boundingRadius` | ~tiles / ~land (55%) |
+| --- | --- | --- |
+| Few | 3 | 37 / ~20 |
+| Medium | 4 | 61 / ~34 |
+| More (default) | 5 | 91 / ~50 |
+
+A seeded pseudo-random generator:
 
 1. Picks a starting hex near the center of the bounding grid.
 2. Grows the landmass outward one ring of adjacency at a time (a bounded
@@ -125,6 +134,14 @@ Rarer than the base biome yield, at most one per tile
 | Rich Ore Vein | Hills, Mountains | Large metal ore yield bonus |
 | Fossil Fuel Field | Mountains, Hills, **Desert** | Large fossil fuel yield bonus |
 | Fertile Soil | Plains, Wetland, Pasture | Crop/livestock yield bonus |
+
+**Guarantee:** every generated island places **at least one** of each catalog
+overlay, each on its **own** tile. If no free eligible biome remains for a
+type (e.g. a tiny Few-province map with a single hills hex already taken by
+Rich Ore), the placer nudges another land tile's biome into eligibility and
+places there. Remaining overlays then scatter up toward
+`AppConfig.regions.resourceOverlayRatio`. A ratio of `0` disables overlays
+entirely (tests / special cases).
 
 Fresh water is intentionally **not** one of the seven national-ledger
 resources. Unlike ore or timber, it isn't stockpiled or shipped between

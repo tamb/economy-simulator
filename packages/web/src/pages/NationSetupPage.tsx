@@ -1,7 +1,14 @@
-import { categories } from "economy-simulator-data";
+import { appConfig, categories } from "economy-simulator-data";
 import { Link } from "react-router";
 import { usePopulation } from "../context/PopulationContext";
 import { useSectorAssignments } from "../context/SectorAssignmentContext";
+
+function regionScaleLabel(boundingRadius: number | undefined): string {
+	const match = appConfig.regions.regionScaleOptions.find(
+		(option) => option.boundingRadius === boundingRadius,
+	);
+	return match?.label ?? "More";
+}
 
 function NationSetupPage() {
 	const {
@@ -10,8 +17,10 @@ function NationSetupPage() {
 		loadProgress,
 		autoAssignAll,
 		startConfiguredGame,
+		gameRun,
 	} = usePopulation();
 	const { setupValidation, refresh } = useSectorAssignments();
+	const provincesLabel = regionScaleLabel(gameRun?.boundingRadius);
 
 	return (
 		<div className="space-y-6">
@@ -19,8 +28,9 @@ function NationSetupPage() {
 				<h2 className="text-xs sm:text-sm">Configure Your Nation</h2>
 				<p className="text-sm leading-relaxed text-muted-foreground">
 					Assign an economic system and role structure to every sub-sector
-					before the simulation begins. {total.toLocaleString()} citizens will
-					be generated when you start the game.
+					before the simulation begins. {total.toLocaleString()} citizens across{" "}
+					{provincesLabel.toLowerCase()} provinces will be generated when you
+					start the game.
 				</p>
 			</header>
 

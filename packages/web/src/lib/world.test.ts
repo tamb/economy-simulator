@@ -50,4 +50,12 @@ describe("buildWorldRegions", () => {
 			}
 		}
 	});
+
+	it("honors an explicit bounding radius", () => {
+		expect(buildWorldRegions(1, 3)).toHaveLength(getRegionCount(3));
+		expect(buildWorldRegions(1, 5)).toHaveLength(getRegionCount(5));
+		expect(buildWorldRegions(1, 3).length).toBeLessThan(
+			buildWorldRegions(1, 5).length,
+		);
+	});
 });

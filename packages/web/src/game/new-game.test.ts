@@ -1,3 +1,4 @@
+import { appConfig } from "economy-simulator-data";
 import {
 	createInitialGameRunState,
 	ensureGameRunState,
@@ -52,12 +53,20 @@ describe("startNewNation", () => {
 			gameDay: 99,
 		});
 
-		await startNewNation(50);
+		await startNewNation(50, appConfig.regions.boundingRadius);
 
 		expect(await loadPopulationMeta()).toBeNull();
 		const gameRun = await loadGameRunState();
 		expect(gameRun?.status).toBe("active");
 		expect(gameRun?.startingPopulation).toBe(50);
+		expect(gameRun?.boundingRadius).toBe(appConfig.regions.boundingRadius);
 		expect(gameRun?.scoreHistory).toEqual([]);
+	});
+
+	it("stores the chosen bounding radius on the fresh game run", async () => {
+		await startNewNation(100, 3);
+		const gameRun = await loadGameRunState();
+		expect(gameRun?.boundingRadius).toBe(3);
+		expect(gameRun?.startingPopulation).toBe(100);
 	});
 });

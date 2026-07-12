@@ -38,12 +38,15 @@ async function abandonActiveRun(): Promise<void> {
 	}
 }
 
-async function startNewNation(size: number): Promise<void> {
+async function startNewNation(
+	size: number,
+	boundingRadius: number,
+): Promise<void> {
 	await abandonActiveRun();
 	await resetNationStores();
 	await clearGameRunState();
 	await ensurePlayerProfile();
-	await ensureGameRunState(size);
+	await ensureGameRunState(size, boundingRadius);
 }
 
 export { abandonActiveRun, resetNationStores, startNewNation };

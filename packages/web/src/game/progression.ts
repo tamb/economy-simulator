@@ -38,6 +38,7 @@ async function archiveRunToProfile(
 				? gameRun.status
 				: "abandoned",
 		startingPopulation: gameRun.startingPopulation,
+		boundingRadius: gameRun.boundingRadius,
 		endingPopulation,
 		yearsPlayed: gameRun.scoreHistory.length,
 		finalScore,

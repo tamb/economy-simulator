@@ -13,6 +13,10 @@ system choices and role structures, and watching your choices play out over
 in-game years. People are born, age, and die; they flee a struggling nation and
 immigrate to a thriving one.
 
+At founding, the player chooses **starting population** and **province scale**
+(Few / Medium / More): more provinces spread citizens thinner and ease
+regional calamity and extraction pressure.
+
 Before the simulation begins, the monarch must assign an economic system and
 role quotas to every sub-sector; citizens then receive a `roleId` (e.g. feudal
 serf = 65) that affects quality of life and extraction efficiency.
@@ -64,7 +68,7 @@ from game logic.
 
 1. **Web builds first** — desktop packages consume the web build output; do not hand-edit generated assets under `packages/desktop/resources/`.
 2. **Monorepo clarity** — shared tooling at the root; app code in packages.
-3. **Config vs. settings** — `AppConfig` (`packages/data`) holds non-gameplay tunables (population scale, storage chunking, perf/feature flags); `GameSettings` (`packages/data`) holds simulation rules that affect gameplay balance (ages, work hours, mortality/fertility/migration, calendar, calamity frequency). Both are single sources of truth — prefer importing them over redefining constants locally.
+3. **Config vs. settings** — `AppConfig` (`packages/data`) holds non-gameplay tunables (population scale, province-scale options / default bounding radius, storage chunking, perf/feature flags); `GameSettings` (`packages/data`) holds simulation rules that affect gameplay balance (ages, work hours, mortality/fertility/migration, calendar, calamity frequency). Both are single sources of truth — prefer importing them over redefining constants locally.
 4. **Pure engine, impure shell** — `packages/simulation` contains no React/I/O code; `packages/persistence` owns storage drivers and repositories; `packages/web` owns UI and game-loop orchestration.
 5. **Copy vs. logic** — player-facing dialogue, titles, hints, and tip text live under `packages/data/src/copy/` (see that folder’s README). Mechanical ids, weights, and effects stay in TypeScript. Do not mix balance numbers into copy files.
 6. **Document decisions** — update constitution when product or architecture changes.

@@ -1,13 +1,16 @@
-import { getEligibleOverlaysForBiome } from "economy-simulator-data";
+import {
+	getEligibleOverlaysForBiome,
+	resourceOverlays,
+} from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
 import { createSeededRandom } from "../rng/seeded-random";
 import { assignBiomes } from "./assign-biomes";
 import { generateIslandShape } from "./generate-island-shape";
 import { placeResourceOverlays } from "./place-resource-overlays";
 
-function generateTestBiomes(seed: number) {
+function generateTestBiomes(seed: number, boundingRadius = 5) {
 	const { land } = generateIslandShape({
-		boundingRadius: 7,
+		boundingRadius,
 		targetLandRatio: 0.55,
 		random: createSeededRandom(seed),
 	});
@@ -44,7 +47,24 @@ describe("placeResourceOverlays", () => {
 		expect(new Set(keys).size).toBe(keys.length);
 	});
 
-	it("places roughly resourceOverlayRatio of the eligible tiles", () => {
+	it("places at least one of every catalog overlay", () => {
+		for (const seed of [1, 2, 3, 7, 11, 42]) {
+			for (const radius of [3, 4, 5]) {
+				const tileBiomes = generateTestBiomes(seed, radius);
+				const overlays = placeResourceOverlays({
+					biomes: tileBiomes,
+					resourceOverlayRatio: 0.15,
+					random: createSeededRandom(seed + radius),
+				});
+				const placed = new Set(overlays.values());
+				for (const overlay of resourceOverlays) {
+					expect(placed.has(overlay.id)).toBe(true);
+				}
+			}
+		}
+	});
+
+	it("places at least the catalog guarantees and roughly the configured ratio", () => {
 		const tileBiomes = generateTestBiomes(3);
 		const eligibleCount = [...tileBiomes.values()].filter(
 			(biomeId) => getEligibleOverlaysForBiome(biomeId).length > 0,
@@ -56,7 +76,9 @@ describe("placeResourceOverlays", () => {
 			random: createSeededRandom(3),
 		});
 
-		expect(overlays.size).toBe(Math.round(eligibleCount * 0.15));
+		const ratioTarget = Math.round(eligibleCount * 0.15);
+		expect(overlays.size).toBeGreaterThanOrEqual(resourceOverlays.length);
+		expect(overlays.size).toBe(Math.max(ratioTarget, resourceOverlays.length));
 	});
 
 	it("places no overlays when the ratio is 0", () => {
@@ -70,17 +92,21 @@ describe("placeResourceOverlays", () => {
 	});
 
 	it("is deterministic for a given seed", () => {
-		const tileBiomes = generateTestBiomes(5);
+		const tileBiomesA = generateTestBiomes(5);
+		const tileBiomesB = new Map(tileBiomesA);
 		const a = placeResourceOverlays({
-			biomes: tileBiomes,
+			biomes: tileBiomesA,
 			resourceOverlayRatio: 0.2,
 			random: createSeededRandom(555),
 		});
 		const b = placeResourceOverlays({
-			biomes: tileBiomes,
+			biomes: tileBiomesB,
 			resourceOverlayRatio: 0.2,
 			random: createSeededRandom(555),
 		});
 		expect([...a.entries()].sort()).toEqual([...b.entries()].sort());
+		expect([...tileBiomesA.entries()].sort()).toEqual(
+			[...tileBiomesB.entries()].sort(),
+		);
 	});
 });

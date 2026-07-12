@@ -16,6 +16,9 @@ test.describe("New game setup", () => {
 			name: /100,000 citizens/,
 		});
 		await expect(defaultOption).toBeChecked();
+
+		const defaultProvinces = page.getByRole("radio", { name: /More/ });
+		await expect(defaultProvinces).toBeChecked();
 	});
 
 	test("requires nation configuration before the game starts", async ({

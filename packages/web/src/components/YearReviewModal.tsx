@@ -24,13 +24,13 @@ function YearReviewModal({ review, onContinue }: YearReviewModalProps) {
 
 	return (
 		<div
-			className="fixed inset-0 z-[60] flex items-center justify-center bg-neutral-950/80 p-4"
+			className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-neutral-950/80 p-4"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="year-review-title"
 		>
-			<div className="w-full max-w-md border-4 border-primary bg-surface shadow-lg shadow-surface-shadow">
-				<header className="border-b-4 border-primary bg-neutral-950 px-6 py-5 text-center text-on-dark">
+			<div className="my-auto flex max-h-[min(90vh,42rem)] w-full max-w-md flex-col overflow-hidden border-4 border-primary bg-surface shadow-lg shadow-surface-shadow">
+				<header className="shrink-0 border-b-4 border-primary bg-neutral-950 px-6 py-5 text-center text-on-dark">
 					<p className="font-label text-[10px] tracking-overline text-on-dark-muted">
 						Cabinet briefing
 					</p>
@@ -39,7 +39,7 @@ function YearReviewModal({ review, onContinue }: YearReviewModalProps) {
 					</h2>
 				</header>
 
-				<div className="space-y-4 px-6 py-6">
+				<div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-6">
 					<dl className="grid grid-cols-2 gap-3 text-sm">
 						<div className="border-2 border-primary/30 bg-surface-muted px-3 py-2">
 							<dt className="font-label text-[10px] tracking-overline text-muted-foreground">

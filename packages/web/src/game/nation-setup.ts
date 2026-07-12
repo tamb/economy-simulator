@@ -112,8 +112,11 @@ async function autoAssignSector(
 	return { assignments: nextAssignments, roleConfigs: nextRoleConfigs };
 }
 
-async function beginNationFounding(size: number): Promise<void> {
-	await ensureGameRunState(size);
+async function beginNationFounding(
+	size: number,
+	boundingRadius: number,
+): Promise<void> {
+	await ensureGameRunState(size, boundingRadius);
 }
 
 async function startGame(
@@ -148,6 +151,7 @@ async function startGame(
 		phase: "active",
 		startedAt: Date.now(),
 		startingPopulation: size,
+		boundingRadius: gameRun.boundingRadius,
 		innerCircle: assignInnerCircle(faceIds),
 	};
 	gameRun = issueMandateForYear(gameRun, 1);

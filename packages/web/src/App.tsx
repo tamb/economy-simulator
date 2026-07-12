@@ -34,8 +34,8 @@ function App() {
 	if (needsSetup) {
 		return (
 			<NewGameSetupPage
-				onStart={(size) => {
-					startGeneration(size).catch(() => undefined);
+				onStart={({ size, boundingRadius }) => {
+					startGeneration(size, boundingRadius).catch(() => undefined);
 				}}
 			/>
 		);
@@ -45,13 +45,14 @@ function App() {
 		return (
 			<Routes>
 				<Route element={<SetupAppShell />}>
+					<Route index element={<Navigate to="/setup" replace />} />
 					<Route path="setup" element={<NationSetupPage />} />
 					<Route path="atlas" element={<EconomicAtlasPage />}>
 						<Route index element={<AtlasCategoriesPage />} />
 						<Route path=":categoryId" element={<AtlasSectorPage />} />
 						<Route path=":categoryId/:sectorId" element={<AtlasSectorPage />} />
 					</Route>
-					<Route path="*" element={<Navigate to="setup" replace />} />
+					<Route path="*" element={<Navigate to="/setup" replace />} />
 				</Route>
 			</Routes>
 		);

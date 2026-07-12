@@ -7,7 +7,8 @@ import {
 import { getVisibleActiveCalamities } from "economy-simulator-simulation";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { CountryMap } from "../components/CountryMap";
+import { CountryMap, qualityRangeForMetric } from "../components/CountryMap";
+import { CountryMapLegend } from "../components/CountryMapLegend";
 import { usePopulation } from "../context/PopulationContext";
 import { useRegions } from "../context/RegionContext";
 import type { MapMetric } from "../lib/region-color-scale";
@@ -70,6 +71,19 @@ function CountryMapPage() {
 	const landRegionCount = regions.filter((region) =>
 		isLand(region.terrain),
 	).length;
+	const maxPopulation = useMemo(() => {
+		let max = 0;
+		for (const region of regions) {
+			if (region.terrain === "ocean") continue;
+			const population = stats.get(region.id)?.population ?? 0;
+			if (population > max) max = population;
+		}
+		return Math.max(1, max);
+	}, [regions, stats]);
+	const qualityRange = useMemo(
+		() => qualityRangeForMetric(metric, regions, stats),
+		[metric, regions, stats],
+	);
 	const calamityRegionIds = useMemo(() => {
 		const active = getVisibleActiveCalamities(
 			gameRun?.activeCalamities ?? [],
@@ -140,14 +154,23 @@ function CountryMapPage() {
 			</fieldset>
 
 			<div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-				<CountryMap
-					regions={regions}
-					stats={stats}
-					metric={metric}
-					selectedRegionId={selectedRegionId}
-					onSelect={setSelectedRegionId}
-					calamityRegionIds={calamityRegionIds}
-				/>
+				<div className="space-y-3">
+					<CountryMap
+						regions={regions}
+						stats={stats}
+						metric={metric}
+						selectedRegionId={selectedRegionId}
+						onSelect={setSelectedRegionId}
+						calamityRegionIds={calamityRegionIds}
+					/>
+					<CountryMapLegend
+						metric={metric}
+						regions={regions}
+						landRegionCount={landRegionCount}
+						maxPopulation={maxPopulation}
+						qualityRange={qualityRange}
+					/>
+				</div>
 
 				<aside className="border-2 border-primary bg-surface-muted px-4 py-3">
 					{selectedRegion ? (

@@ -38,6 +38,21 @@ describe("appConfig", () => {
 		expect(appConfig.regions.boundingRadius).toBeGreaterThan(0);
 	});
 
+	it("offers region-scale options that include the default radius", () => {
+		const { regionScaleOptions, defaultRegionScale, boundingRadius } =
+			appConfig.regions;
+		expect(regionScaleOptions.length).toBeGreaterThan(0);
+		const defaultOption = regionScaleOptions.find(
+			(option) => option.id === defaultRegionScale,
+		);
+		expect(defaultOption).toBeDefined();
+		expect(defaultOption?.boundingRadius).toBe(boundingRadius);
+		for (const option of regionScaleOptions) {
+			expect(option.boundingRadius).toBeGreaterThan(0);
+			expect(option.label.length).toBeGreaterThan(0);
+		}
+	});
+
 	it("keeps land ratio and resource overlay ratio valid fractions", () => {
 		expect(appConfig.regions.targetLandRatio).toBeGreaterThan(0);
 		expect(appConfig.regions.targetLandRatio).toBeLessThan(1);

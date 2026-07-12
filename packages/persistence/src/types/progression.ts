@@ -1,3 +1,4 @@
+import { appConfig } from "economy-simulator-data";
 import type { ActiveCalamity, CalamityHistoryEntry } from "./calamities";
 import { createEmptyCalamityState } from "./calamities";
 
@@ -88,6 +89,8 @@ interface GameRunState {
 	status: GameRunStatus;
 	phase: GameRunPhase;
 	startingPopulation: number;
+	/** Bounding hex radius chosen at new-game setup for this run's island. */
+	boundingRadius: number;
 	startedAt: number;
 	endedAt?: number;
 	endReason?: string;
@@ -132,11 +135,15 @@ function createInitialWinLoseStreaks(): WinLoseStreaks {
 	};
 }
 
-function createInitialGameRunState(startingPopulation: number): GameRunState {
+function createInitialGameRunState(
+	startingPopulation: number,
+	boundingRadius: number = appConfig.regions.boundingRadius,
+): GameRunState {
 	return {
 		status: "active",
 		phase: "setup",
 		startingPopulation,
+		boundingRadius,
 		startedAt: Date.now(),
 		scoreHistory: [],
 		streaks: createInitialWinLoseStreaks(),

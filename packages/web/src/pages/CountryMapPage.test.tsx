@@ -83,6 +83,25 @@ describe("CountryMapPage", () => {
 		expect(
 			screen.getByText(/Hover a land tile for a quick summary/),
 		).toBeInTheDocument();
+		expect(screen.getByText("Land regions")).toBeInTheDocument();
+		expect(screen.getByText("Map key")).toBeInTheDocument();
+		expect(screen.getByText("Active calamity")).toBeInTheDocument();
+		expect(screen.getByText("Fresh Water Spring")).toBeInTheDocument();
+	});
+
+	it("updates the legend when switching map metrics", async () => {
+		renderPage();
+
+		await screen.findByRole("img");
+		expect(screen.getByText("Map key")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: "Population" }));
+		expect(screen.getByText("Empty")).toBeInTheDocument();
+		expect(screen.getByText("10 citizens")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: "Environment" }));
+		expect(screen.getByText("75")).toBeInTheDocument();
+		expect(screen.getByText("88")).toBeInTheDocument();
 	});
 
 	it("shows region details after selecting a populated region", async () => {
@@ -90,9 +109,10 @@ describe("CountryMapPage", () => {
 
 		fireEvent.click(await screen.findByRole("button", { name: /Alpha/ }));
 
-		expect(await screen.findByText("Alpha")).toBeInTheDocument();
-		expect(screen.getByText("10")).toBeInTheDocument();
-		expect(screen.getByText("Plains")).toBeInTheDocument();
+		const aside = screen.getByRole("complementary");
+		expect(aside).toHaveTextContent("Alpha");
+		expect(aside).toHaveTextContent("10");
+		expect(aside).toHaveTextContent("Plains");
 	});
 
 	it("shows a no-citizens message for an empty selected region", async () => {

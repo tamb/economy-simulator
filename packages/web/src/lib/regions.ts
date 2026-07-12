@@ -34,11 +34,15 @@ function isRegionId(value: unknown): value is RegionId {
 }
 
 /** Total regions in a hexagon-shaped grid of the configured radius. */
-function getRegionCount(radius = appConfig.regions.boundingRadius): number {
+function getRegionCount(
+	radius: number = appConfig.regions.boundingRadius,
+): number {
 	return 1 + 3 * radius * (radius + 1);
 }
 
-function getRegionIds(radius = appConfig.regions.boundingRadius): RegionId[] {
+function getRegionIds(
+	radius: number = appConfig.regions.boundingRadius,
+): RegionId[] {
 	return Array.from({ length: getRegionCount(radius) }, (_, index) =>
 		formatRegionId(index),
 	);
@@ -52,7 +56,7 @@ function getRegionIds(radius = appConfig.regions.boundingRadius): RegionId[] {
  * persisted (see `repos/regions.ts`).
  */
 function generateRegionCoordinates(
-	radius = appConfig.regions.boundingRadius,
+	radius: number = appConfig.regions.boundingRadius,
 ): RegionCoordinate[] {
 	const grid = new Grid(RegionHex, spiral({ start: [0, 0], radius }));
 	const coordinates: RegionCoordinate[] = [];

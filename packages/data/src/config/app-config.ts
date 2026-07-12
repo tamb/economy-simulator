@@ -36,13 +36,25 @@ const appConfig = {
 
 	regions: {
 		/**
-		 * Radius of the bounding hex grid the island is grown within (a
-		 * hexagon-shaped grid of hexagons centered on the origin region).
-		 * Total hexes in the bounding grid = 1 + 3 * radius * (radius + 1);
-		 * only a subset become land — see `targetLandRatio`. The rest are
-		 * ocean, guaranteeing every island is fully sea-surrounded.
+		 * Default radius of the bounding hex grid the island is grown within
+		 * (equals the "More" region-scale option). Total hexes =
+		 * 1 + 3 * radius * (radius + 1); only a subset become land — see
+		 * `targetLandRatio`. The rest are ocean, guaranteeing every island
+		 * is fully sea-surrounded. Passed explicitly at new-game time when
+		 * the player picks Few / Medium / More.
 		 */
-		boundingRadius: 7,
+		boundingRadius: 5,
+		/**
+		 * Choices on the new-game setup screen for how many provinces to
+		 * generate. Fewer = denser / harder; More = thinner / easier.
+		 */
+		regionScaleOptions: [
+			{ id: "few", label: "Few", boundingRadius: 3 },
+			{ id: "medium", label: "Medium", boundingRadius: 4 },
+			{ id: "more", label: "More", boundingRadius: 5 },
+		],
+		/** Default selection on the new-game setup screen. */
+		defaultRegionScale: "more",
 		/**
 		 * Target fraction of the bounding grid's hexes that become land.
 		 * The actual island generator (`economy-simulator-geography`) grows

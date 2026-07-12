@@ -29,13 +29,13 @@ function CalamityOnsetModal({ onsets, onRespond }: CalamityOnsetModalProps) {
 
 	return (
 		<div
-			className="fixed inset-0 z-[60] flex items-center justify-center bg-neutral-950/80 p-4"
+			className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto bg-neutral-950/80 p-4"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="calamity-onset-title"
 		>
-			<div className="w-full max-w-lg border-4 border-accent bg-surface shadow-lg shadow-surface-shadow">
-				<header className="border-b-4 border-accent bg-destructive/10 px-6 py-5 text-center">
+			<div className="my-auto flex max-h-[min(90vh,42rem)] w-full max-w-lg flex-col overflow-hidden border-4 border-accent bg-surface shadow-lg shadow-surface-shadow">
+				<header className="shrink-0 border-b-4 border-accent bg-destructive/10 px-6 py-5 text-center">
 					<p className="font-label text-[10px] tracking-overline text-muted-foreground">
 						Nation alert
 					</p>
@@ -44,60 +44,62 @@ function CalamityOnsetModal({ onsets, onRespond }: CalamityOnsetModalProps) {
 					</h2>
 				</header>
 
-				<ul className="max-h-[40vh] space-y-4 overflow-y-auto px-6 py-5">
-					{onsets.map((onset) => {
-						const definition = getCalamityDefinition(onset.calamityId);
-						const regionLabels = onset.regionIds.map(
-							(id) => nameById.get(id) ?? id,
-						);
-						return (
-							<li
-								key={onset.instanceId}
-								className={`border-2 bg-surface-muted px-4 py-3 ${SEVERITY_CLASS[onset.severity] ?? "border-primary"}`}
-							>
-								<div className="flex flex-wrap items-baseline justify-between gap-2">
-									<p className="text-sm text-foreground">{onset.name}</p>
-									<span className="font-label text-[10px] tracking-overline uppercase">
-										{onset.severity}
-										{onset.fromCascade ? " · cascade" : ""}
-									</span>
-								</div>
-								{definition?.description && (
-									<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-										{definition.description}
+				<div className="min-h-0 flex-1 overflow-y-auto">
+					<ul className="space-y-4 px-6 py-5">
+						{onsets.map((onset) => {
+							const definition = getCalamityDefinition(onset.calamityId);
+							const regionLabels = onset.regionIds.map(
+								(id) => nameById.get(id) ?? id,
+							);
+							return (
+								<li
+									key={onset.instanceId}
+									className={`border-2 bg-surface-muted px-4 py-3 ${SEVERITY_CLASS[onset.severity] ?? "border-primary"}`}
+								>
+									<div className="flex flex-wrap items-baseline justify-between gap-2">
+										<p className="text-sm text-foreground">{onset.name}</p>
+										<span className="font-label text-[10px] tracking-overline uppercase">
+											{onset.severity}
+											{onset.fromCascade ? " · cascade" : ""}
+										</span>
+									</div>
+									{definition?.description && (
+										<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+											{definition.description}
+										</p>
+									)}
+									<p className="mt-2 font-label text-[10px] tracking-overline text-muted-foreground">
+										Regions: {regionLabels.join(", ") || "Nationwide"}
 									</p>
-								)}
-								<p className="mt-2 font-label text-[10px] tracking-overline text-muted-foreground">
-									Regions: {regionLabels.join(", ") || "Nationwide"}
-								</p>
-							</li>
-						);
-					})}
-				</ul>
+								</li>
+							);
+						})}
+					</ul>
 
-				<div className="space-y-2 border-t-2 border-primary px-6 py-4">
-					<p className="font-label text-[10px] tracking-overline text-muted-foreground">
-						Choose a response
-						{onsets.length > 1 ? " (applies to all above)" : ""}
-					</p>
-					{RESPONSES.map((response) => {
-						const effect = RESPONSE_EFFECTS[response];
-						return (
-							<button
-								key={response}
-								type="button"
-								onClick={() => onRespond(response)}
-								className="w-full cursor-pointer border-2 border-primary bg-surface px-4 py-3 text-left transition-colors hover:bg-primary hover:text-primary-foreground"
-							>
-								<span className="font-label text-[10px] tracking-overline">
-									{effect.label}
-								</span>
-								<span className="mt-1 block text-xs leading-relaxed opacity-90">
-									{effect.detail}
-								</span>
-							</button>
-						);
-					})}
+					<div className="space-y-2 border-t-2 border-primary px-6 py-4">
+						<p className="font-label text-[10px] tracking-overline text-muted-foreground">
+							Choose a response
+							{onsets.length > 1 ? " (applies to all above)" : ""}
+						</p>
+						{RESPONSES.map((response) => {
+							const effect = RESPONSE_EFFECTS[response];
+							return (
+								<button
+									key={response}
+									type="button"
+									onClick={() => onRespond(response)}
+									className="w-full cursor-pointer border-2 border-primary bg-surface px-4 py-3 text-left transition-colors hover:bg-primary hover:text-primary-foreground"
+								>
+									<span className="font-label text-[10px] tracking-overline">
+										{effect.label}
+									</span>
+									<span className="mt-1 block text-xs leading-relaxed opacity-90">
+										{effect.detail}
+									</span>
+								</button>
+							);
+						})}
+					</div>
 				</div>
 			</div>
 		</div>

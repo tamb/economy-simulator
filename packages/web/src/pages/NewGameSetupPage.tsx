@@ -1,21 +1,36 @@
 import { appConfig } from "economy-simulator-data";
 import { useId, useState } from "react";
 
+interface NewGameSetupOptions {
+	size: number;
+	boundingRadius: number;
+}
+
 interface NewGameSetupPageProps {
-	onStart: (size: number) => void;
+	onStart: (options: NewGameSetupOptions) => void;
 }
 
 /**
  * Full-screen "found a new nation" title screen shown before a population
- * exists. Lets the player pick how many citizens to simulate — bigger
- * populations are more representative but take longer to generate and
- * process (see `appConfig.population.sizeOptions`).
+ * exists. Lets the player pick how many citizens to simulate and how many
+ * provinces to divide the island into — bigger populations are more
+ * representative but take longer; more provinces spread people thinner and
+ * ease regional pressure (see `appConfig.population` / `appConfig.regions`).
  */
 function NewGameSetupPage({ onStart }: NewGameSetupPageProps) {
 	const [selectedSize, setSelectedSize] = useState<number>(
 		appConfig.population.size,
 	);
-	const legendId = useId();
+	const [selectedScaleId, setSelectedScaleId] = useState<string>(
+		appConfig.regions.defaultRegionScale,
+	);
+	const populationLegendId = useId();
+	const regionLegendId = useId();
+
+	const selectedScale =
+		appConfig.regions.regionScaleOptions.find(
+			(option) => option.id === selectedScaleId,
+		) ?? appConfig.regions.regionScaleOptions[0];
 
 	return (
 		<main className="flex min-h-screen items-center justify-center p-4 font-sans sm:p-6">
@@ -36,12 +51,16 @@ function NewGameSetupPage({ onStart }: NewGameSetupPageProps) {
 					className="space-y-6 px-6 py-8 sm:px-8"
 					onSubmit={(event) => {
 						event.preventDefault();
-						onStart(selectedSize);
+						if (!selectedScale) return;
+						onStart({
+							size: selectedSize,
+							boundingRadius: selectedScale.boundingRadius,
+						});
 					}}
 				>
 					<fieldset className="space-y-3">
 						<legend
-							id={legendId}
+							id={populationLegendId}
 							className="font-label text-[10px] text-muted-foreground tracking-overline"
 						>
 							Starting population
@@ -80,9 +99,50 @@ function NewGameSetupPage({ onStart }: NewGameSetupPageProps) {
 						</div>
 					</fieldset>
 
+					<fieldset className="space-y-3">
+						<legend
+							id={regionLegendId}
+							className="font-label text-[10px] text-muted-foreground tracking-overline"
+						>
+							Provinces
+						</legend>
+						<div className="grid grid-cols-1 gap-2">
+							{appConfig.regions.regionScaleOptions.map((option) => {
+								const isSelected = option.id === selectedScaleId;
+								return (
+									<label
+										key={option.id}
+										className={`flex w-full cursor-pointer items-center border-2 px-4 py-3 transition-colors ${
+											isSelected
+												? "border-primary bg-primary text-primary-foreground"
+												: "border-primary/30 bg-surface-muted text-foreground hover:border-primary/60"
+										}`}
+									>
+										<input
+											type="radio"
+											name="region-scale"
+											value={option.id}
+											checked={isSelected}
+											onChange={() => setSelectedScaleId(option.id)}
+											className="sr-only"
+										/>
+										<span className="text-sm sm:text-base">{option.label}</span>
+										{option.id === appConfig.regions.defaultRegionScale && (
+											<span className="ml-2 font-label text-[10px] tracking-overline opacity-70">
+												(default)
+											</span>
+										)}
+									</label>
+								);
+							})}
+						</div>
+					</fieldset>
+
 					<p className="text-sm leading-relaxed text-muted-foreground">
 						Larger populations take longer to generate and to simulate each
-						in-game day, but give a more granular economy.
+						in-game day, but give a more granular economy. More provinces spread
+						people thinner and ease regional pressure; fewer pack the same
+						population tighter.
 					</p>
 
 					<button
@@ -97,4 +157,5 @@ function NewGameSetupPage({ onStart }: NewGameSetupPageProps) {
 	);
 }
 
+export type { NewGameSetupOptions };
 export { NewGameSetupPage };

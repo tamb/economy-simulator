@@ -25,13 +25,14 @@ interface WorldRegion {
  * order) so every existing `RegionId` keeps working unchanged everywhere
  * else in the app (storage, job assignment, dashboards).
  */
-function buildWorldRegions(seed: number): WorldRegion[] {
-	const coordinates = generateRegionCoordinates(
-		appConfig.regions.boundingRadius,
-	);
+function buildWorldRegions(
+	seed: number,
+	boundingRadius: number = appConfig.regions.boundingRadius,
+): WorldRegion[] {
+	const coordinates = generateRegionCoordinates(boundingRadius);
 	const generated = generateWorld({
 		seed,
-		boundingRadius: appConfig.regions.boundingRadius,
+		boundingRadius,
 		targetLandRatio: appConfig.regions.targetLandRatio,
 		resourceOverlayRatio: appConfig.regions.resourceOverlayRatio,
 	});

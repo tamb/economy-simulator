@@ -97,7 +97,8 @@ No React, no I/O, no randomness beyond an explicit seed — mirrors
 `packages/simulation`'s "pure engine" rule so world generation stays
 unit-testable and safe to run inside a Web Worker. Depends on `packages/data`
 for the biome/resource/overlay catalogs and `AppConfig.regions` sizing
-tunables; uses `honeycomb-grid` for hex adjacency math (same library
+tunables (`boundingRadius`, `regionScaleOptions` Few/Medium/More chosen at
+new-game setup); uses `honeycomb-grid` for hex adjacency math (same library
 `packages/web` uses for rendering). No build step.
 
 ## Simulation (`packages/simulation`)

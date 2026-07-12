@@ -10,7 +10,6 @@ import type { WorldRegion } from "../lib/world";
 import { randomInt } from "../models/generatePerson";
 import {
 	ensureRegionResourceStates,
-	ensureWorld,
 	loadWorldRegions,
 	type RegionResourceState,
 } from "./world";
@@ -38,10 +37,19 @@ async function saveRegionName(id: RegionId, name: string): Promise<void> {
 	await saveRegionNameRepo(id, name);
 }
 
+/**
+ * Loads named regions for an already-generated world. Does **not** create a
+ * world — that happens at new-game founding with the player's chosen
+ * bounding radius (`ensureWorld`). Returns [] when no world exists yet.
+ */
 async function ensureRegionPool(
 	random: RandomFn = Math.random,
 ): Promise<Region[]> {
-	const worldRegions = await ensureWorld(random);
+	const worldRegions = (await loadWorldRegions()) ?? [];
+	if (worldRegions.length === 0) {
+		return [];
+	}
+
 	const resourceStates = await ensureRegionResourceStates(worldRegions);
 	const regions: Region[] = [];
 

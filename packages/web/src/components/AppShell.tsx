@@ -249,7 +249,9 @@ function AppShell() {
 						const nextSize =
 							appConfig.population.sizeOptions.find((size) => size === total) ??
 							gameRun.startingPopulation;
-						restartNation(nextSize).catch(() => undefined);
+						const nextRadius =
+							gameRun.boundingRadius ?? appConfig.regions.boundingRadius;
+						restartNation(nextSize, nextRadius).catch(() => undefined);
 					}}
 				/>
 			)}

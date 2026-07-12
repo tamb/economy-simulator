@@ -1,3 +1,4 @@
+import { appConfig } from "economy-simulator-data";
 import { getStorageDriver } from "../driver/registry";
 import type { GameRunState } from "../types/progression";
 import { createInitialGameRunState } from "../types/progression";
@@ -23,6 +24,10 @@ function withDefaults(state: GameRunState): GameRunState {
 	return {
 		...withCalamityDefaults(state),
 		phase: state.phase ?? "active",
+		boundingRadius:
+			typeof state.boundingRadius === "number"
+				? state.boundingRadius
+				: appConfig.regions.boundingRadius,
 		eventLog: state.eventLog ?? [],
 		activeMandate: state.activeMandate ?? null,
 		mandateCompletions: state.mandateCompletions ?? 0,
@@ -61,11 +66,12 @@ async function clearGameRunState(): Promise<void> {
 
 async function ensureGameRunState(
 	startingPopulation: number,
+	boundingRadius: number = appConfig.regions.boundingRadius,
 ): Promise<GameRunState> {
 	const existing = await loadGameRunState();
 	if (existing) return existing;
 
-	const initial = createInitialGameRunState(startingPopulation);
+	const initial = createInitialGameRunState(startingPopulation, boundingRadius);
 	await saveGameRunState(initial);
 	return initial;
 }

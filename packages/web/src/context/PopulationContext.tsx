@@ -2,7 +2,7 @@ import type {
 	AideProposalChoiceKind,
 	CategoryId,
 } from "economy-simulator-data";
-import { getWeeklyDecisionTree } from "economy-simulator-data";
+import { appConfig, getWeeklyDecisionTree } from "economy-simulator-data";
 import type {
 	CalamityPlayerResponse,
 	GameRunState,
@@ -55,7 +55,8 @@ import {
 	hasPopulation,
 	loadPopulationMeta,
 } from "../repos/population";
-import { ensureWorld } from "../repos/world";
+import { clearRegionPool } from "../repos/regions";
+import { clearWorld, ensureWorld } from "../repos/world";
 import type {
 	PopulationMutationResult,
 	PopulationWorkerRequest,
@@ -85,8 +86,8 @@ interface PopulationContextValue {
 	isGenerating: boolean;
 	needsSetup: boolean;
 	needsConfiguration: boolean;
-	startGeneration: (size: number) => Promise<void>;
-	restartNation: (size: number) => Promise<void>;
+	startGeneration: (size: number, boundingRadius: number) => Promise<void>;
+	restartNation: (size: number, boundingRadius: number) => Promise<void>;
 	autoAssignAll: () => Promise<void>;
 	startConfiguredGame: () => Promise<void>;
 	isAdvancingDay: boolean;
@@ -128,7 +129,7 @@ const PopulationContext = createContext<PopulationContextValue | null>(null);
 
 function PopulationProvider({ children }: { children: ReactNode }) {
 	const { faceIds, isReady: isFacePoolReady } = useFacePool();
-	const { regions, isReady: isRegionsReady } = useRegions();
+	const { isReady: isRegionsReady, refreshRegions } = useRegions();
 	const [isReady, setIsReady] = useState(false);
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [needsSetup, setNeedsSetup] = useState(false);
@@ -199,21 +200,27 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const enterConfigurationPhase = useCallback(
-		async (size: number) => {
-			await beginNationFounding(size);
-			await ensureWorld();
+		async (size: number, boundingRadius: number) => {
+			await beginNationFounding(size, boundingRadius);
+			// Drop any world created before the player chose a province scale
+			// (or left over from a prior run) so the chosen radius is honored.
+			await clearRegionPool();
+			await clearWorld();
+			await ensureWorld(Math.random, boundingRadius);
+			await refreshRegions();
 			await refreshGameRun();
 			setTotal(size);
 			setNeedsSetup(false);
 			setNeedsConfiguration(true);
 			setIsReady(true);
 		},
-		[refreshGameRun],
+		[refreshGameRun, refreshRegions],
 	);
 
 	useEffect(() => {
 		if (!isFacePoolReady || faceIds.length === 0) return;
-		if (!isRegionsReady || regions.length === 0) return;
+		// Regions may be empty before founding (no world yet); still allow setup.
+		if (!isRegionsReady) return;
 
 		let cancelled = false;
 
@@ -250,9 +257,10 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 
 			const override = getPopulationSizeOverride();
 			if (override != null) {
-				await enterConfigurationPhase(override);
+				const defaultRadius = appConfig.regions.boundingRadius;
+				await enterConfigurationPhase(override, defaultRadius);
 				await autoAssignAllSectors();
-				const worldRegions = await ensureWorld();
+				const worldRegions = await ensureWorld(Math.random, defaultRadius);
 				await startGame(override, faceIds, worldRegions, (loaded) => {
 					if (!cancelled) setLoadProgress(loaded);
 				});
@@ -287,17 +295,16 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	}, [
 		faceIds,
 		isFacePoolReady,
-		regions,
 		isRegionsReady,
 		enterConfigurationPhase,
 		refreshGameRun,
 	]);
 
 	const startGeneration = useCallback(
-		async (size: number) => {
+		async (size: number, boundingRadius: number) => {
 			setIsGenerating(true);
 			try {
-				await enterConfigurationPhase(size);
+				await enterConfigurationPhase(size, boundingRadius);
 			} finally {
 				setIsGenerating(false);
 			}
@@ -306,15 +313,15 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	);
 
 	const restartNation = useCallback(
-		async (size: number) => {
-			await startNewNation(size);
+		async (size: number, boundingRadius: number) => {
+			await startNewNation(size, boundingRadius);
 			setGameRun(null);
 			setNeedsSetup(false);
 			setPendingCalamityOnsets([]);
 			setPendingWeeklyReport(null);
 			setPendingAideProposal(null);
 			setPendingYearReview(null);
-			await enterConfigurationPhase(size);
+			await enterConfigurationPhase(size, boundingRadius);
 		},
 		[enterConfigurationPhase],
 	);

@@ -1,6 +1,7 @@
 import {
 	createContext,
 	type ReactNode,
+	useCallback,
 	useContext,
 	useEffect,
 	useState,
@@ -13,6 +14,8 @@ interface RegionContextValue {
 	regionIds: RegionId[];
 	getRegion: (id: RegionId | undefined) => Region | undefined;
 	isReady: boolean;
+	/** Reload named regions from the persisted world (e.g. after founding). */
+	refreshRegions: () => Promise<Region[]>;
 }
 
 const RegionContext = createContext<RegionContextValue | null>(null);
@@ -20,6 +23,13 @@ const RegionContext = createContext<RegionContextValue | null>(null);
 function RegionProvider({ children }: { children: ReactNode }) {
 	const [regions, setRegions] = useState<Region[]>([]);
 	const [isReady, setIsReady] = useState(false);
+
+	const refreshRegions = useCallback(async () => {
+		const pool = await ensureRegionPool();
+		setRegions(pool);
+		setIsReady(true);
+		return pool;
+	}, []);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -50,6 +60,7 @@ function RegionProvider({ children }: { children: ReactNode }) {
 				regionIds,
 				getRegion: (id) => regions.find((region) => region.id === id),
 				isReady,
+				refreshRegions,
 			}}
 		>
 			{children}

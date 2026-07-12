@@ -1,4 +1,9 @@
-import { appConfig, biomes, isLand } from "economy-simulator-data";
+import {
+	appConfig,
+	biomes,
+	isLand,
+	resourceOverlays,
+} from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
 import { generateBoundingGridCoordinates } from "../hex/coordinates";
 import { generateWorld } from "./generate-world";
@@ -46,6 +51,29 @@ describe("generateWorld", () => {
 		for (const region of world) {
 			if (region.resourceOverlay) {
 				expect(isLand(region.terrain)).toBe(true);
+			}
+		}
+	});
+
+	it("places every catalog resource overlay at least once", () => {
+		for (const seed of [1, 9, 17, 42]) {
+			for (const boundingRadius of [3, 4, 5]) {
+				const world = generateWorld({
+					seed: seed + boundingRadius,
+					boundingRadius,
+					targetLandRatio: baseOptions.targetLandRatio,
+					resourceOverlayRatio: baseOptions.resourceOverlayRatio,
+				});
+				const placed = new Set(
+					world
+						.map((region) => region.resourceOverlay)
+						.filter((overlay): overlay is NonNullable<typeof overlay> =>
+							Boolean(overlay),
+						),
+				);
+				for (const overlay of resourceOverlays) {
+					expect(placed.has(overlay.id)).toBe(true);
+				}
 			}
 		}
 	});

@@ -18,7 +18,10 @@ function InstructionsPage() {
 			<CollapsibleSection title="Getting started" defaultOpen>
 				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
 					<li>
-						Pick a starting population size (10k / 100k / 1M) on first launch.
+						Pick a starting population size (10k / 100k / 1M) and how many
+						provinces to found (Few / Medium / More) on first launch. More
+						provinces spread people thinner and ease regional pressure; fewer
+						pack the same population tighter.
 					</li>
 					<li>
 						Configure every sub-sector's economic system and role mix on the
@@ -26,9 +29,9 @@ function InstructionsPage() {
 					</li>
 					<li>
 						The game generates a unique island (biomes, resource deposits,
-						ocean) and assigns every citizen a home region, job, and economic
-						role. Working-age citizens (18–65) are employed; children and
-						retirees are not.
+						ocean) sized to your province choice and assigns every citizen a
+						home region, job, and economic role. Working-age citizens (18–65)
+						are employed; children and retirees are not.
 					</li>
 					<li>
 						The default landing page is the <strong>Country Map</strong> — your

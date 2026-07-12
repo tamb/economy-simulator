@@ -62,7 +62,7 @@ function HowToRulePanel() {
 						</button>
 					</header>
 
-					<ul className="max-h-[50vh] space-y-3 overflow-y-auto px-4 py-4 text-sm">
+					<ul className="max-h-[min(50vh,24rem)] space-y-3 overflow-y-auto px-4 py-4 text-sm">
 						{HOW_TO_RULE_STEPS.map((step) => (
 							<li key={step.title}>
 								<p className="font-label text-[10px] tracking-overline text-muted-foreground">

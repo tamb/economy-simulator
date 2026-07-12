@@ -16,7 +16,19 @@ describe("NewGameSetupPage", () => {
 		}
 	});
 
-	it("defaults to appConfig.population.size and starts generation with it", () => {
+	it("renders every configured region-scale option", () => {
+		render(<NewGameSetupPage onStart={vi.fn()} />);
+
+		for (const option of appConfig.regions.regionScaleOptions) {
+			expect(
+				screen.getByRole("radio", {
+					name: new RegExp(option.label),
+				}),
+			).toBeInTheDocument();
+		}
+	});
+
+	it("defaults to appConfig size and region scale and starts with them", () => {
 		const onStart = vi.fn();
 		render(<NewGameSetupPage onStart={onStart} />);
 
@@ -27,14 +39,27 @@ describe("NewGameSetupPage", () => {
 		});
 		expect(defaultOption).toBeChecked();
 
+		const defaultScale = appConfig.regions.regionScaleOptions.find(
+			(option) => option.id === appConfig.regions.defaultRegionScale,
+		);
+		expect(defaultScale).toBeDefined();
+		expect(
+			screen.getByRole("radio", {
+				name: new RegExp(defaultScale?.label ?? ""),
+			}),
+		).toBeChecked();
+
 		fireEvent.click(
 			screen.getByRole("button", { name: "Continue to nation setup" }),
 		);
 
-		expect(onStart).toHaveBeenCalledWith(appConfig.population.size);
+		expect(onStart).toHaveBeenCalledWith({
+			size: appConfig.population.size,
+			boundingRadius: defaultScale?.boundingRadius,
+		});
 	});
 
-	it("starts generation with the size the player selects", () => {
+	it("starts with the size and region scale the player selects", () => {
 		const onStart = vi.fn();
 		render(<NewGameSetupPage onStart={onStart} />);
 
@@ -43,15 +68,28 @@ describe("NewGameSetupPage", () => {
 		);
 		expect(nonDefaultSize).toBeDefined();
 
+		const nonDefaultScale = appConfig.regions.regionScaleOptions.find(
+			(option) => option.id !== appConfig.regions.defaultRegionScale,
+		);
+		expect(nonDefaultScale).toBeDefined();
+
 		fireEvent.click(
 			screen.getByRole("radio", {
 				name: new RegExp(`${nonDefaultSize?.toLocaleString()} citizens`),
 			}),
 		);
 		fireEvent.click(
+			screen.getByRole("radio", {
+				name: new RegExp(nonDefaultScale?.label ?? ""),
+			}),
+		);
+		fireEvent.click(
 			screen.getByRole("button", { name: "Continue to nation setup" }),
 		);
 
-		expect(onStart).toHaveBeenCalledWith(nonDefaultSize);
+		expect(onStart).toHaveBeenCalledWith({
+			size: nonDefaultSize,
+			boundingRadius: nonDefaultScale?.boundingRadius,
+		});
 	});
 });

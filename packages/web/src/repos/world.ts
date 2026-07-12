@@ -51,6 +51,7 @@ function initializeRegionResourceState(
 
 async function ensureWorld(
 	random: RandomFn = Math.random,
+	boundingRadius: number = appConfig.regions.boundingRadius,
 ): Promise<WorldRegion[]> {
 	const meta = await loadWorldMetaRepo();
 	const existing = meta ? await loadWorldRegionsRepo() : null;
@@ -60,11 +61,12 @@ async function ensureWorld(
 	}
 
 	const seed = Math.floor(random() * 2_147_483_647);
-	const regions = buildWorldRegions(seed);
+	const regions = buildWorldRegions(seed, boundingRadius);
 
 	await saveWorldRegionsRepo(regions.map(fromWorldRegion));
 	await saveWorldMeta({
 		version: appConfig.regions.worldVersion,
+		boundingRadius,
 	} satisfies WorldMeta);
 	await removeRegionResourceStates();
 

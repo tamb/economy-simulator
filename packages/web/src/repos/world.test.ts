@@ -1,4 +1,4 @@
-import { isLand } from "economy-simulator-data";
+import { appConfig, isLand } from "economy-simulator-data";
 import { beforeEach, describe, expect, it } from "vitest";
 import { setupMemoryStorage } from "../test/storage-driver";
 import {
@@ -18,13 +18,23 @@ describe("ensureWorld", () => {
 	it("generates and persists a world on first call", async () => {
 		const regions = await ensureWorld(() => 0.5);
 		expect(regions.length).toBeGreaterThan(0);
-		expect(await loadWorldMeta()).not.toBeNull();
+		const meta = await loadWorldMeta();
+		expect(meta).not.toBeNull();
+		expect(meta?.boundingRadius).toBe(appConfig.regions.boundingRadius);
 		expect(await loadWorldRegions()).toEqual(regions);
 	});
 
-	it("returns the same persisted world on a second call, ignoring the random source", async () => {
-		const first = await ensureWorld(() => 0.1);
-		const second = await ensureWorld(() => 0.9);
+	it("persists the chosen bounding radius when creating a world", async () => {
+		const regions = await ensureWorld(() => 0.5, 3);
+		expect(regions).toHaveLength(37);
+		expect(await loadWorldMeta()).toMatchObject({
+			boundingRadius: 3,
+		});
+	});
+
+	it("returns the same persisted world on a second call, ignoring radius and random", async () => {
+		const first = await ensureWorld(() => 0.1, 3);
+		const second = await ensureWorld(() => 0.9, 5);
 		expect(second).toEqual(first);
 	});
 

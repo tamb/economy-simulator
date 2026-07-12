@@ -11,6 +11,8 @@ interface StoredWorldRegion {
 
 interface WorldMeta {
 	version: number;
+	/** Bounding hex radius used when this world was generated. */
+	boundingRadius?: number;
 }
 
 interface RegionResourceState {

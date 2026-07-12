@@ -13,14 +13,14 @@ function GameEndModal({ gameRun, onStartNewNation }: GameEndModalProps) {
 
 	return (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/80 p-4"
+			className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-neutral-950/80 p-4"
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="game-end-title"
 		>
-			<div className="w-full max-w-md border-4 border-primary bg-surface shadow-lg shadow-surface-shadow">
+			<div className="my-auto flex max-h-[min(90vh,42rem)] w-full max-w-md flex-col overflow-hidden border-4 border-primary bg-surface shadow-lg shadow-surface-shadow">
 				<header
-					className={`border-b-4 px-6 py-5 text-center ${
+					className={`shrink-0 border-b-4 px-6 py-5 text-center ${
 						isWin
 							? "border-accent bg-accent/20"
 							: "border-destructive bg-destructive/10"
@@ -34,7 +34,7 @@ function GameEndModal({ gameRun, onStartNewNation }: GameEndModalProps) {
 					</h2>
 				</header>
 
-				<div className="space-y-4 px-6 py-6">
+				<div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-6">
 					<p className="text-center text-3xl font-bold text-primary">
 						{Math.round(finalScore)}
 					</p>

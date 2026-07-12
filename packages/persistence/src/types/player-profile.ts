@@ -8,6 +8,8 @@ interface RunSummary {
 	runId: string;
 	status: "won" | "lost" | "abandoned";
 	startingPopulation: number;
+	/** Bounding hex radius used for this run's island; omit on older archives. */
+	boundingRadius?: number;
 	endingPopulation: number;
 	yearsPlayed: number;
 	finalScore: number;
