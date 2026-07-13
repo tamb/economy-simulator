@@ -1,6 +1,7 @@
 import {
 	buildAutoAssignments,
 	buildAutoRoleConfigs,
+	sectorKey,
 	validateNationSetup,
 } from "economy-simulator-data";
 import {
@@ -16,7 +17,11 @@ import { loadSectorAssignments } from "../repos/sector-assignments";
 import { loadSectorRoleConfigs } from "../repos/sector-role-config";
 import {
 	autoAssignAllSectors,
+	autoAssignCategory,
+	autoAssignSector,
+	beginNationFounding,
 	getNationSetupValidation,
+	isNationInSetupPhase,
 	startGame,
 } from "./nation-setup";
 
@@ -64,5 +69,52 @@ describe("nation-setup", () => {
 		const run = await loadGameRunState();
 		expect(run?.phase).toBe("setup");
 		generateSpy.mockRestore();
+	});
+
+	it("startGame rejects incomplete nation setup", async () => {
+		await expect(startGame(6, faceIds, regions)).rejects.toThrow(
+			"Nation setup is incomplete",
+		);
+	});
+
+	it("beginNationFounding creates a setup-phase run with the chosen scale", async () => {
+		await beginNationFounding(250_000, 3);
+
+		const run = await loadGameRunState();
+		expect(run?.phase).toBe("setup");
+		expect(run?.startingPopulation).toBe(250_000);
+		expect(run?.boundingRadius).toBe(3);
+	});
+
+	it("isNationInSetupPhase reflects the persisted game run phase", async () => {
+		expect(await isNationInSetupPhase()).toBe(false);
+
+		await beginNationFounding(10_000, 4);
+		expect(await isNationInSetupPhase()).toBe(true);
+	});
+
+	it("autoAssignCategory configures every sub-sector in the category", async () => {
+		await autoAssignCategory("extractive");
+
+		const assignments = await loadSectorAssignments();
+		const roleConfigs = await loadSectorRoleConfigs();
+		const validation = getNationSetupValidation(assignments, roleConfigs);
+
+		expect(assignments[sectorKey("extractive", "mining")]).toBeDefined();
+		expect(
+			roleConfigs[sectorKey("extractive", "mining")]?.quotas.length,
+		).toBeGreaterThan(0);
+		expect(validation.configuredCount).toBeGreaterThan(0);
+	});
+
+	it("autoAssignSector configures a single sub-sector", async () => {
+		await autoAssignSector("industrial", "light-manufacturing");
+
+		const assignments = await loadSectorAssignments();
+		const roleConfigs = await loadSectorRoleConfigs();
+		const key = sectorKey("industrial", "light-manufacturing");
+
+		expect(assignments[key]).toBeDefined();
+		expect(roleConfigs[key]?.quotas.length).toBeGreaterThan(0);
 	});
 });
