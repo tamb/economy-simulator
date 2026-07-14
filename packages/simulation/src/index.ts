@@ -49,6 +49,38 @@ export {
 } from "./employment/role-assignment";
 export { rerollRoleForCitizen } from "./employment/role-reform";
 export type {
+	FiscalBudgetShares,
+	FiscalPolicy,
+	FiscalTickInput,
+	FiscalTickResult,
+	FiscalYearSummary,
+	InfrastructureIndices,
+	InfrastructureMultipliers,
+	InfrastructureTickInput,
+	InfrastructureTickResult,
+	NationEconomyState,
+	NationEconomyTickInput,
+	NationEconomyTickResult,
+	PublicServiceEffects,
+	PublicServicesState,
+	ServiceMetrics,
+	ServiceTickInput,
+} from "./nation";
+export {
+	applyEconomicSystemFiscalBias,
+	computeFiscalYear,
+	computeInfrastructureMultipliers,
+	computeInfrastructureTick,
+	computeNationEconomyTick,
+	computePublicServiceEffects,
+	computePublicServicesTick,
+	createInitialNationEconomyState,
+	meanInfrastructure,
+	normalizeBudgetShares,
+	spendTreasuryForCalamityResponse,
+	taxPressureFromRate,
+} from "./nation";
+export type {
 	AnnualCitizenInput,
 	AnnualCitizenOutcome,
 } from "./population-dynamics/annual-cycle";
@@ -142,35 +174,3 @@ export {
 	computeFiniteYieldMultiplier,
 	computeRenewableYieldMultiplier,
 } from "./resources/reserve-yield-multiplier";
-export type {
-	FiscalBudgetShares,
-	FiscalPolicy,
-	FiscalTickInput,
-	FiscalTickResult,
-	FiscalYearSummary,
-	InfrastructureIndices,
-	InfrastructureMultipliers,
-	InfrastructureTickInput,
-	InfrastructureTickResult,
-	NationEconomyState,
-	NationEconomyTickInput,
-	NationEconomyTickResult,
-	PublicServiceEffects,
-	PublicServicesState,
-	ServiceMetrics,
-	ServiceTickInput,
-} from "./nation";
-export {
-	applyEconomicSystemFiscalBias,
-	computeFiscalYear,
-	computeInfrastructureMultipliers,
-	computeInfrastructureTick,
-	computeNationEconomyTick,
-	computePublicServiceEffects,
-	computePublicServicesTick,
-	createInitialNationEconomyState,
-	meanInfrastructure,
-	normalizeBudgetShares,
-	spendTreasuryForCalamityResponse,
-	taxPressureFromRate,
-} from "./nation";

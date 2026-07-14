@@ -121,8 +121,8 @@ describe("gameSettings", () => {
 		expect(
 			gameSettings.publicServices.healthcare.diseaseSeverityReductionMax,
 		).toBeGreaterThan(0);
-		expect(gameSettings.publicServices.education.affinityBoostMax).toBeGreaterThan(
-			0,
-		);
+		expect(
+			gameSettings.publicServices.education.affinityBoostMax,
+		).toBeGreaterThan(0);
 	});
 });

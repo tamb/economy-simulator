@@ -1,9 +1,6 @@
-import { describe, expect, it } from "vitest";
-import {
-	clampTaxRate,
-	updateNationFiscalPolicy,
-} from "./realm-dashboard";
 import { createInitialNationEconomyState } from "economy-simulator-simulation";
+import { describe, expect, it } from "vitest";
+import { clampTaxRate, updateNationFiscalPolicy } from "./realm-dashboard";
 
 describe("realm-dashboard helpers", () => {
 	it("clamps tax rate to GameSettings bounds", () => {
@@ -25,6 +22,8 @@ describe("realm-dashboard helpers", () => {
 			shares.education +
 			shares.reliefReserve;
 		expect(sum).toBeCloseTo(1, 5);
-		expect(shares.healthcare).toBeGreaterThan(state.policy.budgetShares.healthcare);
+		expect(shares.healthcare).toBeGreaterThan(
+			state.policy.budgetShares.healthcare,
+		);
 	});
 });

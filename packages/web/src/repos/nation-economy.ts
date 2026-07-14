@@ -1,10 +1,10 @@
-import type { NationEconomyState } from "economy-simulator-simulation";
 import {
 	clearNationEconomy as clearPersisted,
 	ensureNationEconomy as ensurePersisted,
 	loadNationEconomy as loadPersisted,
 	saveNationEconomy as savePersisted,
 } from "economy-simulator-persistence";
+import type { NationEconomyState } from "economy-simulator-simulation";
 
 async function loadNationEconomy(): Promise<NationEconomyState | null> {
 	return loadPersisted();

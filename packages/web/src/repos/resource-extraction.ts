@@ -235,7 +235,8 @@ function runAnnualResourceExtraction({
 					})),
 					demandByResource,
 					logisticsEmploymentShare,
-					infrastructureCapacityMultiplier: infrastructureFlowCapacityMultiplier,
+					infrastructureCapacityMultiplier:
+						infrastructureFlowCapacityMultiplier,
 					settings,
 				})
 			: null;

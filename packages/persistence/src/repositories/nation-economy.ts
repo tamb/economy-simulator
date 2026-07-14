@@ -19,7 +19,10 @@ function isNationEconomyState(value: unknown): value is NationEconomyState {
 }
 
 async function loadNationEconomy(): Promise<NationEconomyState | null> {
-	const saved = await getStorageDriver().get<unknown>(STORE, NATION_ECONOMY_KEY);
+	const saved = await getStorageDriver().get<unknown>(
+		STORE,
+		NATION_ECONOMY_KEY,
+	);
 	return isNationEconomyState(saved) ? saved : null;
 }
 

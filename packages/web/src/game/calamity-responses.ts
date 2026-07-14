@@ -191,8 +191,7 @@ function applyCalamityResponses(
 		if (didSpendTreasury) {
 			spendNotes.push(`Treasury spent: ${totalTreasurySpent.toFixed(0)}`);
 		}
-		const spendNote =
-			spendNotes.length > 0 ? ` ${spendNotes.join(". ")}.` : "";
+		const spendNote = spendNotes.length > 0 ? ` ${spendNotes.join(". ")}.` : "";
 		events.push({
 			id: `response-${calamity.instanceId}-${response}`,
 			gameDay,

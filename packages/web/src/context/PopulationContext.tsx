@@ -48,14 +48,11 @@ import {
 	getPopulationSizeOverride,
 } from "../lib/runtime-config";
 import type { Person } from "../models/Person";
+import { loadNationEconomy, saveNationEconomy } from "../repos/nation-economy";
 import {
 	loadNationalLedger,
 	saveNationalLedger,
 } from "../repos/national-ledger";
-import {
-	loadNationEconomy,
-	saveNationEconomy,
-} from "../repos/nation-economy";
 import {
 	buildPopulationDirectory,
 	getPeopleByIndices,

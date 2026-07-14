@@ -78,8 +78,8 @@ describe("applyCalamityResponses", () => {
 		expect(result.didSpendTreasury).toBe(true);
 		expect(result.totalTreasurySpent).toBeGreaterThan(0);
 		expect(result.remainingTreasury).toBeLessThan(200);
-		expect(
-			result.gameRun.activeCalamities[0]?.extractionHitScale,
-		).toBeLessThan(0.45);
+		expect(result.gameRun.activeCalamities[0]?.extractionHitScale).toBeLessThan(
+			0.45,
+		);
 	});
 });

@@ -12,7 +12,10 @@ import {
 	loadGameRunState,
 	saveGameRunState,
 } from "economy-simulator-persistence";
-import { applyEconomicSystemFiscalBias, createInitialNationEconomyState } from "economy-simulator-simulation";
+import {
+	applyEconomicSystemFiscalBias,
+	createInitialNationEconomyState,
+} from "economy-simulator-simulation";
 import type { FaceId } from "../lib/faces";
 import { type CategoryId, getCategory } from "../lib/taxonomy";
 import { generateAndSavePopulation } from "../models/generatePopulation";
@@ -180,7 +183,9 @@ async function startGame(
 	const fiscalPolicy = applyEconomicSystemFiscalBias(
 		dominantEconomicSystemId(assignments),
 	);
-	await saveNationEconomy(createInitialNationEconomyState(undefined, fiscalPolicy));
+	await saveNationEconomy(
+		createInitialNationEconomyState(undefined, fiscalPolicy),
+	);
 }
 
 async function isNationInSetupPhase(): Promise<boolean> {

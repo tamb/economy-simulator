@@ -90,8 +90,7 @@ function applyEconomicSystemFiscalBias(
 			fiscal.defaultBudgetShares.infrastructure +
 			(bias?.infrastructureShareDelta ?? 0),
 		healthcare:
-			fiscal.defaultBudgetShares.healthcare +
-			(bias?.healthcareShareDelta ?? 0),
+			fiscal.defaultBudgetShares.healthcare + (bias?.healthcareShareDelta ?? 0),
 		education:
 			fiscal.defaultBudgetShares.education + (bias?.educationShareDelta ?? 0),
 		reliefReserve:
@@ -170,11 +169,9 @@ function computeInfrastructureTick(
 ): InfrastructureTickResult {
 	const settings = input.settings ?? gameSettings;
 	const cfg = settings.infrastructure;
-	const constructionShare =
-		input.employmentShareBySubSector.construction ?? 0;
+	const constructionShare = input.employmentShareBySubSector.construction ?? 0;
 	const utilitiesShare = input.employmentShareBySubSector.utilities ?? 0;
-	const telecomShare =
-		input.employmentShareBySubSector.telecommunications ?? 0;
+	const telecomShare = input.employmentShareBySubSector.telecommunications ?? 0;
 
 	const laborGain: InfrastructureIndices = {
 		transport:
@@ -203,8 +200,7 @@ function computeInfrastructureTick(
 		input.outputProxy > 1e-9
 			? (input.infrastructureSpend / input.outputProxy) * 100
 			: 0;
-	const rawInvest =
-		investPctOfOutput * cfg.investmentGainPerOutputPercent;
+	const rawInvest = investPctOfOutput * cfg.investmentGainPerOutputPercent;
 	const investmentGain: InfrastructureIndices = {
 		transport: rawInvest * 0.45,
 		powerWater: rawInvest * 0.35,
@@ -289,8 +285,7 @@ function computeFiscalYear(input: FiscalTickInput): FiscalTickResult {
 		spendingByLine.reliefReserve;
 
 	const calamitySpend = Math.max(0, input.calamityTreasurySpent ?? 0);
-	let deficit =
-		totalSpending + debtService + calamitySpend - taxRevenue;
+	let deficit = totalSpending + debtService + calamitySpend - taxRevenue;
 	let treasury = input.priorTreasury - deficit;
 
 	const softFloor = -fiscal.softDeficitCapFractionOfOutput * outputProxy;
@@ -328,7 +323,8 @@ function computeFiscalYear(input: FiscalTickInput): FiscalTickResult {
 	}
 	debt = Math.max(
 		0,
-		debt * (1 - fiscal.debtPrincipalRepaymentRate) - Math.max(0, -deficit) * 0.5,
+		debt * (1 - fiscal.debtPrincipalRepaymentRate) -
+			Math.max(0, -deficit) * 0.5,
 	);
 
 	return {
@@ -403,10 +399,7 @@ function staffingShare(
 	subSectorIds: readonly string[],
 	employment: Record<string, number>,
 ): number {
-	return subSectorIds.reduce(
-		(sum, id) => sum + (employment[id] ?? 0),
-		0,
-	);
+	return subSectorIds.reduce((sum, id) => sum + (employment[id] ?? 0), 0);
 }
 
 function computeServicePair(
@@ -427,8 +420,7 @@ function computeServicePair(
 		1,
 		staffShare / Math.max(1e-9, cfg.staffingSaturationShare),
 	);
-	const spendPctOfOutput =
-		outputProxy > 1e-9 ? (spend / outputProxy) * 100 : 0;
+	const spendPctOfOutput = outputProxy > 1e-9 ? (spend / outputProxy) * 100 : 0;
 	const budgetFactor = spendPctOfOutput / 5;
 
 	const targetCoverage =
@@ -517,7 +509,8 @@ function computePublicServiceEffects(
 	);
 
 	return {
-		diseaseSeverityScale: 1 - healthQuality * health.diseaseSeverityReductionMax,
+		diseaseSeverityScale:
+			1 - healthQuality * health.diseaseSeverityReductionMax,
 		healthFloorBonus: healthQuality * health.healthFloorBonusMax,
 		educationAffinityMultiplier: 1 + eduQuality * edu.affinityBoostMax,
 		underfundingHappinessPenaltyPerDay:
@@ -575,10 +568,7 @@ function computeNationEconomyTick(
 		settings,
 	});
 
-	const multipliers = computeInfrastructureMultipliers(
-		infra.indices,
-		settings,
-	);
+	const multipliers = computeInfrastructureMultipliers(infra.indices, settings);
 
 	const services = computePublicServicesTick({
 		prior: input.prior.services,

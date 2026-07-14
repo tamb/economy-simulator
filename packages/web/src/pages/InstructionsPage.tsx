@@ -204,14 +204,14 @@ function InstructionsPage() {
 					</li>
 					<li>
 						Set the overall <strong>tax rate</strong> and budget shares for
-						infrastructure, healthcare, education, and a relief reserve.
-						Higher taxes raise revenue but press happiness and emigration.
+						infrastructure, healthcare, education, and a relief reserve. Higher
+						taxes raise revenue but press happiness and emigration.
 					</li>
 					<li>
-						Construction, utilities, and telecom labor plus infrastructure
-						spend raise capital indices that multiply extraction and domestic
-						flows. Healthcare quality blunts disease; education quality
-						improves job fit.
+						Construction, utilities, and telecom labor plus infrastructure spend
+						raise capital indices that multiply extraction and domestic flows.
+						Healthcare quality blunts disease; education quality improves job
+						fit.
 					</li>
 					<li>
 						Relief and Rebuild calamity responses can spend treasury alongside

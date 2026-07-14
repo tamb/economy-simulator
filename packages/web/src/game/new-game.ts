@@ -6,8 +6,8 @@ import {
 	loadPopulationMeta,
 	saveGameRunState,
 } from "economy-simulator-persistence";
-import { clearNationalLedger } from "../repos/national-ledger";
 import { clearNationEconomy } from "../repos/nation-economy";
+import { clearNationalLedger } from "../repos/national-ledger";
 import { clearPopulation } from "../repos/population";
 import { clearRegionPool } from "../repos/regions";
 import { clearSectorAssignments } from "../repos/sector-assignments";

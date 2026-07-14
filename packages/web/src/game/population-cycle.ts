@@ -85,14 +85,14 @@ import {
 import { Person, type PersonSnapshot } from "../models/Person";
 import { updatePersonStats } from "../models/updatePersonStats";
 import {
-	loadNationalLedger,
-	saveNationalLedger,
-} from "../repos/national-ledger";
-import {
 	ensureNationEconomy,
 	loadNationEconomy,
 	saveNationEconomy,
 } from "../repos/nation-economy";
+import {
+	loadNationalLedger,
+	saveNationalLedger,
+} from "../repos/national-ledger";
 import { ensureRegionPool } from "../repos/regions";
 import { runAnnualResourceExtraction } from "../repos/resource-extraction";
 import {
@@ -979,7 +979,8 @@ async function advanceGameDay(
 				taxHappinessPenalty: taxPressure?.happinessPenaltyPerDay,
 				serviceUnderfundingHappinessPenalty:
 					serviceEffects?.underfundingHappinessPenaltyPerDay,
-				educationAffinityMultiplier: serviceEffects?.educationAffinityMultiplier,
+				educationAffinityMultiplier:
+					serviceEffects?.educationAffinityMultiplier,
 				healthFloorBonus: serviceEffects?.healthFloorBonus,
 			});
 			person.setIndex(

@@ -1,13 +1,4 @@
 export type {
-	FiscalBudgetShares,
-	FiscalPolicy,
-	FiscalYearSummary,
-	InfrastructureIndices,
-	NationEconomyState,
-	PublicServicesState,
-	ServiceMetrics,
-} from "./types";
-export type {
 	FiscalTickInput,
 	FiscalTickResult,
 	InfrastructureMultipliers,
@@ -32,3 +23,12 @@ export {
 	spendTreasuryForCalamityResponse,
 	taxPressureFromRate,
 } from "./economy";
+export type {
+	FiscalBudgetShares,
+	FiscalPolicy,
+	FiscalYearSummary,
+	InfrastructureIndices,
+	NationEconomyState,
+	PublicServicesState,
+	ServiceMetrics,
+} from "./types";
