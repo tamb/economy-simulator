@@ -4,9 +4,11 @@
  * extractive sub-sector maps to exactly one resource). Fresh water is
  * deliberately *not* one of these: it is modeled as a per-region overlay
  * effect (see `resource-overlays.ts`) rather than a national commodity,
- * because unlike ore or timber it isn't stockpiled/traded — it acts locally,
- * boosting nearby agriculture/livestock yield and regional environment
- * quality directly. See research/resources-and-geography.md.
+ * because it acts locally — boosting nearby agriculture/livestock yield and
+ * regional environment quality — rather than entering the national stockpile
+ * / inter-region flow ledger (Phase 0c/0d). See
+ * research/resources-and-geography.md and
+ * research/stockpiles-flows-and-regional-employment.md.
  */
 
 type ResourceId =

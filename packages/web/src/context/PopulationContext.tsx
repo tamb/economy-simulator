@@ -49,6 +49,10 @@ import {
 } from "../lib/runtime-config";
 import type { Person } from "../models/Person";
 import {
+	loadNationalLedger,
+	saveNationalLedger,
+} from "../repos/national-ledger";
+import {
 	buildPopulationDirectory,
 	getPeopleByIndices,
 	getPersonRangeBatched,
@@ -450,14 +454,29 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			const onsets = pendingCalamityOnsets;
 			const run = await loadGameRunState();
 			if (run && onsets.length > 0) {
-				const next = applyCalamityResponses(
+				const ledger = await loadNationalLedger();
+				const result = applyCalamityResponses(
 					run,
 					onsets.map((onset) => onset.instanceId),
 					response,
 					gameDayRef.current,
+					{ stockpileByResource: ledger?.stockpileByResource ?? {} },
 				);
-				await saveGameRunState(next);
-				setGameRun(next);
+				await saveGameRunState(result.gameRun);
+				setGameRun(result.gameRun);
+				if (ledger && result.didSpendStockpile) {
+					await saveNationalLedger({
+						...ledger,
+						stockpileByResource: result.remainingStockpileByResource,
+						resources: ledger.resources.map((entry) => ({
+							...entry,
+							stockpile:
+								result.remainingStockpileByResource[entry.resourceId] ??
+								entry.stockpile ??
+								0,
+						})),
+					});
+				}
 			}
 			resolveInterrupt();
 		},

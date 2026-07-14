@@ -22,9 +22,12 @@ import {
 	savePopulationMeta as savePopulationMetaRepo,
 } from "economy-simulator-persistence";
 import {
+	applyCalamityStockpileLoss,
+	type CalamityWeightBiasSnapshot,
 	computeAnnualOutcomeForCitizen,
 	computeExpectedImmigrantCount,
 	computeNationScore,
+	computeRegionalCategoryMultipliers,
 	evaluateRunBadges,
 	evaluateWinLose,
 	getCalamityExtractionEfficiency,
@@ -33,6 +36,7 @@ import {
 	getRoleModifiersForCitizen,
 	isWorkingAge,
 	processCalamitiesForDay,
+	stapleSufficiencyFromEntries,
 	syncEmploymentWithAge,
 	syncRoleWithAge,
 } from "economy-simulator-simulation";
@@ -359,6 +363,55 @@ async function runAnnualCycle(
 		Record<string, number>
 	> = {};
 	const industrialWorkersBySubSector: Record<string, number> = {};
+	const populationByRegion: Record<RegionId, number> = {};
+	let logisticsWorkers = 0;
+	let totalWorkers = 0;
+
+	// First pass: population counts for regional employment capacity.
+	for (let cohort = 0; cohort < meta.cohortCount; cohort++) {
+		const chunkCount = getChunkCount(meta.cohortSizes[cohort] ?? 0);
+		for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
+			const chunk = await loadCohortChunk(cohort, chunkIndex);
+			if (!chunk) continue;
+			for (const person of chunk) {
+				if (!person?.isLiving()) continue;
+				const regionId = person.getRegionId();
+				if (!regionId) continue;
+				populationByRegion[regionId] = (populationByRegion[regionId] ?? 0) + 1;
+			}
+		}
+	}
+	const landRegions = regions.filter((region) => region.terrain !== "ocean");
+	const averageLandPopulation =
+		landRegions.length > 0
+			? landRegions.reduce(
+					(sum, region) => sum + (populationByRegion[region.id] ?? 0),
+					0,
+				) / landRegions.length
+			: 1;
+
+	function regionalMultipliersFor(regionId: string | undefined) {
+		if (!regionId) return undefined;
+		const region = regions.find((entry) => entry.id === regionId);
+		if (!region || region.terrain === "ocean") return undefined;
+		return computeRegionalCategoryMultipliers({
+			regionPopulation: populationByRegion[regionId] ?? 0,
+			averageLandPopulation,
+			isCoastal: region.isCoastal,
+			terrain: region.terrain,
+		});
+	}
+
+	function temporaryEmigrationBump(regionId: string | undefined): number {
+		let bump = 0;
+		for (const modifier of gameRun?.temporaryModifiers ?? []) {
+			if (modifier.expiresOnGameDay <= yearEndDay) continue;
+			if (modifier.emigrationProbabilityBump == null) continue;
+			if (modifier.regionId && modifier.regionId !== regionId) continue;
+			bump += modifier.emigrationProbabilityBump;
+		}
+		return bump;
+	}
 
 	function trackWorker(person: Person): void {
 		const categoryId = person.getCategoryId();
@@ -369,9 +422,14 @@ async function runAnnualCycle(
 		if (!roleModifiers.countsAsWorker) return;
 
 		const weight = roleModifiers.efficiencyMultiplier;
+		totalWorkers += weight;
+		const regionId = person.getRegionId();
+
+		if (categoryId === "services" && subSectorId === "transport-logistics") {
+			logisticsWorkers += weight;
+		}
 
 		if (categoryId === "extractive") {
-			const regionId = person.getRegionId();
 			if (!regionId) return;
 			if (!extractiveWorkersByRegionAndSubSector[regionId]) {
 				extractiveWorkersByRegionAndSubSector[regionId] = {};
@@ -415,6 +473,7 @@ async function runAnnualCycle(
 						person.getRegionId(),
 					),
 					settings,
+					regionalMultipliersFor(person.getRegionId()),
 				);
 				person.setCategoryId(employment.categoryId);
 				person.setSubSectorId(employment.subSectorId);
@@ -446,7 +505,9 @@ async function runAnnualCycle(
 						happiness,
 						health,
 						calamityMortalityBump: yearBumps.mortalityBump,
-						calamityEmigrationBump: yearBumps.emigrationBump,
+						calamityEmigrationBump:
+							yearBumps.emigrationBump +
+							temporaryEmigrationBump(person.getRegionId()),
 					},
 					random,
 					settings,
@@ -503,11 +564,16 @@ async function runAnnualCycle(
 	await rewritePopulationChunks(finalPopulation);
 	await clearStaleChunks(meta, nextCohortSizes);
 
+	const priorLedger = await loadNationalLedger();
 	const extraction = runAnnualResourceExtraction({
 		regions,
 		resourceStates,
 		extractiveWorkersByRegionAndSubSector,
 		industrialWorkersBySubSector,
+		populationByRegion,
+		logisticsEmploymentShare:
+			totalWorkers > 0 ? logisticsWorkers / totalWorkers : 0,
+		priorStockpileByResource: priorLedger?.stockpileByResource ?? {},
 		sectorAssignments,
 		settings,
 		getCalamityEfficiency: (regionId, subSectorId) => {
@@ -640,12 +706,47 @@ async function advanceGameDay(
 
 	if (gameRun) {
 		gameRun = pruneExpiredModifiers(gameRun, meta.gameDay);
+
+		const nationalLedgerForBias = await loadNationalLedger();
+		let envTotal = 0;
+		let envCount = 0;
+		let timberTotal = 0;
+		let timberCount = 0;
+		let fossilTotal = 0;
+		let fossilCount = 0;
+		for (const region of regions) {
+			if (region.terrain === "ocean") continue;
+			const state = resourceStates[region.id];
+			if (!state) continue;
+			envTotal += state.environmentQuality;
+			envCount += 1;
+			if (state.reserveOrCapacityByResource.timber != null) {
+				timberTotal += state.reserveOrCapacityByResource.timber;
+				timberCount += 1;
+			}
+			if (state.reserveOrCapacityByResource.fossilFuels != null) {
+				fossilTotal += state.reserveOrCapacityByResource.fossilFuels;
+				fossilCount += 1;
+			}
+		}
+		const lastYear = meta.yearlyStats?.[meta.yearlyStats.length - 1];
+		const weightBiasSnapshot: CalamityWeightBiasSnapshot = {
+			nationalAverageQualityOfLife: lastYear?.averageQualityOfLife ?? 50,
+			nationalAverageEnvironment: envCount > 0 ? envTotal / envCount : 100,
+			stapleSufficiency: stapleSufficiencyFromEntries(
+				nationalLedgerForBias?.resources ?? [],
+			),
+			meanTimberCapacity: timberCount > 0 ? timberTotal / timberCount : 1,
+			meanFossilReserve: fossilCount > 0 ? fossilTotal / fossilCount : 1,
+		};
+
 		const calamityResult = processCalamitiesForDay({
 			run: toCalamityRunSlice(gameRun),
 			gameDay: meta.gameDay,
 			regions: buildCalamityRegionInputs(regions, resourceStates),
 			random,
 			settings,
+			weightBiasSnapshot,
 		});
 		gameRun = mergeCalamityRunSlice(gameRun, calamityResult.run);
 
@@ -699,6 +800,21 @@ async function advanceGameDay(
 			resourceStates = applied.resourceStates;
 			await saveWorldRegions(applied.regions);
 			await saveRegionResourceStates(resourceStates);
+
+			if (nationalLedgerForBias) {
+				let stock = { ...(nationalLedgerForBias.stockpileByResource ?? {}) };
+				for (const onset of calamityResult.onsets) {
+					stock = applyCalamityStockpileLoss(stock, onset.calamity.severity);
+				}
+				await saveNationalLedger({
+					...nationalLedgerForBias,
+					stockpileByResource: stock,
+					resources: nationalLedgerForBias.resources.map((entry) => ({
+						...entry,
+						stockpile: stock[entry.resourceId] ?? entry.stockpile ?? 0,
+					})),
+				});
+			}
 
 			const onsetEvents: GameEvent[] = onsets.map((onset) => ({
 				id: `onset-${onset.instanceId}`,
@@ -1121,6 +1237,8 @@ interface RegionStats {
 	population: number;
 	averageHappiness: number;
 	averageHealth: number;
+	/** Working citizens by economic category (Phase 0b regional job mix). */
+	workersByCategory?: Record<string, number>;
 }
 
 async function computeRegionStats(
@@ -1129,7 +1247,12 @@ async function computeRegionStats(
 	const meta = await loadMeta();
 	const totals = new Map<
 		string,
-		{ population: number; happiness: number; health: number }
+		{
+			population: number;
+			happiness: number;
+			health: number;
+			workersByCategory: Record<string, number>;
+		}
 	>();
 	if (!meta) return new Map();
 
@@ -1149,10 +1272,16 @@ async function computeRegionStats(
 					population: 0,
 					happiness: 0,
 					health: 0,
+					workersByCategory: {},
 				};
 				entry.population += 1;
 				entry.happiness += person.getOverallHappiness() ?? 50;
 				entry.health += person.getOverallHealth() ?? 50;
+				const categoryId = person.getCategoryId();
+				if (categoryId && person.getSubSectorId()) {
+					entry.workersByCategory[categoryId] =
+						(entry.workersByCategory[categoryId] ?? 0) + 1;
+				}
 				totals.set(regionId, entry);
 			}
 		}
@@ -1164,6 +1293,7 @@ async function computeRegionStats(
 			population: entry.population,
 			averageHappiness: entry.happiness / entry.population,
 			averageHealth: entry.health / entry.population,
+			workersByCategory: entry.workersByCategory,
 		});
 	}
 	return stats;

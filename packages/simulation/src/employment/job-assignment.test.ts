@@ -76,6 +76,16 @@ describe("assignJobSector", () => {
 		const withoutFilter = assignJobSector(() => 0, undefined);
 		expect(withFilter).toEqual(withoutFilter);
 	});
+
+	it("shifts non-extractive odds when category multipliers are supplied", () => {
+		const industrialHeavy = assignJobSector(() => 0.35, undefined, {
+			industrial: 5,
+			services: 0.1,
+			knowledge: 0.1,
+			command: 0.1,
+		});
+		expect(industrialHeavy.categoryId).toBe("industrial");
+	});
 });
 
 describe("isWorkingAge", () => {

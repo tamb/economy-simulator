@@ -9,6 +9,7 @@ import {
 import {
 	assignJobSector,
 	assignRoleForCitizen,
+	computeRegionalCategoryMultipliers,
 	isWorkingAge,
 } from "economy-simulator-simulation";
 import type { FaceId } from "../lib/faces";
@@ -120,9 +121,19 @@ function generatePerson(
 	assignTraits(person, config.traits, traitPoints);
 
 	if (isWorkingAge(person.getAge() ?? 0)) {
+		const home = homes.find((region) => region.id === person.getRegionId());
+		const multipliers = home
+			? computeRegionalCategoryMultipliers({
+					regionPopulation: 1,
+					averageLandPopulation: 1,
+					isCoastal: home.isCoastal,
+					terrain: home.terrain,
+				})
+			: undefined;
 		const job = assignJobSector(
 			random,
 			getViableExtractiveSubSectorIdsForRegion(regions, person.getRegionId()),
+			multipliers,
 		);
 		person.setCategoryId(job.categoryId);
 		person.setSubSectorId(job.subSectorId);

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { computeNationalLedger } from "./national-ledger";
+import {
+	applyCalamityStockpileLoss,
+	computeNationalLedger,
+	spendStockpileForCalamityResponse,
+} from "./national-ledger";
 
 describe("computeNationalLedger", () => {
 	it("sums production for a resource across multiple regions", () => {
@@ -14,6 +18,7 @@ describe("computeNationalLedger", () => {
 			(entry) => entry.resourceId === "stone",
 		);
 		expect(stone?.production).toBe(15);
+		expect(stone?.stockpile).toBe(15);
 	});
 
 	it("computes demand from industrial worker counts and resource requirements", () => {
@@ -42,7 +47,7 @@ describe("computeNationalLedger", () => {
 		expect(crops?.sufficiency).toBe(Number.POSITIVE_INFINITY);
 	});
 
-	it("computes sufficiency as production over demand", () => {
+	it("computes sufficiency as available supply over demand", () => {
 		const ledger = computeNationalLedger({
 			production: [{ resourceId: "fossilFuels", amount: 35 }],
 			industrialWorkersBySubSector: { utilities: 100 }, // demand = 0.7 * 100 = 70
@@ -51,6 +56,35 @@ describe("computeNationalLedger", () => {
 			(entry) => entry.resourceId === "fossilFuels",
 		);
 		expect(fossilFuels?.sufficiency).toBeCloseTo(0.5, 10);
+	});
+
+	it("draws prior stockpile before applying shortfall", () => {
+		const ledger = computeNationalLedger({
+			production: [{ resourceId: "fossilFuels", amount: 35 }],
+			industrialWorkersBySubSector: { utilities: 100 },
+			priorStockpileByResource: { fossilFuels: 40 },
+		});
+		const fossilFuels = ledger.resources.find(
+			(entry) => entry.resourceId === "fossilFuels",
+		);
+		expect(fossilFuels?.stockpileDrawn).toBe(35);
+		expect(fossilFuels?.sufficiency).toBeCloseTo(1, 10);
+		expect(fossilFuels?.stockpile).toBeCloseTo(5, 10);
+		expect(ledger.shortfallHappinessPenaltyBySubSector.utilities).toBe(0);
+	});
+
+	it("carries surplus production into stockpile", () => {
+		const ledger = computeNationalLedger({
+			production: [{ resourceId: "crops", amount: 200 }],
+			industrialWorkersBySubSector: { "food-processing": 10 },
+			priorStockpileByResource: { crops: 10 },
+		});
+		const crops = ledger.resources.find(
+			(entry) => entry.resourceId === "crops",
+		);
+		expect(crops?.stockpileAdded).toBeGreaterThan(0);
+		expect(crops?.stockpile).toBeGreaterThan(10);
+		expect(crops?.coverageDays).not.toBeNull();
 	});
 
 	it("applies no shortfall penalty when every required resource is sufficient", () => {
@@ -114,5 +148,26 @@ describe("computeNationalLedger", () => {
 		expect(
 			ledger.resources.find((entry) => entry.resourceId === "stone"),
 		).toBeUndefined();
+	});
+});
+
+describe("stockpile spend and loss", () => {
+	it("destroys a severity-scaled fraction on calamity onset", () => {
+		const next = applyCalamityStockpileLoss(
+			{ crops: 100, timber: 50 },
+			"severe",
+		);
+		expect(next.crops).toBeLessThan(100);
+		expect(next.timber).toBeLessThan(50);
+	});
+
+	it("spends a fraction on relief and leaves endure untouched", () => {
+		const relief = spendStockpileForCalamityResponse({ crops: 100 }, "relief");
+		expect(relief.didSpend).toBe(true);
+		expect(relief.remainingByResource.crops).toBeLessThan(100);
+
+		const endure = spendStockpileForCalamityResponse({ crops: 100 }, "endure");
+		expect(endure.didSpend).toBe(false);
+		expect(endure.remainingByResource.crops).toBe(100);
 	});
 });

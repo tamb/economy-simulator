@@ -439,7 +439,19 @@
 				"severe": 0.5
 			},
 			"scope": "regional"
-		}
+		},
+		"cascades": [
+			{
+				"calamityId": "disease",
+				"chance": 0.22,
+				"minSeverity": "moderate"
+			},
+			{
+				"calamityId": "landslide",
+				"chance": 0.12,
+				"minSeverity": "severe"
+			}
+		]
 	},
 	{
 		"id": "flash_flood",
@@ -717,7 +729,14 @@
 				"severe": 0.2
 			},
 			"scope": "regional"
-		}
+		},
+		"cascades": [
+			{
+				"calamityId": "flood",
+				"chance": 0.28,
+				"minSeverity": "moderate"
+			}
+		]
 	},
 	{
 		"id": "tornado",

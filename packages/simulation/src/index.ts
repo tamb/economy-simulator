@@ -17,6 +17,12 @@ export {
 	regionMatchesFilter,
 	selectTargetRegions,
 } from "./calamities/calamity-engine";
+export type { CalamityWeightBiasSnapshot } from "./calamities/weight-bias";
+export {
+	biasedCalamityWeight,
+	getCalamityWeightMultiplier,
+	stapleSufficiencyFromEntries,
+} from "./calamities/weight-bias";
 export type { JobAssignment, RandomFn } from "./employment/job-assignment";
 export {
 	assignJobSector,
@@ -31,6 +37,11 @@ export {
 	isEligibleLaborEdictWorker,
 	selectLaborEdictCandidates,
 } from "./employment/labor-edict";
+export type { RegionalCapacityInput } from "./employment/regional-capacity";
+export {
+	computeRegionalCategoryMultipliers,
+	terrainAffinity,
+} from "./employment/regional-capacity";
 export {
 	assignRoleForCitizen,
 	getRoleModifiersForCitizen,
@@ -105,13 +116,26 @@ export {
 } from "./resources/extraction-yield";
 export type { FiniteDepletionResult } from "./resources/finite-depletion";
 export { applyFiniteDepletion } from "./resources/finite-depletion";
+export { axialDistance } from "./resources/hex-distance";
+export type {
+	FlowRegion,
+	InterRegionFlowInput,
+	InterRegionFlowResult,
+	RegionalFlowBalance,
+	RegionalResourceAmount,
+} from "./resources/inter-region-flows";
+export { computeInterRegionFlows } from "./resources/inter-region-flows";
 export type {
 	NationalLedger,
 	NationalLedgerInput,
 	RegionalProduction,
 	ResourceLedgerEntry,
 } from "./resources/national-ledger";
-export { computeNationalLedger } from "./resources/national-ledger";
+export {
+	applyCalamityStockpileLoss,
+	computeNationalLedger,
+	spendStockpileForCalamityResponse,
+} from "./resources/national-ledger";
 export type { RenewableRegenerationResult } from "./resources/renewable-regeneration";
 export { applyRenewableYear } from "./resources/renewable-regeneration";
 export {

@@ -264,6 +264,30 @@ function CountryMapPage() {
 											No citizens currently call this region home.
 										</p>
 									)}
+									{selectedStats &&
+										Object.keys(selectedStats.workersByCategory ?? {}).length >
+											0 && (
+											<div className="mt-3 space-y-1">
+												<h4 className="font-label text-[10px] text-muted-foreground tracking-overline">
+													Job mix
+												</h4>
+												<dl className="space-y-1 text-sm">
+													{Object.entries(selectedStats.workersByCategory ?? {})
+														.sort((a, b) => b[1] - a[1])
+														.map(([categoryId, count]) => (
+															<div
+																key={categoryId}
+																className="flex items-center justify-between gap-4"
+															>
+																<dt className="text-muted-foreground capitalize">
+																	{categoryId}
+																</dt>
+																<dd>{count.toLocaleString()}</dd>
+															</div>
+														))}
+												</dl>
+											</div>
+										)}
 								</div>
 							)}
 

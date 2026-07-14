@@ -61,6 +61,11 @@ interface TemporaryRunModifier {
 	expiresOnGameDay: number;
 	extractionEfficiencyFactor?: number;
 	nextCalamityHappinessScale?: number;
+	/**
+	 * Absolute annual emigration probability bump while this modifier is
+	 * active (Phase 0a — weekly `emigrationRisk` Endure choices).
+	 */
+	emigrationProbabilityBump?: number;
 }
 
 interface YearlyNationScore {

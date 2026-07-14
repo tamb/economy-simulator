@@ -59,9 +59,14 @@ vi.mock("../repos/national-ledger", () => ({
 				production: 100,
 				demand: 80,
 				sufficiency: 1.25,
+				stockpile: 20,
+				stockpileDrawn: 0,
+				stockpileAdded: 20,
+				coverageDays: 91,
 			},
 		],
 		shortfallHappinessPenaltyBySubSector: {},
+		stockpileByResource: { crops: 20 },
 	})),
 }));
 

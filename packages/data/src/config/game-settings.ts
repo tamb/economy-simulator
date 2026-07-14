@@ -86,6 +86,14 @@ const gameSettings = {
 			qolThreshold: 35,
 			/** Emigration probability a citizen approaches as QoL nears zero. */
 			maxAnnualProbability: 0.15,
+			/**
+			 * Absolute annual emigration probability added when the player
+			 * chooses an Endure-style weekly option (`emigrationRisk`).
+			 * Applied via a temporary run modifier until expiry.
+			 */
+			weeklyRiskProbabilityBump: 0.04,
+			/** How long the weekly emigration-risk modifier lasts (game days). */
+			weeklyRiskDurationDays: 21,
 		},
 		immigration: {
 			/** National average QoL at which immigration sits at the baseline rate (no bonus/penalty). */
@@ -148,12 +156,96 @@ const gameSettings = {
 			/** Sufficiency ratio (production / demand) at or above which a resource is considered fully sufficient (no shortfall penalty). */
 			sufficiencyThreshold: 1.0,
 		},
+		/**
+		 * National buffer / strategic stockpiles (Phase 0c). See
+		 * research/stockpiles-flows-and-regional-employment.md. Magnitudes
+		 * are designed balance informed by IEA/FAO order-of-magnitude
+		 * coverage heuristics — not hard win conditions.
+		 */
+		stockpile: {
+			/** Soft UI / mandate target: days of demand coverage by resource family. */
+			targetCoverageDays: {
+				crops: 60,
+				livestock: 60,
+				fish: 45,
+				fossilFuels: 90,
+				metalOre: 30,
+				stone: 30,
+				timber: 30,
+			},
+			/** Fraction of national stock destroyed on calamity onset by severity. */
+			calamityLossFractionBySeverity: {
+				minor: 0.05,
+				moderate: 0.12,
+				severe: 0.22,
+			},
+			/** Share of current stockpile spent when choosing Relief (per onset). */
+			reliefSpendFraction: 0.08,
+			/** Share of current stockpile spent when choosing Rebuild (per onset). */
+			rebuildSpendFraction: 0.12,
+			/**
+			 * Extra multiplicative blunt to happinessPenaltyScale when Relief
+			 * successfully spends stock (stacked on the base response scale).
+			 */
+			reliefStockpileBlunt: 0.85,
+			/** Extra multiplicative blunt to extractionHitScale when Rebuild spends stock. */
+			rebuildStockpileBlunt: 0.85,
+			/** Minimum total stockpile units required before Relief/Rebuild spend applies. */
+			minSpendableTotal: 1,
+		},
+		/**
+		 * Domestic inter-region resource flows (Phase 0d). Gravity-style
+		 * friction from hex distance; logistics employment reduces friction.
+		 * Infrastructure capacity hook reserved for Phase 1a (defaults to 1).
+		 */
+		flows: {
+			/** Ad-valorem-like friction added per hex step between surplus and deficit. */
+			baseFrictionPerHex: 0.07,
+			/** Cap on transfer friction (1 = nothing arrives). */
+			maxFriction: 0.85,
+			/**
+			 * How much national transport-logistics employment share (0–1)
+			 * reduces effective friction (1 = full reduction of the logistics term).
+			 */
+			logisticsFrictionReduction: 0.45,
+			/** Employment share of transport-logistics at which logistics relief saturates. */
+			logisticsSaturationShare: 0.04,
+			/** Phase 1a infrastructure throughput multiplier hook (1 = no effect yet). */
+			infrastructureCapacityMultiplier: 1,
+		},
+	},
+
+	/**
+	 * Regional employment capacity for non-extractive categories (Phase 0b).
+	 * Extractive work remains biome/overlay-gated; industrial/services/
+	 * knowledge/command shares vary by density, coast, and terrain.
+	 */
+	employment: {
+		regional: {
+			/** How strongly relative population density shifts non-extractive shares. */
+			densityWeight: 0.45,
+			/** Industrial share bonus for coastal land tiles. */
+			coastalIndustrialBonus: 0.3,
+			/** Services share bonus for coastal land tiles. */
+			coastalServicesBonus: 0.12,
+			/** Knowledge share bonus in denser-than-average regions. */
+			densityKnowledgeBonus: 0.2,
+			/** Floor / ceiling on category employment-share multipliers. */
+			minCapacityMultiplier: 0.35,
+			maxCapacityMultiplier: 2.25,
+			/**
+			 * Max fraction of a labor edict's movers that may come from
+			 * outside the densest source regions when reassigning into
+			 * industrial/services/knowledge/command (sticky labor).
+			 */
+			laborEdictCrossRegionShareCap: 0.45,
+		},
 	},
 
 	/**
 	 * Calamity (nation debuff) tunables. Catalog definitions live in
 	 * `packages/data/src/calamities/catalog/*.json`; this block only
-	 * controls frequency, stacking, and which tiers are eligible to roll.
+	 * controls frequency, stacking, bias, and which tiers are eligible.
 	 */
 	calamities: {
 		/**
@@ -178,6 +270,30 @@ const gameSettings = {
 		enabledTiers: ["v1", "v1.5", "v2"] as const,
 		/** Cap cascade spawns from a single primary onset. */
 		maxCascadesPerOnset: 2,
+		/**
+		 * World-state weight bias (Phase 0e). Multipliers apply on top of
+		 * static catalog weights. Social/political calamities remain QoL
+		 * debuffs until Phase 2 politics — bias only changes onset odds.
+		 */
+		bias: {
+			/** Timber capacity fraction at or below which fire weights rise. */
+			timberStressCapacityThreshold: 0.55,
+			/** Max multiplier on forest_fire / accidental_fire when timber is stressed. */
+			timberFireWeightMultiplier: 2.4,
+			/** National average QoL at or below which food_riot / labor_strike rise. */
+			lowQolThreshold: 40,
+			/** Max multiplier on social unrest calamities under low QoL. */
+			lowQolSocialWeightMultiplier: 2.2,
+			/** Staple (crops/livestock/fish) sufficiency at or below which food_riot rises. */
+			foodSufficiencyThreshold: 0.75,
+			foodRiotWeightMultiplier: 2.0,
+			/** Environment quality (0–100 national mean) at or below which disease rises. */
+			lowEnvironmentThreshold: 45,
+			diseaseWeightMultiplier: 1.7,
+			/** Fossil-fuel reserve stress → well_blowout / oil_spill weight. */
+			fossilStressReserveThreshold: 0.5,
+			fossilAccidentWeightMultiplier: 1.8,
+		},
 	},
 
 	/** Nation scoring, win/lose thresholds, and badge-related balance. */

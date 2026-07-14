@@ -25,9 +25,10 @@ describe("resource-ledger-dashboard", () => {
 		});
 
 		expect(data.labels).toEqual(["Crops", "Metal Ore"]);
-		expect(data.datasets).toHaveLength(2);
+		expect(data.datasets).toHaveLength(3);
 		expect(data.datasets[0]?.data).toEqual([120, 10]);
 		expect(data.datasets[1]?.data).toEqual([80, 50]);
+		expect(data.datasets[2]?.data).toEqual([0, 0]);
 	});
 
 	it("builds sufficiency chart data only for resources with demand", () => {

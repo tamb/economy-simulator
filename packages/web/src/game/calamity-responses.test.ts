@@ -26,14 +26,17 @@ describe("applyCalamityResponses", () => {
 		run.phase = "active";
 		run.activeCalamities = [sampleCalamity()];
 
-		const next = applyCalamityResponses(run, ["c1"], "relief", 10);
-		const calamity = next.activeCalamities[0];
+		const result = applyCalamityResponses(run, ["c1"], "relief", 10);
+		const calamity = result.gameRun.activeCalamities[0];
 		expect(calamity?.playerResponse).toBe("relief");
 		expect(calamity?.happinessPenaltyScale).toBe(0.55);
 		expect(calamity?.midTermEndsOnGameDay).toBeLessThan(50);
 		expect(
-			next.eventLog.some((event) => event.type === "calamity_response"),
+			result.gameRun.eventLog.some(
+				(event) => event.type === "calamity_response",
+			),
 		).toBe(true);
+		expect(result.didSpendStockpile).toBe(false);
 	});
 
 	it("reduces extraction hit for rebuild", () => {
@@ -41,8 +44,26 @@ describe("applyCalamityResponses", () => {
 		run.phase = "active";
 		run.activeCalamities = [sampleCalamity()];
 
-		const next = applyCalamityResponses(run, ["c1"], "rebuild", 10);
-		expect(next.activeCalamities[0]?.extractionHitScale).toBe(0.45);
-		expect(next.activeCalamities[0]?.happinessPenaltyScale).toBe(1.15);
+		const result = applyCalamityResponses(run, ["c1"], "rebuild", 10);
+		expect(result.gameRun.activeCalamities[0]?.extractionHitScale).toBe(0.45);
+		expect(result.gameRun.activeCalamities[0]?.happinessPenaltyScale).toBe(
+			1.15,
+		);
+	});
+
+	it("spends stockpile on relief and further blunts happiness scale", () => {
+		const run = createInitialGameRunState(1000);
+		run.phase = "active";
+		run.activeCalamities = [sampleCalamity()];
+
+		const result = applyCalamityResponses(run, ["c1"], "relief", 10, {
+			stockpileByResource: { crops: 100, timber: 50 },
+		});
+		expect(result.didSpendStockpile).toBe(true);
+		expect(result.totalStockpileSpent).toBeGreaterThan(0);
+		expect(result.remainingStockpileByResource.crops).toBeLessThan(100);
+		expect(
+			result.gameRun.activeCalamities[0]?.happinessPenaltyScale,
+		).toBeLessThan(0.55);
 	});
 });

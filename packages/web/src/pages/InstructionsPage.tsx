@@ -151,19 +151,19 @@ function InstructionsPage() {
 					<li>
 						Fires, storms, quakes, disease, and other shocks can strike regions
 						during a run. New calamities interrupt time advances — choose{" "}
-						<strong>Relief</strong>, <strong>Rebuild</strong>, or{" "}
-						<strong>Endure</strong>. Active ones appear as nation debuffs and
-						pulse on the map.
+						<strong>Relief</strong> or <strong>Rebuild</strong> (spending
+						national stockpile when available) or <strong>Endure</strong>.
+						Active ones appear as nation debuffs and pulse on the map.
 					</li>
 					<li>
 						Expect at least one primary calamity every{" "}
-						<strong>28-day month</strong>, with more frequent rolls than early
-						builds.
+						<strong>28-day month</strong>. Over-extracted timber, low QoL, and
+						thin food stocks raise the odds of related disasters.
 					</li>
 					<li>
-						Each calamity has an immediate hit (reserves, environment), a
-						mid-term drag on production and happiness, and a quieter long-term
-						scar after the banner clears.
+						Each calamity has an immediate hit (reserves, environment,
+						stockpile), a mid-term drag on production and happiness, and a
+						quieter long-term scar after the banner clears.
 					</li>
 					<li>
 						Score still comes from QoL, growth, resources, and environment —
@@ -173,12 +173,32 @@ function InstructionsPage() {
 				</ul>
 			</CollapsibleSection>
 
+			<CollapsibleSection title="Stockpiles and domestic flows">
+				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+					<li>
+						Annual extraction fills a <strong>national stockpile</strong>.
+						Industrial demand draws it down before shortfall penalties apply.
+						Dashboards → Resource Ledger shows stock and days of coverage.
+					</li>
+					<li>
+						Surplus provinces supply deficit ones with friction from distance.
+						<strong> Transport &amp; logistics</strong> employment reduces that
+						friction.
+					</li>
+					<li>
+						Industrial and service jobs cluster by coast, terrain, and density —
+						inspect a map tile's job mix to see the regional employment pattern.
+					</li>
+				</ul>
+			</CollapsibleSection>
+
 			<CollapsibleSection title="Weekly reports and inner circle">
 				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
 					<li>
 						Every <strong>7 days</strong> a weekly region report lists the
 						worst-performing provinces. Choose an investment, compromise, or
-						endure option for the primary region.
+						endure option for the primary region. Endure-style picks can raise
+						short-term emigration risk.
 					</li>
 					<li>
 						Twice per <strong>28-day month</strong> (days 14 and 28) an

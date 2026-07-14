@@ -25,7 +25,10 @@ interface WeeklyChoiceEffect {
 	calamityHappinessScale?: number;
 	/** Percent of workers to evacuate from extractive jobs in the region. */
 	evacuateLaborPercent?: number;
-	/** Emigration risk flag for the next weekly cycle (dispatch only in v1). */
+	/**
+	 * When true, apply a short-lived regional emigration probability bump
+	 * (see `GameSettings.population.emigration.weeklyRisk*`).
+	 */
 	emigrationRisk?: boolean;
 }
 

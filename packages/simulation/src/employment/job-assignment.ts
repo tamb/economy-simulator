@@ -19,23 +19,36 @@ type RandomFn = () => number;
  *
  * When `viableExtractiveSubSectorIds` is supplied (region-aware assignment
  * — see `economy-simulator-data`'s `getViableExtractiveSubSectorIds`), only
- * "extractive" entries whose sub-sector is in that list remain eligible;
- * every other category is unaffected (non-extractive work stays
- * country-wide, per the confirmed scope). A region whose terrain supports no
- * extractive sub-sector at all (e.g. a non-coastal, overlay-less desert)
- * simply removes "extractive" from the pool entirely — its citizens are
- * assigned one of the other four categories instead.
+ * "extractive" entries whose sub-sector is in that list remain eligible.
+ * Optional `categoryMultipliers` (Phase 0b) scale non-extractive category
+ * shares by province capacity (density / coast / terrain). A region whose
+ * terrain supports no extractive sub-sector at all simply removes
+ * "extractive" from the pool.
  */
 function assignJobSector(
 	random: RandomFn = Math.random,
 	viableExtractiveSubSectorIds?: readonly string[],
+	categoryMultipliers?: Partial<Record<CategoryId, number>>,
 ): JobAssignment {
-	const weighted = getAllSubSectorEmploymentShares().filter((entry) => {
-		if (entry.categoryId !== "extractive" || !viableExtractiveSubSectorIds) {
-			return true;
-		}
-		return viableExtractiveSubSectorIds.includes(entry.subSectorId);
-	});
+	const weighted = getAllSubSectorEmploymentShares()
+		.filter((entry) => {
+			if (entry.categoryId !== "extractive" || !viableExtractiveSubSectorIds) {
+				return true;
+			}
+			return viableExtractiveSubSectorIds.includes(entry.subSectorId);
+		})
+		.map((entry) => {
+			const multiplier =
+				entry.categoryId === "extractive"
+					? 1
+					: (categoryMultipliers?.[entry.categoryId] ?? 1);
+			return {
+				...entry,
+				employmentShare: entry.employmentShare * Math.max(0, multiplier),
+			};
+		})
+		.filter((entry) => entry.employmentShare > 0);
+
 	const total = weighted.reduce((sum, entry) => sum + entry.employmentShare, 0);
 
 	if (weighted.length === 0 || total <= 0) {
@@ -86,6 +99,7 @@ function syncEmploymentWithAge(
 	random: RandomFn = Math.random,
 	viableExtractiveSubSectorIds?: readonly string[],
 	settings: GameSettings = gameSettings,
+	categoryMultipliers?: Partial<Record<CategoryId, number>>,
 ): EmploymentState {
 	if (!isWorkingAge(age, settings)) {
 		return { categoryId: undefined, subSectorId: undefined };
@@ -95,7 +109,11 @@ function syncEmploymentWithAge(
 		return current;
 	}
 
-	const job = assignJobSector(random, viableExtractiveSubSectorIds);
+	const job = assignJobSector(
+		random,
+		viableExtractiveSubSectorIds,
+		categoryMultipliers,
+	);
 	return { categoryId: job.categoryId, subSectorId: job.subSectorId };
 }
 

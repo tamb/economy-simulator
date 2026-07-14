@@ -15,11 +15,15 @@ interface LaborEdictCandidate {
 
 /**
  * Pick which workers in a source sector will be reassigned by a labor edict.
+ * When `crossRegionShareCap` is set (Phase 0b), at most that fraction of
+ * selected movers may come from outside the modal (most common) source
+ * region — labor is sticky across provinces.
  */
 function selectLaborEdictCandidates(
 	candidates: LaborEdictCandidate[],
 	percent: number,
 	random: () => number,
+	crossRegionShareCap?: number,
 ): Set<string> {
 	const count = Math.floor((candidates.length * Math.max(0, percent)) / 100);
 	if (count <= 0) return new Set();
@@ -30,10 +34,43 @@ function selectLaborEdictCandidates(
 		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
 	}
 
+	if (crossRegionShareCap == null || crossRegionShareCap >= 1) {
+		return new Set(
+			shuffled
+				.slice(0, count)
+				.map((entry) => `${entry.cohort}:${entry.chunkIndex}:${entry.offset}`),
+		);
+	}
+
+	const regionCounts = new Map<string, number>();
+	for (const entry of candidates) {
+		const key = entry.regionId ?? "";
+		regionCounts.set(key, (regionCounts.get(key) ?? 0) + 1);
+	}
+	let homeRegionId = "";
+	let homeCount = -1;
+	for (const [regionId, regionCount] of regionCounts) {
+		if (regionCount > homeCount) {
+			homeRegionId = regionId;
+			homeCount = regionCount;
+		}
+	}
+
+	const maxCross = Math.floor(count * Math.max(0, crossRegionShareCap));
+	const selected: LaborEdictCandidate[] = [];
+	let crossCount = 0;
+	for (const entry of shuffled) {
+		if (selected.length >= count) break;
+		const isCross = (entry.regionId ?? "") !== homeRegionId;
+		if (isCross && crossCount >= maxCross) continue;
+		selected.push(entry);
+		if (isCross) crossCount += 1;
+	}
+
 	return new Set(
-		shuffled
-			.slice(0, count)
-			.map((entry) => `${entry.cohort}:${entry.chunkIndex}:${entry.offset}`),
+		selected.map(
+			(entry) => `${entry.cohort}:${entry.chunkIndex}:${entry.offset}`,
+		),
 	);
 }
 
