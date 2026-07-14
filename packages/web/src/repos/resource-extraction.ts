@@ -5,6 +5,7 @@ import {
 	getBiome,
 	getEconomicSystemEffect,
 	getResourceForSubSector,
+	getResourceRequirement,
 	getViableExtractiveSubSectorIds,
 	type ResourceId,
 } from "economy-simulator-data";
@@ -15,10 +16,12 @@ import {
 	computeExtractionIntensity,
 	computeExtractionYield,
 	computeFiniteYieldMultiplier,
+	computeInterRegionFlows,
 	computeNationalLedger,
 	computeRenewableYieldMultiplier,
 	type ExtractionEnvironmentEntry,
 	getBaseYieldPerWorker,
+	type InterRegionFlowResult,
 	type NationalLedger,
 	type RegionalProduction,
 } from "economy-simulator-simulation";
@@ -40,6 +43,12 @@ interface RunAnnualResourceExtractionInput {
 	>;
 	/** Industrial sub-sector id -> assigned worker count this year. */
 	industrialWorkersBySubSector: Record<string, number>;
+	/** Region id -> living population (for domestic flow demand shares). */
+	populationByRegion?: Record<RegionId, number>;
+	/** National employment share in transport-logistics (0–1). */
+	logisticsEmploymentShare?: number;
+	/** Prior-year stockpile carry-over. */
+	priorStockpileByResource?: Partial<Record<ResourceId, number>>;
 	sectorAssignments: SectorAssignments;
 	settings?: GameSettings;
 	/** Optional calamity extraction efficiency lookup (regionId, subSectorId) -> multiplier. */
@@ -51,22 +60,25 @@ interface RunAnnualResourceExtractionResult {
 	regions: WorldRegion[];
 	resourceStates: Record<RegionId, RegionResourceState>;
 	ledger: NationalLedger;
+	flows: InterRegionFlowResult | null;
 }
 
 /**
  * One game year's national resource-extraction pass: for every region, walks
- * its viable extractive sub-sectors, computes each one's yield (base yield x
- * reserve/capacity multiplier x economic-system efficiency), applies
- * depletion/regeneration, degrades the tile's terrain if it crossed the
- * configured threshold, and updates regional environment quality — then
- * aggregates every region's production into the national ledger. See
- * research/resources-and-geography.md §5.
+ * its viable extractive sub-sectors, computes each one's yield, applies
+ * depletion/regeneration, then runs domestic inter-region flows and the
+ * national ledger with stockpile carry-over. See
+ * research/resources-and-geography.md §5 and
+ * research/stockpiles-flows-and-regional-employment.md.
  */
 function runAnnualResourceExtraction({
 	regions,
 	resourceStates,
 	extractiveWorkersByRegionAndSubSector,
 	industrialWorkersBySubSector,
+	populationByRegion = {},
+	logisticsEmploymentShare = 0,
+	priorStockpileByResource = {},
 	sectorAssignments,
 	settings = gameSettings,
 	getCalamityEfficiency,
@@ -130,7 +142,11 @@ function runAnnualResourceExtraction({
 				),
 			});
 			if (amount > 0) {
-				production.push({ resourceId: resource.id, amount });
+				production.push({
+					resourceId: resource.id,
+					regionId: region.id,
+					amount,
+				});
 			}
 
 			const extractionIntensity = computeExtractionIntensity(
@@ -179,12 +195,57 @@ function runAnnualResourceExtraction({
 		nextRegions.push(degradesTo ? { ...region, terrain: degradesTo } : region);
 	}
 
+	const demandByResource: Partial<Record<ResourceId, number>> = {};
+	for (const [subSectorId, workers] of Object.entries(
+		industrialWorkersBySubSector,
+	)) {
+		const requirement = getResourceRequirement(subSectorId);
+		if (!requirement || workers <= 0) continue;
+		for (const [resourceId, perWorkerAmount] of Object.entries(
+			requirement.inputs,
+		) as [ResourceId, number][]) {
+			demandByResource[resourceId] =
+				(demandByResource[resourceId] ?? 0) + perWorkerAmount * workers;
+		}
+	}
+
+	const landRegions = regions.filter((region) => region.terrain !== "ocean");
+	const flows =
+		landRegions.length > 0 && production.length > 0
+			? computeInterRegionFlows({
+					regions: landRegions.map((region) => ({
+						id: region.id,
+						q: region.q,
+						r: region.r,
+						population: populationByRegion[region.id] ?? 0,
+					})),
+					production: production.map((entry) => ({
+						regionId: entry.regionId ?? "",
+						resourceId: entry.resourceId,
+						amount: entry.amount,
+					})),
+					demandByResource,
+					logisticsEmploymentShare,
+					settings,
+				})
+			: null;
+
 	const ledger = computeNationalLedger(
-		{ production, industrialWorkersBySubSector },
+		{
+			production,
+			industrialWorkersBySubSector,
+			priorStockpileByResource,
+			effectiveProductionByResource: flows?.effectiveProductionByResource,
+		},
 		settings,
 	);
 
-	return { regions: nextRegions, resourceStates: nextResourceStates, ledger };
+	return {
+		regions: nextRegions,
+		resourceStates: nextResourceStates,
+		ledger,
+		flows,
+	};
 }
 
 export type {

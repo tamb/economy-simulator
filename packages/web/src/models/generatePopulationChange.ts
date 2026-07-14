@@ -1,7 +1,8 @@
-import { gameSettings, sectorKey } from "economy-simulator-data";
+import { gameSettings, isLand, sectorKey } from "economy-simulator-data";
 import {
 	assignJobSector,
 	assignRoleForCitizen,
+	computeRegionalCategoryMultipliers,
 	isWorkingAge,
 } from "economy-simulator-simulation";
 import type { FaceId } from "../lib/faces";
@@ -57,12 +58,25 @@ function generateImmigrantPerson(
 	immigrant.setAge(age);
 
 	if (isWorkingAge(age)) {
+		const home = regions.find(
+			(region) =>
+				region.id === immigrant.getRegionId() && isLand(region.terrain),
+		);
+		const multipliers = home
+			? computeRegionalCategoryMultipliers({
+					regionPopulation: 1,
+					averageLandPopulation: 1,
+					isCoastal: home.isCoastal,
+					terrain: home.terrain,
+				})
+			: undefined;
 		const job = assignJobSector(
 			random,
 			getViableExtractiveSubSectorIdsForRegion(
 				regions,
 				immigrant.getRegionId(),
 			),
+			multipliers,
 		);
 		immigrant.setCategoryId(job.categoryId);
 		immigrant.setSubSectorId(job.subSectorId);

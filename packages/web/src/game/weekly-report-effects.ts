@@ -1,4 +1,4 @@
-import type { WeeklyChoiceEffect } from "economy-simulator-data";
+import { gameSettings, type WeeklyChoiceEffect } from "economy-simulator-data";
 import {
 	appendGameEvents,
 	type GameRunState,
@@ -210,6 +210,17 @@ async function applyWeeklyChoiceEffects(input: {
 				};
 			}),
 		};
+	}
+
+	if (input.effects.emigrationRisk) {
+		const { weeklyRiskDurationDays, weeklyRiskProbabilityBump } =
+			gameSettings.population.emigration;
+		gameRun = pushTemporaryModifier(gameRun, {
+			id: `weekly-emigration-${input.gameDay}-${input.regionId}`,
+			regionId: input.regionId,
+			expiresOnGameDay: input.gameDay + weeklyRiskDurationDays,
+			emigrationProbabilityBump: weeklyRiskProbabilityBump,
+		});
 	}
 
 	gameRun = appendGameEvents(gameRun, [

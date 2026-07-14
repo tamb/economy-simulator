@@ -127,6 +127,7 @@ async function applyLaborEdict(input: {
 		candidates,
 		input.percent,
 		random,
+		settings.employment.regional.laborEdictCrossRegionShareCap,
 	);
 	let affected = 0;
 

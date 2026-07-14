@@ -92,4 +92,20 @@ describe("gameSettings", () => {
 		expect(ledger.maxShortfallHappinessPenaltyPerDay).toBeGreaterThan(0);
 		expect(ledger.sufficiencyThreshold).toBeGreaterThan(0);
 	});
+
+	it("defines stockpile, flow, regional employment, and calamity bias tunables", () => {
+		expect(
+			gameSettings.resources.stockpile.targetCoverageDays.fossilFuels,
+		).toBe(90);
+		expect(gameSettings.resources.flows.baseFrictionPerHex).toBeGreaterThan(0);
+		expect(
+			gameSettings.employment.regional.minCapacityMultiplier,
+		).toBeGreaterThan(0);
+		expect(
+			gameSettings.population.emigration.weeklyRiskProbabilityBump,
+		).toBeGreaterThan(0);
+		expect(
+			gameSettings.calamities.bias.timberFireWeightMultiplier,
+		).toBeGreaterThan(1);
+	});
 });

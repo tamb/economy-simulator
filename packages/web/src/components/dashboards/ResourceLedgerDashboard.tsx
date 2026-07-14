@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { usePopulation } from "../../context/PopulationContext";
 import {
+	buildResourceCoverageData,
 	buildResourceProductionDemandData,
 	buildResourceSufficiencyData,
 } from "../../lib/resource-ledger-dashboard";
@@ -59,7 +60,7 @@ function ResourceLedgerDashboard() {
 					<ChartCard
 						variant="briefing"
 						title="National Production vs. Demand"
-						description="Total extraction output compared to what industrial sub-sectors consumed this year."
+						description="Extraction output, industrial demand, and year-end stockpile by resource."
 					>
 						<Bar
 							data={buildResourceProductionDemandData(ledger)}
@@ -74,7 +75,7 @@ function ResourceLedgerDashboard() {
 					<ChartCard
 						variant="briefing"
 						title="Resource Sufficiency"
-						description="Production as a percentage of demand (100% = balanced; below 100% triggers industrial shortfall penalties)."
+						description="Available supply (production + stock drawn) as a percentage of demand."
 					>
 						<Bar
 							data={buildResourceSufficiencyData(ledger)}
@@ -89,13 +90,29 @@ function ResourceLedgerDashboard() {
 						/>
 					</ChartCard>
 
+					<ChartCard
+						variant="briefing"
+						title="Stockpile Coverage"
+						description="Days of industrial demand covered by the national stockpile (soft targets vary by resource)."
+					>
+						<Bar
+							data={buildResourceCoverageData(ledger)}
+							options={{
+								responsive: true,
+								maintainAspectRatio: false,
+								scales: { y: { beginAtZero: true } },
+							}}
+						/>
+					</ChartCard>
+
 					<div className="border-2 border-primary bg-surface px-4 py-3">
 						<h3 className="text-[10px] leading-relaxed sm:text-xs">
 							Resource Ledger Detail
 						</h3>
 						<p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-							Per-resource production, demand, and sufficiency for the most
-							recent completed game year.
+							Production, demand, stockpile, and sufficiency for the most recent
+							completed game year. Domestic flows move surplus toward deficit
+							provinces before the national ledger settles.
 						</p>
 
 						<table className="mt-3 w-full text-left text-sm">
@@ -104,6 +121,8 @@ function ResourceLedgerDashboard() {
 									<th className="py-1.5 pr-2">Resource</th>
 									<th className="py-1.5 pr-2 text-right">Production</th>
 									<th className="py-1.5 pr-2 text-right">Demand</th>
+									<th className="py-1.5 pr-2 text-right">Stockpile</th>
+									<th className="py-1.5 pr-2 text-right">Coverage</th>
 									<th className="py-1.5 text-right">Sufficiency</th>
 								</tr>
 							</thead>
@@ -130,6 +149,14 @@ function ResourceLedgerDashboard() {
 											</td>
 											<td className="py-1.5 pr-2 text-right">
 												{entry.demand.toFixed(1)}
+											</td>
+											<td className="py-1.5 pr-2 text-right">
+												{(entry.stockpile ?? 0).toFixed(1)}
+											</td>
+											<td className="py-1.5 pr-2 text-right">
+												{entry.coverageDays == null
+													? "—"
+													: `${Math.round(entry.coverageDays)}d`}
 											</td>
 											<td className="py-1.5 text-right">
 												{entry.demand <= 0

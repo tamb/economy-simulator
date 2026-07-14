@@ -1,14 +1,14 @@
 {
 	"endure": {
 		"label": "Endure",
-		"detail": "No intervention — full catalog duration and penalties."
+		"detail": "No intervention — full catalog duration and penalties. Stockpiles untouched."
 	},
 	"relief": {
 		"label": "Relief",
-		"detail": "Divert aid to the stricken regions: shorter crisis, softer happiness hit; extraction stays damaged."
+		"detail": "Divert aid from the national stockpile: shorter crisis, softer happiness hit; extraction stays damaged."
 	},
 	"rebuild": {
 		"label": "Rebuild",
-		"detail": "Prioritize infrastructure: extraction recovers faster, workers are strained, crisis lasts a bit less."
+		"detail": "Spend stockpile on infrastructure crews: extraction recovers faster, workers are strained, crisis lasts a bit less."
 	}
 }

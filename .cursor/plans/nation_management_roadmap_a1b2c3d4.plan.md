@@ -4,19 +4,19 @@ overview: "Close documented v1 economy gaps (regional employment, stockpiles, tr
 todos:
   - id: phase-0a
     content: "Phase 0a: Wire unfinished v1 hooks (weekly emigrationRisk, calamity relief spending hooks)"
-    status: pending
+    status: completed
   - id: phase-0b
     content: "Phase 0b: Per-region non-extractive employment assignment"
-    status: pending
+    status: completed
   - id: phase-0c
     content: "Phase 0c: National stockpiles + calamity relief spending"
-    status: pending
+    status: completed
   - id: phase-0d
     content: "Phase 0d: Inter-region resource flows / domestic pricing simplification"
-    status: pending
+    status: completed
   - id: phase-0e
     content: "Phase 0e: Finish calamity catalog agency + remaining v1.5/v2 mechanical polish"
-    status: pending
+    status: completed
   - id: phase-1a
     content: "Phase 1a: Infrastructure capital stock (construction/utilities → service quality)"
     status: pending

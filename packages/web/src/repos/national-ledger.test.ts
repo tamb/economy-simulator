@@ -9,9 +9,19 @@ import {
 
 const sampleLedger: NationalLedger = {
 	resources: [
-		{ resourceId: "crops", production: 100, demand: 50, sufficiency: 2 },
+		{
+			resourceId: "crops",
+			production: 100,
+			demand: 50,
+			sufficiency: 2,
+			stockpile: 50,
+			stockpileDrawn: 0,
+			stockpileAdded: 50,
+			coverageDays: 364,
+		},
 	],
 	shortfallHappinessPenaltyBySubSector: { "heavy-industry": 0 },
+	stockpileByResource: { crops: 50 },
 };
 
 describe("national ledger storage", () => {

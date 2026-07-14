@@ -11,6 +11,10 @@ import {
 	type ResourceId,
 	type Terrain,
 } from "economy-simulator-data";
+import {
+	biasedCalamityWeight,
+	type CalamityWeightBiasSnapshot,
+} from "./weight-bias";
 
 type RandomFn = () => number;
 
@@ -350,6 +354,8 @@ function processCalamitiesForDay(input: {
 	settings?: GameSettings;
 	/** Force a specific calamity id (tests / debug). */
 	forceCalamityId?: string;
+	/** Optional world-state snapshot for Phase 0e weight bias. */
+	weightBiasSnapshot?: CalamityWeightBiasSnapshot;
 }): ProcessCalamitiesResult {
 	const random = input.random ?? Math.random;
 	const settings = input.settings ?? gameSettings;
@@ -390,7 +396,12 @@ function processCalamitiesForDay(input: {
 		const definition =
 			input.forceCalamityId != null
 				? getCalamityDefinition(input.forceCalamityId)
-				: pickWeighted(eligible, (entry) => entry.weight, random);
+				: pickWeighted(
+						eligible,
+						(entry) =>
+							biasedCalamityWeight(entry, input.weightBiasSnapshot, settings),
+						random,
+					);
 
 		if (definition) {
 			const regionIds = selectTargetRegions(definition, input.regions, random);
@@ -560,6 +571,12 @@ function daysRemainingOnMidTerm(
 	return Math.max(0, calamity.midTermEndsOnGameDay - gameDay);
 }
 
+export type { CalamityWeightBiasSnapshot } from "./weight-bias";
+export {
+	biasedCalamityWeight,
+	getCalamityWeightMultiplier,
+	stapleSufficiencyFromEntries,
+} from "./weight-bias";
 export type {
 	ActiveCalamityState,
 	CalamityHistoryEntryState,

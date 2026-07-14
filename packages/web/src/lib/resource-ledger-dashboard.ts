@@ -1,5 +1,5 @@
 import type { ChartData } from "chart.js";
-import { getResource } from "economy-simulator-data";
+import { gameSettings, getResource } from "economy-simulator-data";
 import type { NationalLedger } from "economy-simulator-simulation";
 import { themeColors } from "./theme-colors";
 
@@ -27,6 +27,13 @@ function buildResourceProductionDemandData(
 				label: "Demand",
 				data: entries.map((entry) => Math.round(entry.demand * 10) / 10),
 				backgroundColor: themeColors.orange,
+			},
+			{
+				label: "Stockpile",
+				data: entries.map(
+					(entry) => Math.round((entry.stockpile ?? 0) * 10) / 10,
+				),
+				backgroundColor: themeColors.green,
 			},
 		],
 	};
@@ -58,4 +65,38 @@ function buildResourceSufficiencyData(
 	};
 }
 
-export { buildResourceProductionDemandData, buildResourceSufficiencyData };
+/** Days-of-coverage bars vs soft stockpile targets. */
+function buildResourceCoverageData(ledger: NationalLedger): ChartData<"bar"> {
+	const targets = gameSettings.resources.stockpile.targetCoverageDays;
+	const entries = [...ledger.resources]
+		.filter((entry) => entry.demand > 0 && entry.coverageDays != null)
+		.sort((a, b) => (a.coverageDays ?? 0) - (b.coverageDays ?? 0));
+
+	return {
+		labels: entries.map(
+			(entry) => getResource(entry.resourceId)?.label ?? entry.resourceId,
+		),
+		datasets: [
+			{
+				label: "Coverage (days)",
+				data: entries.map(
+					(entry) => Math.round((entry.coverageDays ?? 0) * 10) / 10,
+				),
+				backgroundColor: themeColors.cyanDark,
+			},
+			{
+				label: "Target (days)",
+				data: entries.map(
+					(entry) => targets[entry.resourceId as keyof typeof targets] ?? 30,
+				),
+				backgroundColor: themeColors.orange,
+			},
+		],
+	};
+}
+
+export {
+	buildResourceCoverageData,
+	buildResourceProductionDemandData,
+	buildResourceSufficiencyData,
+};

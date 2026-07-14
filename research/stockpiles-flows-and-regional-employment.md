@@ -9,10 +9,12 @@ Today the national resource ledger compares annual production to demand with
 jobs are region-gated; industrial / services / knowledge / command jobs are
 not.
 
-> **Implementation note:** when coding Phase 0 (todos `phase-0a`–`phase-0e`),
-> treat this document as the research authority for directions and
-> baselines. Exact magnitudes belong in `GameSettings` (`packages/data`),
-> consistent with the life-tables / QoL research pattern.
+> **Implementation note:** Phase 0 (`phase-0a`–`phase-0e`) is implemented in
+> `packages/data` (`GameSettings` tunables), `packages/simulation`
+> (stockpile ledger, inter-region flows, regional employment capacity,
+> calamity weight bias), and `packages/web` (annual cycle wiring, ledger UI,
+> calamity spend). Exact magnitudes remain in `GameSettings` and may diverge
+> from the research baselines below as the game is balanced.
 
 ```mermaid
 flowchart TD
