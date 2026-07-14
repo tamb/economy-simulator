@@ -211,8 +211,14 @@ simulation of hospitals and schools.
 
 | Concern | Package |
 | --- | --- |
-| Policy definitions, tax bands, index tunables | `packages/data` |
-| Annual infrastructure / fiscal / service ticks | `packages/simulation` |
-| Realm / Treasury dashboard, budget sliders | `packages/web` |
-| Treasury + index persistence | `packages/persistence` |
+| Policy definitions, tax bands, index tunables | `packages/data` (`GameSettings.infrastructure` / `fiscal` / `publicServices`) |
+| Annual infrastructure / fiscal / service ticks | `packages/simulation` (`src/nation/`) |
+| Realm / Treasury dashboard, budget sliders | `packages/web` (`RealmTreasuryDashboard`, Dashboards → Realm & Treasury) |
+| Treasury + index persistence | `packages/persistence` (`repositories/nation-economy.ts`) |
 | Instructions / How to rule copy | `packages/data/src/copy/` |
+
+**Implemented:** Phase 1a–1c ship as a single domestic-foundations layer —
+nation infrastructure indices multiply extraction and inter-region flows;
+annual treasury settles tax − spend − debt service with soft deficit cap;
+healthcare/education coverage × quality feed QoL, disease severity, and the
+education job-fit channel; Relief/Rebuild spend treasury alongside stockpile.

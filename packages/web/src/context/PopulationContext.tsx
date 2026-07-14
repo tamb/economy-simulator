@@ -48,6 +48,7 @@ import {
 	getPopulationSizeOverride,
 } from "../lib/runtime-config";
 import type { Person } from "../models/Person";
+import { loadNationEconomy, saveNationEconomy } from "../repos/nation-economy";
 import {
 	loadNationalLedger,
 	saveNationalLedger,
@@ -455,12 +456,16 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			const run = await loadGameRunState();
 			if (run && onsets.length > 0) {
 				const ledger = await loadNationalLedger();
+				const economy = await loadNationEconomy();
 				const result = applyCalamityResponses(
 					run,
 					onsets.map((onset) => onset.instanceId),
 					response,
 					gameDayRef.current,
-					{ stockpileByResource: ledger?.stockpileByResource ?? {} },
+					{
+						stockpileByResource: ledger?.stockpileByResource ?? {},
+						treasury: economy?.treasury ?? 0,
+					},
 				);
 				await saveGameRunState(result.gameRun);
 				setGameRun(result.gameRun);
@@ -475,6 +480,12 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 								entry.stockpile ??
 								0,
 						})),
+					});
+				}
+				if (economy && result.didSpendTreasury) {
+					await saveNationEconomy({
+						...economy,
+						treasury: result.remainingTreasury,
 					});
 				}
 			}

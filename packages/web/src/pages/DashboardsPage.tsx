@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CountryDashboard } from "../components/dashboards/CountryDashboard";
 import { PopulationDashboard } from "../components/dashboards/PopulationDashboard";
+import { RealmTreasuryDashboard } from "../components/dashboards/RealmTreasuryDashboard";
 import { ResourceLedgerDashboard } from "../components/dashboards/ResourceLedgerDashboard";
 import { ScoreDashboard } from "../components/dashboards/ScoreDashboard";
 import { SectorDashboard } from "../components/dashboards/SectorDashboard";
@@ -11,6 +12,7 @@ type DashboardTab =
 	| "sectors"
 	| "country"
 	| "resources"
+	| "realm"
 	| "score";
 
 const TABS: { id: DashboardTab; label: string }[] = [
@@ -18,6 +20,7 @@ const TABS: { id: DashboardTab; label: string }[] = [
 	{ id: "sectors", label: "Economic Sectors" },
 	{ id: "country", label: "Country Overview" },
 	{ id: "resources", label: "Resource Ledger" },
+	{ id: "realm", label: "Realm & Treasury" },
 	{ id: "score", label: "Nation Score" },
 ];
 
@@ -34,6 +37,8 @@ function renderTab(
 			return <CountryDashboard />;
 		case "resources":
 			return <ResourceLedgerDashboard />;
+		case "realm":
+			return <RealmTreasuryDashboard />;
 		case "score":
 			return <ScoreDashboard gameRun={gameRun} />;
 	}
@@ -49,7 +54,8 @@ function DashboardsPage() {
 				<h2 className="text-xs sm:text-sm">Dashboards</h2>
 				<p className="text-sm leading-relaxed text-muted-foreground">
 					Charts and tables summarizing population, economic sectors, national
-					quality-of-life trends, and the monarchy-orchestrated resource ledger.
+					quality-of-life trends, the monarchy-orchestrated resource ledger, and
+					realm treasury accounts.
 				</p>
 			</header>
 

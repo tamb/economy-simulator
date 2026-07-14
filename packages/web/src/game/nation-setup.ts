@@ -12,9 +12,14 @@ import {
 	loadGameRunState,
 	saveGameRunState,
 } from "economy-simulator-persistence";
+import {
+	applyEconomicSystemFiscalBias,
+	createInitialNationEconomyState,
+} from "economy-simulator-simulation";
 import type { FaceId } from "../lib/faces";
 import { type CategoryId, getCategory } from "../lib/taxonomy";
 import { generateAndSavePopulation } from "../models/generatePopulation";
+import { saveNationEconomy } from "../repos/nation-economy";
 import {
 	loadSectorAssignments,
 	type SectorAssignments,
@@ -29,6 +34,24 @@ import type { ensureWorld } from "../repos/world";
 import { assignInnerCircle } from "./aide-proposals";
 import { issueMandateForYear } from "./mandates";
 
+function dominantEconomicSystemId(
+	assignments: SectorAssignments,
+): EconomicSystemId | undefined {
+	const counts = new Map<EconomicSystemId, number>();
+	for (const systemId of Object.values(assignments)) {
+		if (!systemId) continue;
+		counts.set(systemId, (counts.get(systemId) ?? 0) + 1);
+	}
+	let best: EconomicSystemId | undefined;
+	let bestCount = 0;
+	for (const [systemId, count] of counts) {
+		if (count > bestCount) {
+			best = systemId;
+			bestCount = count;
+		}
+	}
+	return best;
+}
 async function loadNationSetupState(): Promise<{
 	assignments: SectorAssignments;
 	roleConfigs: SectorRoleConfigs;
@@ -156,6 +179,13 @@ async function startGame(
 	};
 	gameRun = issueMandateForYear(gameRun, 1);
 	await saveGameRunState(gameRun);
+
+	const fiscalPolicy = applyEconomicSystemFiscalBias(
+		dominantEconomicSystemId(assignments),
+	);
+	await saveNationEconomy(
+		createInitialNationEconomyState(undefined, fiscalPolicy),
+	);
 }
 
 async function isNationInSetupPhase(): Promise<boolean> {

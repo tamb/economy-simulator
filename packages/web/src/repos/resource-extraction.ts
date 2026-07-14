@@ -49,6 +49,12 @@ interface RunAnnualResourceExtractionInput {
 	logisticsEmploymentShare?: number;
 	/** Prior-year stockpile carry-over. */
 	priorStockpileByResource?: Partial<Record<ResourceId, number>>;
+	/**
+	 * Phase 1a infrastructure multipliers (from prior year's indices).
+	 * Extraction yield and inter-region flow capacity.
+	 */
+	infrastructureEfficiencyMultiplier?: number;
+	infrastructureFlowCapacityMultiplier?: number;
 	sectorAssignments: SectorAssignments;
 	settings?: GameSettings;
 	/** Optional calamity extraction efficiency lookup (regionId, subSectorId) -> multiplier. */
@@ -79,6 +85,8 @@ function runAnnualResourceExtraction({
 	populationByRegion = {},
 	logisticsEmploymentShare = 0,
 	priorStockpileByResource = {},
+	infrastructureEfficiencyMultiplier = 1,
+	infrastructureFlowCapacityMultiplier,
 	sectorAssignments,
 	settings = gameSettings,
 	getCalamityEfficiency,
@@ -140,6 +148,7 @@ function runAnnualResourceExtraction({
 					region.id,
 					subSectorId,
 				),
+				infrastructureEfficiencyMultiplier,
 			});
 			if (amount > 0) {
 				production.push({
@@ -226,6 +235,8 @@ function runAnnualResourceExtraction({
 					})),
 					demandByResource,
 					logisticsEmploymentShare,
+					infrastructureCapacityMultiplier:
+						infrastructureFlowCapacityMultiplier,
 					settings,
 				})
 			: null;

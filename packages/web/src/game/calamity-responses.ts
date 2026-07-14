@@ -7,7 +7,10 @@ import type {
 	GameRunState,
 } from "economy-simulator-persistence";
 import { appendGameEvents } from "economy-simulator-persistence";
-import { spendStockpileForCalamityResponse } from "economy-simulator-simulation";
+import {
+	spendStockpileForCalamityResponse,
+	spendTreasuryForCalamityResponse,
+} from "economy-simulator-simulation";
 
 interface CalamityResponseEffect {
 	happinessPenaltyScale: number;
@@ -19,15 +22,15 @@ interface CalamityResponseEffect {
 }
 
 /**
- * Spend API for calamity responses (Phase 0a hooks → 0c stockpile / 1b treasury).
+ * Spend API for calamity responses (Phase 0a/0c stockpile + Phase 1b treasury).
  *
- * Relief and Rebuild may optionally consume national stockpile (and later
- * treasury). When a spend succeeds, response scales are further blunted.
- * Endure never spends. Callers persist `remainingStockpileByResource` back
- * onto the national ledger.
+ * Relief and Rebuild may optionally consume national stockpile and treasury.
+ * When a spend succeeds, response scales are further blunted.
+ * Endure never spends. Callers persist remaining stockpile / treasury.
  */
 interface CalamityResponseSpendInput {
 	stockpileByResource?: Partial<Record<ResourceId, number>>;
+	treasury?: number;
 }
 
 interface CalamityResponseSpendResult {
@@ -36,6 +39,9 @@ interface CalamityResponseSpendResult {
 	didSpendStockpile: boolean;
 	totalStockpileSpent: number;
 	remainingStockpileByResource: Partial<Record<ResourceId, number>>;
+	didSpendTreasury: boolean;
+	totalTreasurySpent: number;
+	remainingTreasury: number;
 }
 
 /** Numeric scales live here; labels/details come from `copy/calamities/responses.json`. */
@@ -81,6 +87,7 @@ function applyResponseToCalamity(
 	response: CalamityPlayerResponse,
 	gameDay: number,
 	stockSpent: boolean,
+	treasurySpent: boolean,
 ): ActiveCalamity {
 	const effect = RESPONSE_EFFECTS[response];
 	const remainingMid = Math.max(0, calamity.midTermEndsOnGameDay - gameDay);
@@ -104,6 +111,12 @@ function applyResponseToCalamity(
 		extractionHitScale *=
 			gameSettings.resources.stockpile.rebuildStockpileBlunt;
 	}
+	if (treasurySpent && response === "relief") {
+		happinessPenaltyScale *= gameSettings.fiscal.reliefTreasuryBlunt;
+	}
+	if (treasurySpent && response === "rebuild") {
+		extractionHitScale *= gameSettings.fiscal.rebuildTreasuryBlunt;
+	}
 
 	return {
 		...calamity,
@@ -117,7 +130,7 @@ function applyResponseToCalamity(
 
 /**
  * Apply the same player response to every pending onset instance, optionally
- * spend national stockpile (Phase 0c), log events, and return the updated run.
+ * spend national stockpile and treasury, log events, and return the updated run.
  */
 function applyCalamityResponses(
 	gameRun: GameRunState,
@@ -133,8 +146,11 @@ function applyCalamityResponses(
 	let remainingStockpileByResource = {
 		...(spendInput.stockpileByResource ?? {}),
 	};
+	let remainingTreasury = spendInput.treasury ?? 0;
 	let didSpendStockpile = false;
 	let totalStockpileSpent = 0;
+	let didSpendTreasury = false;
+	let totalTreasurySpent = 0;
 
 	const pendingCount = gameRun.activeCalamities.filter(
 		(calamity) => idSet.has(calamity.instanceId) && !calamity.playerResponse,
@@ -142,14 +158,23 @@ function applyCalamityResponses(
 
 	// Spend once for the batch of simultaneous onsets (not per instance).
 	if (pendingCount > 0 && response !== "endure") {
-		const spend = spendStockpileForCalamityResponse(
+		const stockSpend = spendStockpileForCalamityResponse(
 			remainingStockpileByResource,
 			response,
 		);
-		if (spend.didSpend) {
+		if (stockSpend.didSpend) {
 			didSpendStockpile = true;
-			totalStockpileSpent = spend.totalSpent;
-			remainingStockpileByResource = spend.remainingByResource;
+			totalStockpileSpent = stockSpend.totalSpent;
+			remainingStockpileByResource = stockSpend.remainingByResource;
+		}
+		const treasurySpend = spendTreasuryForCalamityResponse(
+			remainingTreasury,
+			response,
+		);
+		if (treasurySpend.didSpend) {
+			didSpendTreasury = true;
+			totalTreasurySpent = treasurySpend.spent;
+			remainingTreasury = treasurySpend.remainingTreasury;
 		}
 	}
 
@@ -157,9 +182,16 @@ function applyCalamityResponses(
 		if (!idSet.has(calamity.instanceId) || calamity.playerResponse) {
 			return calamity;
 		}
-		const spendNote = didSpendStockpile
-			? ` Stockpile spent: ${totalStockpileSpent.toFixed(1)} units.`
-			: "";
+		const spendNotes: string[] = [];
+		if (didSpendStockpile) {
+			spendNotes.push(
+				`Stockpile spent: ${totalStockpileSpent.toFixed(1)} units`,
+			);
+		}
+		if (didSpendTreasury) {
+			spendNotes.push(`Treasury spent: ${totalTreasurySpent.toFixed(0)}`);
+		}
+		const spendNote = spendNotes.length > 0 ? ` ${spendNotes.join(". ")}.` : "";
 		events.push({
 			id: `response-${calamity.instanceId}-${response}`,
 			gameDay,
@@ -172,6 +204,7 @@ function applyCalamityResponses(
 			response,
 			gameDay,
 			didSpendStockpile,
+			didSpendTreasury,
 		);
 	});
 
@@ -180,6 +213,9 @@ function applyCalamityResponses(
 		didSpendStockpile,
 		totalStockpileSpent,
 		remainingStockpileByResource,
+		didSpendTreasury,
+		totalTreasurySpent,
+		remainingTreasury,
 	};
 }
 

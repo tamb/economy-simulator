@@ -2,6 +2,17 @@
  * Tunable simulation rules — adjust before release. Unlike `app-config.ts`,
  * every value here can change balance/outcomes for the player.
  */
+
+/** Nation infrastructure capital indices (Phase 1a). */
+type InfrastructureIndexId = "transport" | "powerWater" | "digital";
+
+/** Fiscal budget lines the monarch allocates (Phase 1b). */
+type FiscalBudgetLine =
+	| "infrastructure"
+	| "healthcare"
+	| "education"
+	| "reliefReserve";
+
 const gameSettings = {
 	demographics: {
 		/** Newborns and minimum citizen age. */
@@ -210,9 +221,209 @@ const gameSettings = {
 			logisticsFrictionReduction: 0.45,
 			/** Employment share of transport-logistics at which logistics relief saturates. */
 			logisticsSaturationShare: 0.04,
-			/** Phase 1a infrastructure throughput multiplier hook (1 = no effect yet). */
+			/**
+			 * Fallback inter-region throughput multiplier when no live
+			 * infrastructure state is passed (Phase 1a computes this from
+			 * transport index). 1 = neutral.
+			 */
 			infrastructureCapacityMultiplier: 1,
 		},
+	},
+
+	/**
+	 * Infrastructure capital stock (Phase 1a). Nation-level 0–100 indices
+	 * raised by construction/utilities/telecom labor and fiscal investment,
+	 * lowered by neglect and capital-hitting calamities. See
+	 * research/infrastructure-fiscal-services.md §1.
+	 */
+	infrastructure: {
+		starting: {
+			transport: 45,
+			powerWater: 45,
+			digital: 40,
+		},
+		min: 0,
+		max: 100,
+		/** Annual decay when investment/labor are thin (neglect). */
+		annualDepreciation: 0.025,
+		/**
+		 * Index points gained per year when employment share equals the
+		 * saturation share (before diminishing returns).
+		 */
+		laborGainAtSaturation: {
+			constructionToTransport: 4,
+			utilitiesToPowerWater: 4,
+			telecomToDigital: 3.5,
+		},
+		/** Employment share at which labor contribution saturates. */
+		laborSaturationShare: {
+			construction: 0.06,
+			utilities: 0.04,
+			telecommunications: 0.03,
+		},
+		/**
+		 * Index points from spending 1% of output-proxy on the infrastructure
+		 * budget line when the index is near zero (before diminishing returns).
+		 */
+		investmentGainPerOutputPercent: 2.2,
+		/** Concave response: gain *= (1 - index/max)^exponent. */
+		diminishingReturnsExponent: 0.55,
+		/** Neutral mean index (0–100) at which production multipliers are 1.0. */
+		neutralMeanIndex: 43,
+		/** Output elasticity of public capital around the neutral mean (IMF-ish ~0.15). */
+		extractionElasticity: 0.15,
+		/** How strongly transport index lifts inter-region flow throughput. */
+		flowCapacityElasticity: 0.2,
+		/** How strongly mean infrastructure lifts health/education delivery. */
+		serviceDeliveryElasticity: 0.25,
+		/**
+		 * Absolute index hits applied when a matching calamity starts this
+		 * year (before Rebuild recovery). Keys are calamity catalog ids.
+		 */
+		calamityIndexHits: {
+			power_outage: { powerWater: -8 },
+			bridge_collapse: { transport: -10 },
+			earthquake: { transport: -6, powerWater: -5, digital: -3 },
+			volcanic_ash: { transport: -4, powerWater: -4 },
+			flood: { transport: -3, powerWater: -5 },
+			flash_flood: { transport: -2, powerWater: -4 },
+			hurricane: { transport: -4, powerWater: -3, digital: -2 },
+		} as Record<string, Partial<Record<InfrastructureIndexId, number>>>,
+		/** Fraction of this year's calamity index damage restored by Rebuild. */
+		rebuildRecoveryFraction: 0.55,
+	},
+
+	/**
+	 * Fiscal core (Phase 1b). Annual treasury = tax − spend − debt service.
+	 * Soft deficit cap; no full monetary policy. See
+	 * research/infrastructure-fiscal-services.md §2.
+	 */
+	fiscal: {
+		startingTreasury: 120,
+		startingDebt: 0,
+		/** Default overall tax-to-output rate (~developing-capacity band). */
+		defaultTaxRate: 0.2,
+		taxRateMin: 0.05,
+		taxRateMax: 0.42,
+		/** Tax rate at which happiness/emigration tax pressure is zero. */
+		neutralTaxRate: 0.18,
+		/** Daily happiness penalty per tax-rate point above neutral (0.01 = 1pp). */
+		taxHappinessPenaltyPerPoint: 0.08,
+		/** Cap on daily tax happiness pressure. */
+		maxTaxHappinessPenaltyPerDay: 1.5,
+		/** Annual emigration probability bump per tax-rate point above neutral. */
+		taxEmigrationBumpPerPoint: 0.004,
+		maxTaxEmigrationBump: 0.06,
+		/** Soft floor: treasury may go this far negative as a fraction of output. */
+		softDeficitCapFractionOfOutput: 0.08,
+		/** Interest rate charged on outstanding debt each year. */
+		debtServiceRate: 0.05,
+		/** Share of a year's deficit that converts into debt stock. */
+		deficitToDebtFraction: 1,
+		/** Optional annual debt principal repayment as a fraction of debt. */
+		debtPrincipalRepaymentRate: 0.05,
+		/** Score points subtracted from the year total when insolvent. */
+		insolvencyScorePenalty: 4,
+		/** Treasury at or below this (and soft cap exhausted) counts as insolvent. */
+		insolvencyTreasuryThreshold: 0,
+		defaultBudgetShares: {
+			infrastructure: 0.28,
+			healthcare: 0.3,
+			education: 0.27,
+			reliefReserve: 0.15,
+		},
+		/**
+		 * Cosmetic→mechanical priors: applied once when creating initial
+		 * fiscal policy from the player's most common economic system.
+		 * Player can override on the Realm dashboard.
+		 */
+		economicSystemBias: {
+			capitalism: { taxRateDelta: -0.03, infrastructureShareDelta: 0.04 },
+			socialism: { taxRateDelta: 0.05, healthcareShareDelta: 0.05 },
+			tripartism: { taxRateDelta: 0.02, educationShareDelta: 0.03 },
+			communism: { taxRateDelta: 0.08, infrastructureShareDelta: 0.05 },
+			"mixed-economy": { taxRateDelta: 0.01 },
+			mercantilism: { taxRateDelta: 0.02, infrastructureShareDelta: 0.04 },
+			feudalism: { taxRateDelta: -0.06, reliefReserveShareDelta: 0.04 },
+			"market-socialism": { taxRateDelta: 0.03, educationShareDelta: 0.03 },
+			"state-capitalism": {
+				taxRateDelta: 0.04,
+				infrastructureShareDelta: 0.06,
+			},
+			"anarcho-capitalism": {
+				taxRateDelta: -0.08,
+				infrastructureShareDelta: -0.04,
+			},
+			subsistence: { taxRateDelta: -0.1, reliefReserveShareDelta: 0.06 },
+		} as Record<
+			string,
+			{
+				taxRateDelta?: number;
+				infrastructureShareDelta?: number;
+				healthcareShareDelta?: number;
+				educationShareDelta?: number;
+				reliefReserveShareDelta?: number;
+			}
+		>,
+		/** Share of treasury spent when choosing Relief (alongside stockpile). */
+		reliefTreasurySpendFraction: 0.06,
+		/** Share of treasury spent when choosing Rebuild. */
+		rebuildTreasurySpendFraction: 0.1,
+		minSpendableTreasury: 1,
+		/** Extra blunt when Relief successfully spends treasury. */
+		reliefTreasuryBlunt: 0.9,
+		/** Extra blunt when Rebuild successfully spends treasury. */
+		rebuildTreasuryBlunt: 0.88,
+	},
+
+	/**
+	 * Public-service policy (Phase 1c). Coverage × quality for healthcare
+	 * and education, funded by budget lines + staffing, delivered through
+	 * infrastructure. See research/infrastructure-fiscal-services.md §3.
+	 */
+	publicServices: {
+		healthcare: {
+			/** Sub-sector ids whose employment share funds coverage. */
+			staffingSubSectorIds: ["healthcare"] as const,
+			staffingSaturationShare: 0.05,
+			/** Coverage points from saturated staffing (before infra). */
+			coverageFromStaffing: 55,
+			/** Coverage points from a full healthcare budget share of outlay/output. */
+			coverageFromBudgetAtFivePercentOutput: 35,
+			/** Quality points from budget intensity. */
+			qualityFromBudgetAtFivePercentOutput: 40,
+			/** Quality points from saturated staffing. */
+			qualityFromStaffing: 30,
+			startingCoverage: 48,
+			startingQuality: 45,
+			/** Max reduction of disease calamity happiness/mortality mid-term. */
+			diseaseSeverityReductionMax: 0.4,
+			/** Flat daily health floor bonus at quality 100. */
+			healthFloorBonusMax: 0.35,
+			/** Daily happiness penalty when coverage is at 0. */
+			underfundingHappinessPenaltyMax: 1.4,
+			/** Coverage at or above which underfunding penalty is 0. */
+			coveragePenaltyThreshold: 55,
+		},
+		education: {
+			staffingSubSectorIds: ["education", "higher-education"] as const,
+			staffingSaturationShare: 0.06,
+			coverageFromStaffing: 50,
+			coverageFromBudgetAtFivePercentOutput: 35,
+			qualityFromBudgetAtFivePercentOutput: 45,
+			qualityFromStaffing: 25,
+			startingCoverage: 46,
+			startingQuality: 44,
+			/**
+			 * Single education gameplay channel (Phase 1c): quality slowly
+			 * boosts personality–job affinity (knowledge-capital lite).
+			 */
+			affinityBoostMax: 0.35,
+			underfundingHappinessPenaltyMax: 1.1,
+			coveragePenaltyThreshold: 50,
+		},
+		/** Blend weight of mean infrastructure into service delivery (0–1). */
+		infrastructureDeliveryWeight: 0.3,
 	},
 
 	/**
@@ -332,5 +543,5 @@ const gameSettings = {
 
 type GameSettings = typeof gameSettings;
 
-export type { GameSettings };
+export type { FiscalBudgetLine, GameSettings, InfrastructureIndexId };
 export { gameSettings };

@@ -30,11 +30,15 @@
 		},
 		{
 			"title": "Calamity responses",
-			"body": "When disaster strikes, choose Relief or Rebuild to spend national stockpile and blunt the crisis, or Endure at full severity. Expect at least one calamity per month."
+			"body": "When disaster strikes, choose Relief or Rebuild to spend national stockpile and treasury and blunt the crisis, or Endure at full severity. Expect at least one calamity per month."
 		},
 		{
 			"title": "Stockpiles & flows",
 			"body": "Surplus extraction fills a national stockpile; industry draws it down before shortfalls bite. Domestic flows move goods between provinces — logistics labor reduces friction."
+		},
+		{
+			"title": "Realm & treasury",
+			"body": "Dashboards → Realm & Treasury sets tax rate and budget shares for infrastructure, healthcare, education, and relief. Construction and utilities labor raise capital indices that lift extraction and services."
 		},
 		{
 			"title": "Royal mandates",

@@ -10,6 +10,8 @@ interface ExtractionYieldInput {
 	roleEfficiencyMultiplier?: number;
 	/** From active calamity mid/long-term modifiers; 1 = no change. */
 	calamityEfficiencyMultiplier?: number;
+	/** Phase 1a infrastructure capital multiplier; 1 = neutral. */
+	infrastructureEfficiencyMultiplier?: number;
 }
 
 /**
@@ -27,7 +29,8 @@ function computeExtractionYield(input: ExtractionYieldInput): number {
 		Math.max(0, input.reserveOrCapacityYieldMultiplier) *
 		(input.economicSystemEfficiencyMultiplier ?? 1) *
 		(input.roleEfficiencyMultiplier ?? 1) *
-		(input.calamityEfficiencyMultiplier ?? 1)
+		(input.calamityEfficiencyMultiplier ?? 1) *
+		(input.infrastructureEfficiencyMultiplier ?? 1)
 	);
 }
 

@@ -23,6 +23,13 @@ export {
 	saveGameRunState,
 } from "./repositories/game-run";
 export {
+	clearNationEconomy,
+	ensureNationEconomy,
+	isNationEconomyState,
+	loadNationEconomy,
+	saveNationEconomy,
+} from "./repositories/nation-economy";
+export {
 	clearNationalLedger,
 	loadNationalLedger,
 	saveNationalLedger,

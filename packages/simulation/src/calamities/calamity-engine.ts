@@ -505,6 +505,11 @@ function getCalamityModifiersForCitizen(input: {
 	gameDay: number;
 	regionId: string | null | undefined;
 	subSectorId: string | null | undefined;
+	/**
+	 * Phase 1c: scales mid/long-term happiness pressure from the `disease`
+	 * calamity (healthcare quality). 1 = no change.
+	 */
+	diseaseSeverityScale?: number;
 }): MidTermModifiers {
 	let extractionEfficiencyFactor = 1;
 	let happinessPenaltyPerDay = 0;
@@ -520,9 +525,12 @@ function getCalamityModifiersForCitizen(input: {
 			(input.regionId != null && calamity.regionIds.includes(input.regionId));
 		if (!appliesToRegion) continue;
 
+		const diseaseScale =
+			definition.id === "disease" ? (input.diseaseSeverityScale ?? 1) : 1;
 		happinessPenaltyPerDay +=
 			modifiers.happinessPenaltyPerDay[calamity.severity] *
-			(calamity.happinessPenaltyScale ?? 1);
+			(calamity.happinessPenaltyScale ?? 1) *
+			diseaseScale;
 
 		const subSectors = modifiers.affectedSubSectors;
 		const appliesToSector =

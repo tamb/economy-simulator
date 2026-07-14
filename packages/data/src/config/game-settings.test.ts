@@ -108,4 +108,21 @@ describe("gameSettings", () => {
 			gameSettings.calamities.bias.timberFireWeightMultiplier,
 		).toBeGreaterThan(1);
 	});
+
+	it("defines Phase 1 infrastructure, fiscal, and public-service tunables", () => {
+		expect(gameSettings.infrastructure.starting.transport).toBeGreaterThan(0);
+		expect(gameSettings.infrastructure.extractionElasticity).toBeGreaterThan(0);
+		expect(gameSettings.fiscal.defaultTaxRate).toBeGreaterThan(
+			gameSettings.fiscal.taxRateMin,
+		);
+		expect(gameSettings.fiscal.defaultTaxRate).toBeLessThan(
+			gameSettings.fiscal.taxRateMax,
+		);
+		expect(
+			gameSettings.publicServices.healthcare.diseaseSeverityReductionMax,
+		).toBeGreaterThan(0);
+		expect(
+			gameSettings.publicServices.education.affinityBoostMax,
+		).toBeGreaterThan(0);
+	});
 });

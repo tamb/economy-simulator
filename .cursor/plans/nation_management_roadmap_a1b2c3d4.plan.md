@@ -19,13 +19,13 @@ todos:
     status: completed
   - id: phase-1a
     content: "Phase 1a: Infrastructure capital stock (construction/utilities → service quality)"
-    status: pending
+    status: completed
   - id: phase-1b
     content: "Phase 1b: Fiscal core (treasury, taxes, budgets, deficits)"
-    status: pending
+    status: completed
   - id: phase-1c
     content: "Phase 1c: Public-service policy (healthcare + education coverage/quality)"
-    status: pending
+    status: completed
   - id: phase-2a
     content: "Phase 2a: Housing stock & affordability"
     status: pending

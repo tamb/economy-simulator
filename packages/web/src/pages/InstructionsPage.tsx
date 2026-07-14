@@ -115,8 +115,9 @@ function InstructionsPage() {
 					<li>
 						<strong>Dashboards</strong> — cabinet-briefing charts for population
 						demographics, sector employment, national quality-of-life trends,
-						nation score, and (after the first completed game year) the Resource
-						Ledger tab showing production vs. demand per resource.
+						nation score, the Resource Ledger (after the first completed game
+						year), and <strong>Realm &amp; Treasury</strong> for tax, budget,
+						infrastructure, and public-service accounts.
 					</li>
 				</ul>
 			</CollapsibleSection>
@@ -152,8 +153,9 @@ function InstructionsPage() {
 						Fires, storms, quakes, disease, and other shocks can strike regions
 						during a run. New calamities interrupt time advances — choose{" "}
 						<strong>Relief</strong> or <strong>Rebuild</strong> (spending
-						national stockpile when available) or <strong>Endure</strong>.
-						Active ones appear as nation debuffs and pulse on the map.
+						national stockpile and treasury when available) or{" "}
+						<strong>Endure</strong>. Active ones appear as nation debuffs and
+						pulse on the map.
 					</li>
 					<li>
 						Expect at least one primary calamity every{" "}
@@ -183,11 +185,38 @@ function InstructionsPage() {
 					<li>
 						Surplus provinces supply deficit ones with friction from distance.
 						<strong> Transport &amp; logistics</strong> employment reduces that
-						friction.
+						friction; infrastructure capital (Realm &amp; Treasury) raises
+						throughput.
 					</li>
 					<li>
 						Industrial and service jobs cluster by coast, terrain, and density —
 						inspect a map tile's job mix to see the regional employment pattern.
+					</li>
+				</ul>
+			</CollapsibleSection>
+
+			<CollapsibleSection title="Realm, treasury, and public services">
+				<ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+					<li>
+						<strong>Dashboards → Realm &amp; Treasury</strong> shows the annual
+						treasury balance, debt, infrastructure indices (transport, power
+						&amp; water, digital), and healthcare/education coverage × quality.
+					</li>
+					<li>
+						Set the overall <strong>tax rate</strong> and budget shares for
+						infrastructure, healthcare, education, and a relief reserve. Higher
+						taxes raise revenue but press happiness and emigration.
+					</li>
+					<li>
+						Construction, utilities, and telecom labor plus infrastructure spend
+						raise capital indices that multiply extraction and domestic flows.
+						Healthcare quality blunts disease; education quality improves job
+						fit.
+					</li>
+					<li>
+						Relief and Rebuild calamity responses can spend treasury alongside
+						stockpile. Soft deficits are allowed; sustained insolvency pressures
+						nation score.
 					</li>
 				</ul>
 			</CollapsibleSection>
