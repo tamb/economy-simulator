@@ -7,6 +7,7 @@ import {
 	saveGameRunState,
 } from "economy-simulator-persistence";
 import { clearNationalLedger } from "../repos/national-ledger";
+import { clearNationEconomy } from "../repos/nation-economy";
 import { clearPopulation } from "../repos/population";
 import { clearRegionPool } from "../repos/regions";
 import { clearSectorAssignments } from "../repos/sector-assignments";
@@ -18,6 +19,7 @@ async function resetNationStores(): Promise<void> {
 	await clearPopulation();
 	await clearWorld();
 	await clearNationalLedger();
+	await clearNationEconomy();
 	await clearSectorAssignments();
 	await clearSectorRoleConfigs();
 	await clearRegionPool();

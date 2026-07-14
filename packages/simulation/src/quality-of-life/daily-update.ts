@@ -56,6 +56,26 @@ interface QualityOfLifeInput extends QualityOfLifeState {
 	 * citizen's region (or nation-scoped calamities). Defaults to 0.
 	 */
 	calamityHappinessPenalty?: number;
+	/**
+	 * Daily happiness penalty from tax pressure above the neutral rate
+	 * (Phase 1b). Defaults to 0.
+	 */
+	taxHappinessPenalty?: number;
+	/**
+	 * Daily happiness penalty from healthcare/education coverage gaps
+	 * (Phase 1c). Defaults to 0.
+	 */
+	serviceUnderfundingHappinessPenalty?: number;
+	/**
+	 * Multiplier on personality–sector affinity from education quality
+	 * (Phase 1c knowledge-capital channel). Defaults to 1.
+	 */
+	educationAffinityMultiplier?: number;
+	/**
+	 * Flat daily health bonus from healthcare quality floor (Phase 1c).
+	 * Applied after the happiness→health lag step. Defaults to 0.
+	 */
+	healthFloorBonus?: number;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -86,7 +106,8 @@ function computeDailyQualityOfLifeUpdate(
 		affinity *
 		settings.work.sectorAffinityMaxDailyDelta *
 		(input.economicSystemMoraleMultiplier ?? 1) *
-		(input.roleMoraleMultiplier ?? 1);
+		(input.roleMoraleMultiplier ?? 1) *
+		(input.educationAffinityMultiplier ?? 1);
 
 	const noise = (random() * 2 - 1) * settings.work.dailyHappinessNoise;
 
@@ -97,7 +118,9 @@ function computeDailyQualityOfLifeUpdate(
 			noise +
 			(input.environmentalQualityModifier ?? 0) -
 			(input.resourceShortfallHappinessPenalty ?? 0) -
-			(input.calamityHappinessPenalty ?? 0),
+			(input.calamityHappinessPenalty ?? 0) -
+			(input.taxHappinessPenalty ?? 0) -
+			(input.serviceUnderfundingHappinessPenalty ?? 0),
 		0,
 		100,
 	);
@@ -107,7 +130,9 @@ function computeDailyQualityOfLifeUpdate(
 	// health (see research doc, citing Diener & Chan 2011).
 	const healthTarget = nextHappiness;
 	const nextHealth = clamp(
-		input.health + settings.work.healthLagRate * (healthTarget - input.health),
+		input.health +
+			settings.work.healthLagRate * (healthTarget - input.health) +
+			(input.healthFloorBonus ?? 0),
 		0,
 		100,
 	);

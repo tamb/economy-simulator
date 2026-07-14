@@ -26,7 +26,10 @@ import {
 	type CalamityWeightBiasSnapshot,
 	computeAnnualOutcomeForCitizen,
 	computeExpectedImmigrantCount,
+	computeInfrastructureMultipliers,
+	computeNationEconomyTick,
 	computeNationScore,
+	computePublicServiceEffects,
 	computeRegionalCategoryMultipliers,
 	evaluateRunBadges,
 	evaluateWinLose,
@@ -39,6 +42,7 @@ import {
 	stapleSufficiencyFromEntries,
 	syncEmploymentWithAge,
 	syncRoleWithAge,
+	taxPressureFromRate,
 } from "economy-simulator-simulation";
 import type {
 	AdvanceGameDayResult,
@@ -84,6 +88,11 @@ import {
 	loadNationalLedger,
 	saveNationalLedger,
 } from "../repos/national-ledger";
+import {
+	ensureNationEconomy,
+	loadNationEconomy,
+	saveNationEconomy,
+} from "../repos/nation-economy";
 import { ensureRegionPool } from "../repos/regions";
 import { runAnnualResourceExtraction } from "../repos/resource-extraction";
 import {
@@ -235,6 +244,7 @@ async function processProgressionAfterYear(
 	resourceStates: Record<string, { environmentQuality: number }>,
 	landRegionIds: ReadonlySet<string>,
 	settings: GameSettings,
+	fiscalInsolvent = false,
 ): Promise<void> {
 	const meta = await loadMeta();
 	if (!meta) return;
@@ -282,9 +292,18 @@ async function processProgressionAfterYear(
 	);
 	gameRun = mandateResolution.gameRun;
 	const pendingBonus = gameRun.pendingScoreBonus ?? 0;
+	const insolvencyPenalty = fiscalInsolvent
+		? settings.fiscal.insolvencyScorePenalty
+		: 0;
 	const scoredBreakdown = {
 		...scoreBreakdown,
-		total: scoreBreakdown.total + mandateResolution.scoreBonus + pendingBonus,
+		total: Math.max(
+			0,
+			scoreBreakdown.total +
+				mandateResolution.scoreBonus +
+				pendingBonus -
+				insolvencyPenalty,
+		),
 	};
 	gameRun = { ...gameRun, pendingScoreBonus: 0 };
 
@@ -350,6 +369,16 @@ async function runAnnualCycle(
 		? getYearCalamityBumps(gameRun, yearStartDay, yearEndDay)
 		: { mortalityBump: 0, emigrationBump: 0 };
 
+	const priorNationEconomy = await ensureNationEconomy();
+	const taxEmigrationBump = taxPressureFromRate(
+		priorNationEconomy.policy.taxRate,
+		settings,
+	).emigrationBump;
+	const priorInfraMultipliers = computeInfrastructureMultipliers(
+		priorNationEconomy.infrastructure,
+		settings,
+	);
+
 	const survivors: Person[] = [];
 	let births = 0;
 	let deaths = 0;
@@ -363,6 +392,7 @@ async function runAnnualCycle(
 		Record<string, number>
 	> = {};
 	const industrialWorkersBySubSector: Record<string, number> = {};
+	const employmentWeightBySubSector: Record<string, number> = {};
 	const populationByRegion: Record<RegionId, number> = {};
 	let logisticsWorkers = 0;
 	let totalWorkers = 0;
@@ -423,6 +453,8 @@ async function runAnnualCycle(
 
 		const weight = roleModifiers.efficiencyMultiplier;
 		totalWorkers += weight;
+		employmentWeightBySubSector[subSectorId] =
+			(employmentWeightBySubSector[subSectorId] ?? 0) + weight;
 		const regionId = person.getRegionId();
 
 		if (categoryId === "services" && subSectorId === "transport-logistics") {
@@ -507,7 +539,8 @@ async function runAnnualCycle(
 						calamityMortalityBump: yearBumps.mortalityBump,
 						calamityEmigrationBump:
 							yearBumps.emigrationBump +
-							temporaryEmigrationBump(person.getRegionId()),
+							temporaryEmigrationBump(person.getRegionId()) +
+							taxEmigrationBump,
 					},
 					random,
 					settings,
@@ -574,6 +607,8 @@ async function runAnnualCycle(
 		logisticsEmploymentShare:
 			totalWorkers > 0 ? logisticsWorkers / totalWorkers : 0,
 		priorStockpileByResource: priorLedger?.stockpileByResource ?? {},
+		infrastructureEfficiencyMultiplier: priorInfraMultipliers.extraction,
+		infrastructureFlowCapacityMultiplier: priorInfraMultipliers.flowCapacity,
 		sectorAssignments,
 		settings,
 		getCalamityEfficiency: (regionId, subSectorId) => {
@@ -598,6 +633,52 @@ async function runAnnualCycle(
 	await saveWorldRegions(extraction.regions);
 	await saveRegionResourceStates(extraction.resourceStates);
 	await saveNationalLedger(extraction.ledger);
+
+	const employmentShareBySubSector: Record<string, number> = {};
+	for (const [subSectorId, weight] of Object.entries(
+		employmentWeightBySubSector,
+	)) {
+		employmentShareBySubSector[subSectorId] =
+			totalWorkers > 0 ? weight / totalWorkers : 0;
+	}
+
+	const outputProxy = extraction.ledger.resources.reduce(
+		(sum, entry) => sum + entry.production,
+		0,
+	);
+	const calamityIdsThisYear = (gameRun?.calamityHistory ?? [])
+		.filter(
+			(entry) =>
+				entry.startedOnGameDay > yearStartDay &&
+				entry.startedOnGameDay <= yearEndDay,
+		)
+		.map((entry) => entry.calamityId);
+	// Also include still-active onsets started this year.
+	for (const calamity of gameRun?.activeCalamities ?? []) {
+		if (
+			calamity.startedOnGameDay > yearStartDay &&
+			calamity.startedOnGameDay <= yearEndDay
+		) {
+			calamityIdsThisYear.push(calamity.calamityId);
+		}
+	}
+	const rebuildResponseThisYear = (gameRun?.activeCalamities ?? []).some(
+		(calamity) =>
+			calamity.playerResponse === "rebuild" &&
+			calamity.startedOnGameDay > yearStartDay &&
+			calamity.startedOnGameDay <= yearEndDay,
+	);
+
+	const nationTick = computeNationEconomyTick({
+		prior: priorNationEconomy,
+		year: Math.floor(meta.gameDay / settings.calendar.daysPerYear),
+		outputProxy,
+		employmentShareBySubSector,
+		calamityIdsThisYear: [...new Set(calamityIdsThisYear)],
+		rebuildResponseThisYear,
+		settings,
+	});
+	await saveNationEconomy(nationTick.state);
 
 	const stats: AnnualCycleStats = {
 		year: Math.floor(meta.gameDay / settings.calendar.daysPerYear),
@@ -635,6 +716,7 @@ async function runAnnualCycle(
 				.map((region) => region.id),
 		),
 		settings,
+		nationTick.state.lastYear?.insolvent ?? false,
 	);
 
 	let runAfterYear = await loadGameRunState();
@@ -669,6 +751,15 @@ async function runAnnualCycle(
 				type: "resource_shortfall",
 				title: "Resource shortfalls",
 				detail: `${shortfallSectors.length} industrial sub-sector(s) face unmet demand.`,
+			});
+		}
+		if (nationTick.state.lastYear?.insolvent) {
+			yearEvents.push({
+				id: `insolvent-${stats.year}-${meta.gameDay}`,
+				gameDay: meta.gameDay,
+				type: "year_end",
+				title: "Treasury under strain",
+				detail: `Fiscal accounts closed insolvent (treasury ${nationTick.state.treasury.toFixed(0)}, debt ${nationTick.state.debt.toFixed(0)}).`,
 			});
 		}
 		runAfterYear = appendGameEvents(runAfterYear, yearEvents);
@@ -835,6 +926,13 @@ async function advanceGameDay(
 
 	const sectorAssignments = await loadSectorAssignments();
 	const nationalLedger = await loadNationalLedger();
+	const nationEconomy = await loadNationEconomy();
+	const serviceEffects = nationEconomy
+		? computePublicServiceEffects(nationEconomy.services, settings)
+		: null;
+	const taxPressure = nationEconomy
+		? taxPressureFromRate(nationEconomy.policy.taxRate, settings)
+		: null;
 	const activeCalamities = gameRun?.activeCalamities ?? [];
 
 	for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex++) {
@@ -863,6 +961,7 @@ async function advanceGameDay(
 				gameDay: meta.gameDay,
 				regionId,
 				subSectorId,
+				diseaseSeverityScale: serviceEffects?.diseaseSeverityScale,
 			});
 
 			updatePersonStats(person, random, settings, {
@@ -877,6 +976,11 @@ async function advanceGameDay(
 					? nationalLedger?.shortfallHappinessPenaltyBySubSector[subSectorId]
 					: undefined,
 				calamityHappinessPenalty: calamityModifiers.happinessPenaltyPerDay,
+				taxHappinessPenalty: taxPressure?.happinessPenaltyPerDay,
+				serviceUnderfundingHappinessPenalty:
+					serviceEffects?.underfundingHappinessPenaltyPerDay,
+				educationAffinityMultiplier: serviceEffects?.educationAffinityMultiplier,
+				healthFloorBonus: serviceEffects?.healthFloorBonus,
 			});
 			person.setIndex(
 				getGlobalIndex(

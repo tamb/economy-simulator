@@ -66,4 +66,20 @@ describe("applyCalamityResponses", () => {
 			result.gameRun.activeCalamities[0]?.happinessPenaltyScale,
 		).toBeLessThan(0.55);
 	});
+
+	it("spends treasury on rebuild and further blunts extraction hit", () => {
+		const run = createInitialGameRunState(1000);
+		run.phase = "active";
+		run.activeCalamities = [sampleCalamity()];
+
+		const result = applyCalamityResponses(run, ["c1"], "rebuild", 10, {
+			treasury: 200,
+		});
+		expect(result.didSpendTreasury).toBe(true);
+		expect(result.totalTreasurySpent).toBeGreaterThan(0);
+		expect(result.remainingTreasury).toBeLessThan(200);
+		expect(
+			result.gameRun.activeCalamities[0]?.extractionHitScale,
+		).toBeLessThan(0.45);
+	});
 });

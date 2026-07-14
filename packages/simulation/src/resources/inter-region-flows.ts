@@ -30,6 +30,11 @@ interface InterRegionFlowInput {
 	 * friction — first real mechanic for that sub-sector.
 	 */
 	logisticsEmploymentShare: number;
+	/**
+	 * Optional Phase 1a infrastructure throughput override. When omitted,
+	 * falls back to `settings.resources.flows.infrastructureCapacityMultiplier`.
+	 */
+	infrastructureCapacityMultiplier?: number;
 	settings?: GameSettings;
 }
 
@@ -78,7 +83,9 @@ function computeInterRegionFlows(
 	);
 	const logisticsFactor =
 		1 - flowCfg.logisticsFrictionReduction * logisticsRelief;
-	const infra = flowCfg.infrastructureCapacityMultiplier;
+	const infra =
+		input.infrastructureCapacityMultiplier ??
+		flowCfg.infrastructureCapacityMultiplier;
 
 	const productionByRegionResource = new Map<string, number>();
 	const resourceIds = new Set<ResourceId>();

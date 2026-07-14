@@ -21,6 +21,14 @@ interface UpdatePersonStatsContext {
 	resourceShortfallHappinessPenalty?: number;
 	/** Daily happiness penalty from active calamity debuffs. */
 	calamityHappinessPenalty?: number;
+	/** Phase 1b tax pressure above the neutral rate. */
+	taxHappinessPenalty?: number;
+	/** Phase 1c healthcare/education coverage gaps. */
+	serviceUnderfundingHappinessPenalty?: number;
+	/** Phase 1c education quality → job-fit channel. */
+	educationAffinityMultiplier?: number;
+	/** Phase 1c healthcare quality floor bonus. */
+	healthFloorBonus?: number;
 }
 
 function getWeeklyHoursForPerson(person: Person): number | undefined {
@@ -69,6 +77,11 @@ function updatePersonStats(
 			resourceShortfallHappinessPenalty:
 				context.resourceShortfallHappinessPenalty,
 			calamityHappinessPenalty: context.calamityHappinessPenalty,
+			taxHappinessPenalty: context.taxHappinessPenalty,
+			serviceUnderfundingHappinessPenalty:
+				context.serviceUnderfundingHappinessPenalty,
+			educationAffinityMultiplier: context.educationAffinityMultiplier,
+			healthFloorBonus: context.healthFloorBonus,
 			roleMoraleMultiplier: getRoleModifiersForCitizen(person.getRoleId())
 				.moraleMultiplier,
 		},

@@ -54,9 +54,10 @@ dialogue and labels live in editable JSON under
 from game logic.
 
 **Forward roadmap:** Phase 0 v1 economy gaps (regional employment, stockpiles,
-domestic flows, calamity agency) are closed. A domestic-first nation-management
-layer (infrastructure, fiscal, public services, housing, order, politics)
-before an optional external layer (trade, diplomacy, defense) continues in
+domestic flows, calamity agency) and Phase 1 domestic foundations
+(infrastructure capital, fiscal core, healthcare/education services) are
+closed. Housing, order, politics, then an optional external layer (trade,
+diplomacy, defense) continue in
 [nation_management_roadmap_a1b2c3d4.plan.md](../.cursor/plans/nation_management_roadmap_a1b2c3d4.plan.md).
 Sourced research for each phase (cite when implementing) is indexed under
 [research/index.md — Product roadmap](../research/index.md#product-roadmap).

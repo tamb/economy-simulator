@@ -45,7 +45,11 @@ export {
 } from "./calamities";
 export type { AppConfig } from "./config/app-config";
 export { appConfig } from "./config/app-config";
-export type { GameSettings } from "./config/game-settings";
+export type {
+	FiscalBudgetLine,
+	GameSettings,
+	InfrastructureIndexId,
+} from "./config/game-settings";
 export { gameSettings } from "./config/game-settings";
 export type {
 	CalamityResponseCopy,

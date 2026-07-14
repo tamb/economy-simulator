@@ -70,6 +70,31 @@ vi.mock("../repos/national-ledger", () => ({
 	})),
 }));
 
+vi.mock("../repos/nation-economy", () => ({
+	ensureNationEconomy: vi.fn(async () => ({
+		year: 0,
+		treasury: 120,
+		debt: 0,
+		policy: {
+			taxRate: 0.2,
+			budgetShares: {
+				infrastructure: 0.28,
+				healthcare: 0.3,
+				education: 0.27,
+				reliefReserve: 0.15,
+			},
+		},
+		infrastructure: { transport: 45, powerWater: 45, digital: 40 },
+		services: {
+			healthcare: { coverage: 48, quality: 45 },
+			education: { coverage: 46, quality: 44 },
+		},
+		lastYear: null,
+	})),
+	loadNationEconomy: vi.fn(async () => null),
+	saveNationEconomy: vi.fn(async () => undefined),
+}));
+
 vi.mock("../repos/population", () => ({
 	computeDemographicStats: vi.fn(async () => ({
 		ageSexPyramid: [{ label: "0-9", male: 1, female: 1 }],
@@ -163,6 +188,18 @@ describe("DashboardsPage", () => {
 		).toBeInTheDocument();
 		expect(
 			await screen.findByText("Resource Ledger Detail"),
+		).toBeInTheDocument();
+	});
+
+	it("switches to the realm and treasury dashboard on tab click", async () => {
+		render(<DashboardsPage />);
+
+		fireEvent.click(screen.getByRole("button", { name: "Realm & Treasury" }));
+
+		expect(await screen.findByText("Treasury")).toBeInTheDocument();
+		expect(await screen.findByText("Fiscal policy")).toBeInTheDocument();
+		expect(
+			await screen.findByText("Infrastructure capital"),
 		).toBeInTheDocument();
 	});
 });
