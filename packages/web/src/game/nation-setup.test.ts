@@ -9,10 +9,15 @@ import {
 	MemoryDriver,
 	setStorageDriver,
 } from "economy-simulator-persistence";
+import {
+	applyEconomicSystemFiscalBias,
+	createInitialNationEconomyState,
+} from "economy-simulator-simulation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getFacePoolIds } from "../lib/faces";
 import { buildWorldRegions } from "../lib/world";
 import * as generatePopulation from "../models/generatePopulation";
+import { loadNationEconomy } from "../repos/nation-economy";
 import { loadSectorAssignments } from "../repos/sector-assignments";
 import { loadSectorRoleConfigs } from "../repos/sector-role-config";
 import {
@@ -54,6 +59,35 @@ describe("nation-setup", () => {
 
 		const run = await loadGameRunState();
 		expect(run?.phase).toBe("active");
+	});
+
+	it("startGame seeds nation economy with dominant economic-system fiscal bias", async () => {
+		await autoAssignAllSectors();
+		await startGame(6, faceIds, regions);
+
+		const assignments = await loadSectorAssignments();
+		const counts = new Map<string, number>();
+		for (const systemId of Object.values(assignments)) {
+			if (!systemId) continue;
+			counts.set(systemId, (counts.get(systemId) ?? 0) + 1);
+		}
+		let dominant: string | undefined;
+		let dominantCount = 0;
+		for (const [systemId, count] of counts) {
+			if (count > dominantCount) {
+				dominant = systemId;
+				dominantCount = count;
+			}
+		}
+
+		const expected = createInitialNationEconomyState(
+			undefined,
+			applyEconomicSystemFiscalBias(dominant),
+		);
+		const economy = await loadNationEconomy();
+		expect(economy?.policy.taxRate).toBe(expected.policy.taxRate);
+		expect(economy?.policy.budgetShares).toEqual(expected.policy.budgetShares);
+		expect(economy?.treasury).toBe(expected.treasury);
 	});
 
 	it("startGame keeps setup phase when population generation fails", async () => {

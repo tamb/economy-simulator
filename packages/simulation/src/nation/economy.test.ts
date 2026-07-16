@@ -130,6 +130,22 @@ describe("nation economy (Phase 1)", () => {
 		expect(high.emigrationBump).toBeGreaterThan(0);
 	});
 
+	it("includes calamity treasury spend in the fiscal year summary", () => {
+		const prior = createInitialNationEconomyState();
+		const tick = computeNationEconomyTick({
+			prior,
+			year: 1,
+			outputProxy: 1000,
+			employmentShareBySubSector: {},
+			calamityIdsThisYear: [],
+			calamityTreasurySpent: 25,
+		});
+		expect(tick.state.lastYear?.totalSpending).toBeGreaterThan(
+			tick.state.lastYear?.taxRevenue ?? 0,
+		);
+		expect(tick.state.treasury).toBeLessThan(prior.treasury);
+	});
+
 	it("derives disease blunt and education affinity from service quality", () => {
 		const weak = computePublicServiceEffects({
 			healthcare: { coverage: 20, quality: 20 },
