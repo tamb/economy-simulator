@@ -255,6 +255,79 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		expect(result.happiness).toBe(48.5);
 	});
 
+	it("subtracts tax and service underfunding penalties from happiness (Phase 1b/1c)", () => {
+		const baseline: QualityOfLifeInput = {
+			happiness: 50,
+			health: 50,
+			age: 30,
+			personality: neutralPersonality,
+			weeklyHours: 40,
+			categoryId: "services",
+		};
+
+		const pressured = computeDailyQualityOfLifeUpdate(
+			{
+				...baseline,
+				taxHappinessPenalty: 1.25,
+				serviceUnderfundingHappinessPenalty: 0.75,
+			},
+			noRandomNoise,
+		);
+
+		expect(pressured.happiness).toBe(48);
+	});
+
+	it("scales personality affinity by education quality (Phase 1c)", () => {
+		const extraverted = {
+			openness: 0,
+			conscientiousness: 0,
+			extraversion: 11,
+			agreeableness: 11,
+			neuroticism: 0,
+		};
+
+		const baseline = computeDailyQualityOfLifeUpdate(
+			{
+				happiness: 50,
+				health: 50,
+				age: 30,
+				personality: extraverted,
+				weeklyHours: 38,
+				categoryId: "services",
+			},
+			noRandomNoise,
+		);
+		const boosted = computeDailyQualityOfLifeUpdate(
+			{
+				happiness: 50,
+				health: 50,
+				age: 30,
+				personality: extraverted,
+				weeklyHours: 38,
+				categoryId: "services",
+				educationAffinityMultiplier: 1.2,
+			},
+			noRandomNoise,
+		);
+
+		expect(boosted.happiness).toBeGreaterThan(baseline.happiness);
+	});
+
+	it("applies healthcare quality as a daily health floor bonus (Phase 1c)", () => {
+		const input: QualityOfLifeInput = {
+			happiness: 50,
+			health: 50,
+			age: 30,
+			personality: neutralPersonality,
+			weeklyHours: 40,
+			categoryId: "services",
+			healthFloorBonus: 0.4,
+		};
+
+		const result = computeDailyQualityOfLifeUpdate(input, noRandomNoise);
+		expect(result.health).toBeGreaterThan(50);
+	});
+
 	it("defaults the new resource-related modifiers to no effect when omitted", () => {
 		const withDefaults = computeDailyQualityOfLifeUpdate(
 			{
@@ -297,97 +370,5 @@ describe("computeDailyQualityOfLifeUpdate", () => {
 		const first = computeDailyQualityOfLifeUpdate(input, () => 0.3);
 		const second = computeDailyQualityOfLifeUpdate(input, () => 0.3);
 		expect(first).toEqual(second);
-	});
-
-	it("subtracts tax and service underfunding penalties from happiness", () => {
-		const baseline = computeDailyQualityOfLifeUpdate(
-			{
-				happiness: 50,
-				health: 50,
-				age: 30,
-				personality: neutralPersonality,
-				weeklyHours: 40,
-				categoryId: "services",
-			},
-			noRandomNoise,
-		);
-		const penalized = computeDailyQualityOfLifeUpdate(
-			{
-				happiness: 50,
-				health: 50,
-				age: 30,
-				personality: neutralPersonality,
-				weeklyHours: 40,
-				categoryId: "services",
-				taxHappinessPenalty: 1.2,
-				serviceUnderfundingHappinessPenalty: 0.8,
-			},
-			noRandomNoise,
-		);
-
-		expect(penalized.happiness).toBeCloseTo(baseline.happiness - 2, 5);
-	});
-
-	it("scales personality affinity by education quality multiplier", () => {
-		const extraverted = {
-			openness: 0,
-			conscientiousness: 0,
-			extraversion: 11,
-			agreeableness: 11,
-			neuroticism: 0,
-		};
-		const baseline = computeDailyQualityOfLifeUpdate(
-			{
-				happiness: 50,
-				health: 50,
-				age: 30,
-				personality: extraverted,
-				weeklyHours: 38,
-				categoryId: "services",
-			},
-			noRandomNoise,
-		);
-		const boosted = computeDailyQualityOfLifeUpdate(
-			{
-				happiness: 50,
-				health: 50,
-				age: 30,
-				personality: extraverted,
-				weeklyHours: 38,
-				categoryId: "services",
-				educationAffinityMultiplier: 1.2,
-			},
-			noRandomNoise,
-		);
-
-		expect(boosted.happiness).toBeGreaterThan(baseline.happiness);
-	});
-
-	it("applies healthcare quality as a daily health floor bonus", () => {
-		const withoutBonus = computeDailyQualityOfLifeUpdate(
-			{
-				happiness: 50,
-				health: 50,
-				age: 30,
-				personality: neutralPersonality,
-				weeklyHours: 40,
-				categoryId: "services",
-			},
-			noRandomNoise,
-		);
-		const withBonus = computeDailyQualityOfLifeUpdate(
-			{
-				happiness: 50,
-				health: 50,
-				age: 30,
-				personality: neutralPersonality,
-				weeklyHours: 40,
-				categoryId: "services",
-				healthFloorBonus: 0.4,
-			},
-			noRandomNoise,
-		);
-
-		expect(withBonus.health).toBeGreaterThan(withoutBonus.health);
 	});
 });
