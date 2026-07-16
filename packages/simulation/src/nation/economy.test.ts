@@ -2,6 +2,7 @@ import { gameSettings } from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
 import {
 	applyEconomicSystemFiscalBias,
+	computeFiscalYear,
 	computeInfrastructureMultipliers,
 	computeInfrastructureTick,
 	computeNationEconomyTick,
@@ -128,6 +129,29 @@ describe("nation economy (Phase 1)", () => {
 		expect(low.happinessPenaltyPerDay).toBe(0);
 		expect(high.happinessPenaltyPerDay).toBeGreaterThan(0);
 		expect(high.emigrationBump).toBeGreaterThan(0);
+	});
+
+	it("includes mid-year calamity treasury spend in the fiscal year close", () => {
+		const prior = createInitialNationEconomyState();
+		const withoutSpend = computeFiscalYear({
+			priorTreasury: prior.treasury,
+			priorDebt: prior.debt,
+			policy: prior.policy,
+			outputProxy: 1000,
+		});
+		const withSpend = computeFiscalYear({
+			priorTreasury: prior.treasury,
+			priorDebt: prior.debt,
+			policy: prior.policy,
+			outputProxy: 1000,
+			calamityTreasurySpent: 40,
+		});
+
+		expect(withSpend.summary.totalSpending).toBe(
+			withoutSpend.summary.totalSpending + 40,
+		);
+		expect(withSpend.treasury).toBe(withoutSpend.treasury - 40);
+		expect(withSpend.summary.deficit).toBe(withoutSpend.summary.deficit + 40);
 	});
 
 	it("derives disease blunt and education affinity from service quality", () => {

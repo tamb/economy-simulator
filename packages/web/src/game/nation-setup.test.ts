@@ -9,12 +9,20 @@ import {
 	MemoryDriver,
 	setStorageDriver,
 } from "economy-simulator-persistence";
+import { applyEconomicSystemFiscalBias } from "economy-simulator-simulation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getFacePoolIds } from "../lib/faces";
 import { buildWorldRegions } from "../lib/world";
 import * as generatePopulation from "../models/generatePopulation";
-import { loadSectorAssignments } from "../repos/sector-assignments";
-import { loadSectorRoleConfigs } from "../repos/sector-role-config";
+import { loadNationEconomy } from "../repos/nation-economy";
+import {
+	loadSectorAssignments,
+	saveSectorAssignments,
+} from "../repos/sector-assignments";
+import {
+	loadSectorRoleConfigs,
+	saveSectorRoleConfigs,
+} from "../repos/sector-role-config";
 import {
 	autoAssignAllSectors,
 	autoAssignCategory,
@@ -116,5 +124,25 @@ describe("nation-setup", () => {
 
 		expect(assignments[key]).toBeDefined();
 		expect(roleConfigs[key]?.quotas.length).toBeGreaterThan(0);
+	});
+
+	it("startGame seeds nation economy with dominant economic-system fiscal bias", async () => {
+		const assignments = buildAutoAssignments();
+		for (const key of Object.keys(assignments)) {
+			assignments[key] = "communism";
+		}
+		const roleConfigs = buildAutoRoleConfigs(assignments);
+		await saveSectorAssignments(assignments);
+		await saveSectorRoleConfigs(roleConfigs);
+
+		await startGame(6, faceIds, regions);
+
+		const economy = await loadNationEconomy();
+		const expected = applyEconomicSystemFiscalBias("communism");
+		expect(economy?.policy.taxRate).toBe(expected.taxRate);
+		expect(economy?.policy.budgetShares.infrastructure).toBeCloseTo(
+			expected.budgetShares.infrastructure,
+			5,
+		);
 	});
 });

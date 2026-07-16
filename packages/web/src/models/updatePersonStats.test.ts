@@ -134,6 +134,34 @@ describe("updatePersonStats", () => {
 		);
 	});
 
+	it("forwards Phase 1 tax and service penalties from context", () => {
+		const baseline = new Person();
+		baseline.setAge(30);
+		baseline.setIsAlive(true);
+		baseline.setOverallHappiness(50);
+		baseline.setOverallHealth(50);
+		baseline.setCategoryId("services");
+		baseline.setSubSectorId("healthcare");
+
+		const penalized = new Person();
+		penalized.setAge(30);
+		penalized.setIsAlive(true);
+		penalized.setOverallHappiness(50);
+		penalized.setOverallHealth(50);
+		penalized.setCategoryId("services");
+		penalized.setSubSectorId("healthcare");
+
+		updatePersonStats(baseline, () => 0.5);
+		updatePersonStats(penalized, () => 0.5, undefined, {
+			taxHappinessPenalty: 1.5,
+			serviceUnderfundingHappinessPenalty: 0.5,
+		});
+
+		expect(penalized.getOverallHappiness() ?? 0).toBeLessThan(
+			baseline.getOverallHappiness() ?? 0,
+		);
+	});
+
 	it("applies an environmental quality modifier from context", () => {
 		const pristine = new Person();
 		pristine.setAge(30);
