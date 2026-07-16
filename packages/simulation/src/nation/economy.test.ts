@@ -2,6 +2,7 @@ import { gameSettings } from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
 import {
 	applyEconomicSystemFiscalBias,
+	computeFiscalYear,
 	computeInfrastructureMultipliers,
 	computeInfrastructureTick,
 	computeNationEconomyTick,
@@ -130,20 +131,27 @@ describe("nation economy (Phase 1)", () => {
 		expect(high.emigrationBump).toBeGreaterThan(0);
 	});
 
-	it("includes calamity treasury spend in the fiscal year summary", () => {
+	it("includes mid-year calamity treasury spend in the fiscal year close", () => {
 		const prior = createInitialNationEconomyState();
-		const tick = computeNationEconomyTick({
-			prior,
-			year: 1,
+		const withoutSpend = computeFiscalYear({
+			priorTreasury: prior.treasury,
+			priorDebt: prior.debt,
+			policy: prior.policy,
 			outputProxy: 1000,
-			employmentShareBySubSector: {},
-			calamityIdsThisYear: [],
-			calamityTreasurySpent: 25,
 		});
-		expect(tick.state.lastYear?.totalSpending).toBeGreaterThan(
-			tick.state.lastYear?.taxRevenue ?? 0,
+		const withSpend = computeFiscalYear({
+			priorTreasury: prior.treasury,
+			priorDebt: prior.debt,
+			policy: prior.policy,
+			outputProxy: 1000,
+			calamityTreasurySpent: 40,
+		});
+
+		expect(withSpend.summary.totalSpending).toBe(
+			withoutSpend.summary.totalSpending + 40,
 		);
-		expect(tick.state.treasury).toBeLessThan(prior.treasury);
+		expect(withSpend.treasury).toBe(withoutSpend.treasury - 40);
+		expect(withSpend.summary.deficit).toBe(withoutSpend.summary.deficit + 40);
 	});
 
 	it("derives disease blunt and education affinity from service quality", () => {
