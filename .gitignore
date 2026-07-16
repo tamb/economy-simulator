@@ -51,11 +51,10 @@ ehthumbs.db
 *.swo
 *~
 
-# Desktop package (Neutralino — synced from web build)
+# Desktop package (Tauri — synced from web build)
 packages/desktop/resources/
-packages/desktop/renderer/
 packages/desktop/dist/
-packages/desktop/bin/
+packages/desktop/src-tauri/target/
 
 # Misc caches
 .cache/
