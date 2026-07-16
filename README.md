@@ -4,7 +4,7 @@ You are the monarch of a procedurally generated island nation. Manage the
 economy, steer up to 1,000,000 simulated citizens across economic sectors,
 and keep quality of life high enough to grow your population instead of losing
 it to unrest or emigration. Monorepo desktop app: **vite + React** wrapped in
-**neutralino**.
+**Tauri**.
 
 ## Screens
 
@@ -38,11 +38,13 @@ bun run dev
 
 ## Full desktop build
 
+Requires a recent Rust toolchain (`rustup` stable) in addition to Bun.
+
 ```bash
 bun run build
 ```
 
-This runs: web build → `copy-web-to-desktop` → desktop package build.
+This runs: web build → `copy-web-to-desktop` → Tauri desktop package build.
 
 ## Quality gates
 
@@ -86,6 +88,6 @@ bun run test:e2e
 | Geography | `packages/geography` | Pure, deterministic world generation |
 | Data | `packages/data` | `AppConfig` / `GameSettings`, catalogs, briefing logic, copy JSON |
 | Persistence | `packages/persistence` | Storage drivers and typed repositories |
-| Desktop | `packages/desktop` | Neutralino wrapper |
+| Desktop | `packages/desktop` | Tauri wrapper |
 
 Bootstrapped with [bootstrap-desktop-app](../bootstrap-desktop-app).

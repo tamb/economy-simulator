@@ -11,7 +11,7 @@
 | `packages/geography/` | Pure, deterministic (seeded) world generation — island shape, biomes, resource overlays, adjacency — no React, no I/O |
 | `packages/data/` | Shared config (`AppConfig`, `GameSettings`), research-backed catalogs, briefing/mandate **logic**, and editable **copy JSON** (`src/copy/`) — no React |
 | `packages/persistence/` | Storage drivers (IndexedDB default) and typed repositories — no React |
-| `packages/desktop/` | neutralino desktop distribution |
+| `packages/desktop/` | Tauri desktop distribution |
 | `scripts/` | Cross-package automation |
 
 `packages/data`, `packages/simulation`, `packages/geography`, and

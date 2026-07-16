@@ -28,9 +28,9 @@ createRoot(root).render(
 				<SectorAssignmentProvider>
 					<PopulationProvider>
 						{/*
-						 * HashRouter (not BrowserRouter): the desktop build is served by
-						 * Neutralino's static file server, which has no SPA fallback for
-						 * arbitrary paths. Keeping the whole route in the URL fragment
+						 * HashRouter (not BrowserRouter): the desktop build is embedded
+						 * and served by Tauri's asset protocol, which has no SPA fallback
+						 * for arbitrary paths. Keeping the whole route in the URL fragment
 						 * means every navigation still resolves to the same index.html.
 						 */}
 						<HashRouter>

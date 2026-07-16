@@ -13,7 +13,7 @@
 | Layer | Choice |
 | --- | --- |
 | UI | **React 19.2.7** |
-| Routing | **react-router** (`HashRouter`) — hash-based (not `BrowserRouter`) because the desktop build is served by Neutralino's static file server with no SPA fallback for arbitrary paths; every route still resolves to the same `index.html`. `AppShell` is the layout route (nav + throne HUD + interrupt modals + `<Outlet />`); `/atlas`, `/atlas/:categoryId`, and `/atlas/:categoryId/:sectorId` give the sector-atlas drill-down real back/forward support too |
+| Routing | **react-router** (`HashRouter`) — hash-based (not `BrowserRouter`) because the desktop build is embedded and served by Tauri's asset protocol with no SPA fallback for arbitrary paths; every route still resolves to the same `index.html`. `AppShell` is the layout route (nav + throne HUD + interrupt modals + `<Outlet />`); `/atlas`, `/atlas/:categoryId`, and `/atlas/:categoryId/:sectorId` give the sector-atlas drill-down real back/forward support too |
 | Build | **Vite** |
 | Styling | **Tailwind CSS v4** (`@tailwindcss/vite` or PostCSS for Next.js) |
 | Storage | **`economy-simulator-persistence`** (IndexedDB via localforage under the hood) — web adapters live in `src/repos/`; web does not own drivers directly |
@@ -122,7 +122,9 @@ repositories from this package rather than talking to IndexedDB directly.
 
 | Layer | Choice |
 | --- | --- |
-| Wrapper | **Neutralino** |
+| Wrapper | **Tauri 2** (Rust shell + system webview) |
+
+Requires a recent **Rust** toolchain (`rustup` stable; Tauri 2 currently needs roughly Rust 1.88+) plus platform webview/GTK deps on Linux. The JS package scripts call `@tauri-apps/cli`; the Rust crate lives under `packages/desktop/src-tauri/`.
 
 ## Build flow
 

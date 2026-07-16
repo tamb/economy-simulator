@@ -2,7 +2,7 @@
 
 ## What The Benevolent Monarch is
 
-A **desktop-first** application: a React web UI (vite) wrapped for native distribution via **neutralino**.
+A **desktop-first** application: a React web UI (vite) wrapped for native distribution via **Tauri**.
 
 ## Game premise
 
@@ -71,7 +71,7 @@ Sourced research for each phase (cite when implementing) is indexed under
 | **Geography** | `packages/geography` — pure, deterministic world generation; no React, no I/O |
 | **Data** | `packages/data` — `AppConfig` / `GameSettings`, research-backed catalogs, briefings logic, and **creative copy JSON**; no React |
 | **Persistence** | `packages/persistence` — storage drivers and typed repositories; no React |
-| **Desktop** | `packages/desktop` — neutralino wrapper around the static web build |
+| **Desktop** | `packages/desktop` — Tauri wrapper around the static web build |
 
 ## Principles
 

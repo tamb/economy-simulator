@@ -1,3 +1,5 @@
 resources/
 dist/
-.bin/
+src-tauri/target/
+src-tauri/gen/
+src-tauri/app-icon.png
