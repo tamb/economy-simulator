@@ -159,6 +159,8 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const interruptAckRef = useRef<(() => void) | null>(null);
 	const gameDayRef = useRef(0);
 	const gameRunRef = useRef<GameRunState | null>(null);
+	const isAdvancingDayRef = useRef(false);
+	const isStartingGameRef = useRef(false);
 
 	useEffect(() => {
 		gameDayRef.current = gameDay;
@@ -233,7 +235,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			const exists = await hasPopulation();
 			const run = await loadGameRunState();
 
-			if (exists && run?.phase === "active") {
+			if (exists && run?.phase === "active" && run?.status === "active") {
 				const populationSize = getPopulationSize();
 				const meta = await loadPopulationMeta();
 				const activeRun = await refreshGameRun();
@@ -336,6 +338,8 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const startConfiguredGame = useCallback(async () => {
+		if (isStartingGameRef.current) return;
+		isStartingGameRef.current = true;
 		setIsGenerating(true);
 		setLoadProgress(0);
 
@@ -356,6 +360,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				throw new Error("Game failed to enter active phase");
 			}
 		} finally {
+			isStartingGameRef.current = false;
 			setIsGenerating(false);
 		}
 	}, [faceIds, total, refreshGameRun]);
@@ -590,13 +595,14 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 		) => {
 			const run = gameRunRef.current;
 			if (
-				isAdvancingDay ||
+				isAdvancingDayRef.current ||
 				!run ||
 				run.status !== "active" ||
 				run.phase !== "active"
 			) {
 				return { affected: 0 };
 			}
+			isAdvancingDayRef.current = true;
 			setIsAdvancingDay(true);
 			setDayAdvanceProgress({ phase: "mutation", processed: 0, total: 0 });
 			try {
@@ -611,24 +617,26 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				playSfx("edict");
 				return result;
 			} finally {
+				isAdvancingDayRef.current = false;
 				setIsAdvancingDay(false);
 				setDayAdvanceProgress(null);
 			}
 		},
-		[isAdvancingDay, refreshGameRun, runMutationInWorker],
+		[refreshGameRun, runMutationInWorker],
 	);
 
 	const applyRoleReform = useCallback(
 		async (categoryId: CategoryId, subSectorId: string) => {
 			const run = gameRunRef.current;
 			if (
-				isAdvancingDay ||
+				isAdvancingDayRef.current ||
 				!run ||
 				run.status !== "active" ||
 				run.phase !== "active"
 			) {
 				return { affected: 0 };
 			}
+			isAdvancingDayRef.current = true;
 			setIsAdvancingDay(true);
 			setDayAdvanceProgress({ phase: "mutation", processed: 0, total: 0 });
 			try {
@@ -642,11 +650,12 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				playSfx("reform");
 				return result;
 			} finally {
+				isAdvancingDayRef.current = false;
 				setIsAdvancingDay(false);
 				setDayAdvanceProgress(null);
 			}
 		},
-		[isAdvancingDay, refreshGameRun, runMutationInWorker],
+		[refreshGameRun, runMutationInWorker],
 	);
 
 	const dismissCoachMarks = useCallback(async () => {
@@ -660,10 +669,16 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const advanceDays = useCallback(
 		async (days: number) => {
 			const run = gameRunRef.current;
-			if (isAdvancingDay || (run && run.status !== "active")) return;
+			if (
+				isAdvancingDayRef.current ||
+				(run && run.status !== "active")
+			) {
+				return;
+			}
 			if (run && run.phase !== "active") return;
 			if (days <= 0) return;
 
+			isAdvancingDayRef.current = true;
 			setIsAdvancingDay(true);
 			setDayAdvanceProgress({
 				phase: "daily",
@@ -711,13 +726,13 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 					}
 				}
 			} finally {
+				isAdvancingDayRef.current = false;
 				setIsAdvancingDay(false);
 				setDayAdvanceProgress(null);
 			}
 		},
 		[
 			enqueueInterrupts,
-			isAdvancingDay,
 			presentInterrupt,
 			refreshGameRun,
 			runSingleDayInWorker,
