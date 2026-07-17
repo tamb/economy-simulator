@@ -17,7 +17,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getFacePoolIds } from "../lib/faces";
 import { buildWorldRegions } from "../lib/world";
 import * as generatePopulation from "../models/generatePopulation";
-import { loadNationEconomy } from "../repos/nation-economy";
+import { loadNationEconomy, saveNationEconomy } from "../repos/nation-economy";
 import { loadSectorAssignments } from "../repos/sector-assignments";
 import { loadSectorRoleConfigs } from "../repos/sector-role-config";
 import {
@@ -139,6 +139,24 @@ describe("nation-setup", () => {
 			roleConfigs[sectorKey("extractive", "mining")]?.quotas.length,
 		).toBeGreaterThan(0);
 		expect(validation.configuredCount).toBeGreaterThan(0);
+	});
+
+	it("startGame does not reset nation economy when population already exists", async () => {
+		await autoAssignAllSectors();
+
+		const seeded = createInitialNationEconomyState();
+		seeded.treasury = 999_999;
+		await saveNationEconomy(seeded);
+
+		const generateSpy = vi
+			.spyOn(generatePopulation, "generateAndSavePopulation")
+			.mockResolvedValueOnce(false);
+
+		await startGame(6, faceIds, regions);
+
+		const economy = await loadNationEconomy();
+		expect(economy?.treasury).toBe(999_999);
+		generateSpy.mockRestore();
 	});
 
 	it("autoAssignSector configures a single sub-sector", async () => {

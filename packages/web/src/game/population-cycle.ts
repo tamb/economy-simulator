@@ -470,7 +470,7 @@ async function runAnnualCycle(
 			bySubSector[subSectorId] = (bySubSector[subSectorId] ?? 0) + weight;
 		} else if (categoryId === "industrial") {
 			industrialWorkersBySubSector[subSectorId] =
-				(industrialWorkersBySubSector[subSectorId] ?? 0) + 1;
+				(industrialWorkersBySubSector[subSectorId] ?? 0) + weight;
 		}
 	}
 

@@ -19,9 +19,9 @@ async function generateAndSavePopulation(
 	size: number = appConfig.population.size,
 	onProgress?: (loaded: number, total: number) => void,
 	roleConfigs?: SectorRoleConfigs,
-): Promise<void> {
+): Promise<boolean> {
 	if (await hasPopulation()) {
-		return;
+		return false;
 	}
 
 	const cohortBuffers: Person[][] = Array.from(
@@ -68,6 +68,7 @@ async function generateAndSavePopulation(
 	}
 
 	await finalizePopulationMeta(size);
+	return true;
 }
 
 /** Test helper: load every person by walking cohort chunks (avoid in production UI). */

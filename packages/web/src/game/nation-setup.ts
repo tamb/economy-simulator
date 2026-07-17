@@ -156,7 +156,7 @@ async function startGame(
 
 	await ensureGameRunState(size);
 
-	await generateAndSavePopulation(
+	const generatedPopulation = await generateAndSavePopulation(
 		faceIds,
 		regions,
 		size,
@@ -180,12 +180,14 @@ async function startGame(
 	gameRun = issueMandateForYear(gameRun, 1);
 	await saveGameRunState(gameRun);
 
-	const fiscalPolicy = applyEconomicSystemFiscalBias(
-		dominantEconomicSystemId(assignments),
-	);
-	await saveNationEconomy(
-		createInitialNationEconomyState(undefined, fiscalPolicy),
-	);
+	if (generatedPopulation) {
+		const fiscalPolicy = applyEconomicSystemFiscalBias(
+			dominantEconomicSystemId(assignments),
+		);
+		await saveNationEconomy(
+			createInitialNationEconomyState(undefined, fiscalPolicy),
+		);
+	}
 }
 
 async function isNationInSetupPhase(): Promise<boolean> {
