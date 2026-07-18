@@ -4,6 +4,7 @@ import { MemoryDriver, setStorageDriver } from "../driver/registry";
 import {
 	clearNationEconomy,
 	ensureNationEconomy,
+	isNationEconomyState,
 	loadNationEconomy,
 	saveNationEconomy,
 } from "./nation-economy";
@@ -33,6 +34,24 @@ describe("nation-economy repository", () => {
 	it("clears persisted state", async () => {
 		await ensureNationEconomy();
 		await clearNationEconomy();
+		expect(await loadNationEconomy()).toBeNull();
+	});
+
+	it("rejects malformed persisted state on load", async () => {
+		const driver = new MemoryDriver();
+		setStorageDriver(driver);
+		await driver.set("world", "nation-economy", {
+			treasury: "not-a-number",
+			debt: 0,
+			policy: { taxRate: 0.2, budgetShares: {} },
+			infrastructure: { transport: 50, powerWater: 50, digital: 50 },
+			services: {
+				healthcare: { coverage: 50, quality: 50 },
+				education: { coverage: 50, quality: 50 },
+			},
+		});
+
+		expect(isNationEconomyState({ treasury: "bad" })).toBe(false);
 		expect(await loadNationEconomy()).toBeNull();
 	});
 });

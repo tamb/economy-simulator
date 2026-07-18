@@ -669,10 +669,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const advanceDays = useCallback(
 		async (days: number) => {
 			const run = gameRunRef.current;
-			if (
-				isAdvancingDayRef.current ||
-				(run && run.status !== "active")
-			) {
+			if (isAdvancingDayRef.current || (run && run.status !== "active")) {
 				return;
 			}
 			if (run && run.phase !== "active") return;
@@ -731,12 +728,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 				setDayAdvanceProgress(null);
 			}
 		},
-		[
-			enqueueInterrupts,
-			presentInterrupt,
-			refreshGameRun,
-			runSingleDayInWorker,
-		],
+		[enqueueInterrupts, presentInterrupt, refreshGameRun, runSingleDayInWorker],
 	);
 
 	const advanceDay = useCallback(async () => {

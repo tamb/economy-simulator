@@ -297,6 +297,24 @@ describe("setup phase gating", () => {
 
 		expect(result.meta?.gameDay).toBe(1);
 	});
+
+	it("does not advance the simulation when the game run was abandoned", async () => {
+		await generateAndSavePopulation(faceIds, testRegions, TEST_SIZE, undefined);
+
+		const abandonedRun = {
+			...createInitialGameRunState(TEST_SIZE),
+			phase: "active" as const,
+			status: "abandoned" as const,
+			endReason: "abandoned" as const,
+		};
+		await saveGameRunState(abandonedRun);
+
+		const metaBefore = await loadPopulationMeta();
+		const result = await advanceGameDay();
+
+		expect(result.meta?.gameDay).toBe(metaBefore?.gameDay);
+		expect(result.meta?.size).toBe(metaBefore?.size);
+	});
 });
 
 describe("advanceGameDay year-boundary trigger", () => {

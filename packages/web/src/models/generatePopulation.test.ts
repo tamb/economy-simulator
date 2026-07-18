@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { setupMemoryStorage } from "../test/storage-driver";
 import { getFacePoolIds } from "../lib/faces";
 import { buildWorldRegions } from "../lib/world";
 import { hasPopulation } from "../repos/population";
+import { setupMemoryStorage } from "../test/storage-driver";
 import { generateAndSavePopulation } from "./generatePopulation";
 
 const faceIds = getFacePoolIds();
