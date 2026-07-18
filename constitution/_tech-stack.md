@@ -5,7 +5,7 @@
 | Tool | Role |
 | --- | --- |
 | **Bun** | Package manager and script runner |
-| **TypeScript** | App logic |
+| **TypeScript 7** | App logic (native `tsc`; typecheck via `bun run typecheck`) |
 | **Biome** | Lint + format |
 
 ## Web (`packages/web`)
