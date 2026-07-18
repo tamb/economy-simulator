@@ -82,4 +82,32 @@ describe("applyCalamityResponses", () => {
 			0.45,
 		);
 	});
+
+	it("spends treasury once for a batch of simultaneous onsets", () => {
+		const run = createInitialGameRunState(1000);
+		run.phase = "active";
+		run.activeCalamities = [
+			sampleCalamity({ instanceId: "c1" }),
+			sampleCalamity({
+				instanceId: "c2",
+				calamityId: "drought",
+				name: "Drought",
+			}),
+		];
+
+		const single = applyCalamityResponses(run, ["c1"], "relief", 10, {
+			treasury: 200,
+		});
+		const batch = applyCalamityResponses(run, ["c1", "c2"], "relief", 10, {
+			treasury: 200,
+		});
+
+		expect(batch.totalTreasurySpent).toBe(single.totalTreasurySpent);
+		expect(batch.remainingTreasury).toBe(single.remainingTreasury);
+		expect(
+			batch.gameRun.activeCalamities.every(
+				(calamity) => calamity.playerResponse === "relief",
+			),
+		).toBe(true);
+	});
 });

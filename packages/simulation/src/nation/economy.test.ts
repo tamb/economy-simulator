@@ -154,6 +154,42 @@ describe("nation economy (Phase 1)", () => {
 		expect(withSpend.summary.deficit).toBe(withoutSpend.summary.deficit + 40);
 	});
 
+	it("does not double-deduct calamity treasury when prior treasury already reflects mid-year spend", () => {
+		const prior = createInitialNationEconomyState();
+		const midYearSpend = spendTreasuryForCalamityResponse(
+			prior.treasury,
+			"relief",
+		);
+		const debitedPrior = {
+			...prior,
+			treasury: midYearSpend.remainingTreasury,
+		};
+
+		const correctClose = computeNationEconomyTick({
+			prior: debitedPrior,
+			year: 1,
+			outputProxy: 1000,
+			employmentShareBySubSector: {},
+			calamityIdsThisYear: ["forest_fire"],
+		});
+		const doubleDeductClose = computeNationEconomyTick({
+			prior: debitedPrior,
+			year: 1,
+			outputProxy: 1000,
+			employmentShareBySubSector: {},
+			calamityIdsThisYear: ["forest_fire"],
+			calamityTreasurySpent: midYearSpend.spent,
+		});
+
+		expect(doubleDeductClose.state.treasury).toBeLessThan(
+			correctClose.state.treasury,
+		);
+		expect(doubleDeductClose.state.treasury).toBeCloseTo(
+			correctClose.state.treasury - midYearSpend.spent,
+			5,
+		);
+	});
+
 	it("derives disease blunt and education affinity from service quality", () => {
 		const weak = computePublicServiceEffects({
 			healthcare: { coverage: 20, quality: 20 },
