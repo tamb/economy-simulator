@@ -40,6 +40,11 @@ import {
 	startGame,
 } from "../game/nation-setup";
 import { startNewNation } from "../game/new-game";
+import {
+	canAdvancePopulationWorker,
+	canMutatePopulationWorker,
+	shouldResumeActivePopulationRun,
+} from "../game/population-worker-guards";
 import { applyWeeklyChoiceEffects } from "../game/weekly-report-effects";
 import { daysUntilYearEnd } from "../lib/calendar";
 import type { PopulationDirectoryEntry } from "../lib/population-directory";
@@ -235,7 +240,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			const exists = await hasPopulation();
 			const run = await loadGameRunState();
 
-			if (exists && run?.phase === "active" && run?.status === "active") {
+			if (shouldResumeActivePopulationRun(exists, run)) {
 				const populationSize = getPopulationSize();
 				const meta = await loadPopulationMeta();
 				const activeRun = await refreshGameRun();
@@ -594,12 +599,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 			percent: number,
 		) => {
 			const run = gameRunRef.current;
-			if (
-				isAdvancingDayRef.current ||
-				!run ||
-				run.status !== "active" ||
-				run.phase !== "active"
-			) {
+			if (!canMutatePopulationWorker(run, isAdvancingDayRef.current)) {
 				return { affected: 0 };
 			}
 			isAdvancingDayRef.current = true;
@@ -628,12 +628,7 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const applyRoleReform = useCallback(
 		async (categoryId: CategoryId, subSectorId: string) => {
 			const run = gameRunRef.current;
-			if (
-				isAdvancingDayRef.current ||
-				!run ||
-				run.status !== "active" ||
-				run.phase !== "active"
-			) {
+			if (!canMutatePopulationWorker(run, isAdvancingDayRef.current)) {
 				return { affected: 0 };
 			}
 			isAdvancingDayRef.current = true;
@@ -669,10 +664,9 @@ function PopulationProvider({ children }: { children: ReactNode }) {
 	const advanceDays = useCallback(
 		async (days: number) => {
 			const run = gameRunRef.current;
-			if (isAdvancingDayRef.current || (run && run.status !== "active")) {
+			if (!canAdvancePopulationWorker(run, isAdvancingDayRef.current)) {
 				return;
 			}
-			if (run && run.phase !== "active") return;
 			if (days <= 0) return;
 
 			isAdvancingDayRef.current = true;
