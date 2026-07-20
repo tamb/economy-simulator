@@ -88,7 +88,9 @@ describe("evaluateCareerBadges", () => {
 
 describe("evaluateEndRunBadges", () => {
 	it("maps win and mass exodus end reasons to badges", () => {
-		expect(evaluateEndRunBadges(undefined, "won")).toEqual(["monarch_emeritus"]);
+		expect(evaluateEndRunBadges(undefined, "won")).toEqual([
+			"monarch_emeritus",
+		]);
 		expect(evaluateEndRunBadges("mass_exodus", "lost")).toEqual(["exodus"]);
 		expect(evaluateEndRunBadges(undefined, "lost")).toEqual([]);
 	});

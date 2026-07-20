@@ -2,8 +2,8 @@ import { gameSettings } from "economy-simulator-data";
 import { describe, expect, it } from "vitest";
 import {
 	isEligibleLaborEdictWorker,
-	selectLaborEdictCandidates,
 	type LaborEdictCandidate,
+	selectLaborEdictCandidates,
 } from "./labor-edict";
 
 function candidate(
@@ -60,7 +60,9 @@ describe("selectLaborEdictCandidates", () => {
 		const home = "r-home";
 		const away = "r-away";
 		const pool = [
-			...Array.from({ length: 8 }, (_, offset) => candidate(home, 0, 0, offset)),
+			...Array.from({ length: 8 }, (_, offset) =>
+				candidate(home, 0, 0, offset),
+			),
 			candidate(away, 0, 1, 0),
 			candidate(away, 0, 1, 1),
 		];
@@ -86,19 +88,54 @@ describe("isEligibleLaborEdictWorker", () => {
 
 	it("requires a living worker in the source sector at working age", () => {
 		expect(
-			isEligibleLaborEdictWorker(30, true, "industrial", "light-manufacturing", source, settings),
+			isEligibleLaborEdictWorker(
+				30,
+				true,
+				"industrial",
+				"light-manufacturing",
+				source,
+				settings,
+			),
 		).toBe(true);
 		expect(
-			isEligibleLaborEdictWorker(30, false, "industrial", "light-manufacturing", source, settings),
+			isEligibleLaborEdictWorker(
+				30,
+				false,
+				"industrial",
+				"light-manufacturing",
+				source,
+				settings,
+			),
 		).toBe(false);
 		expect(
-			isEligibleLaborEdictWorker(5, true, "industrial", "light-manufacturing", source, settings),
+			isEligibleLaborEdictWorker(
+				5,
+				true,
+				"industrial",
+				"light-manufacturing",
+				source,
+				settings,
+			),
 		).toBe(false);
 		expect(
-			isEligibleLaborEdictWorker(30, true, "services", "light-manufacturing", source, settings),
+			isEligibleLaborEdictWorker(
+				30,
+				true,
+				"services",
+				"light-manufacturing",
+				source,
+				settings,
+			),
 		).toBe(false);
 		expect(
-			isEligibleLaborEdictWorker(30, true, "industrial", "other-sector", source, settings),
+			isEligibleLaborEdictWorker(
+				30,
+				true,
+				"industrial",
+				"other-sector",
+				source,
+				settings,
+			),
 		).toBe(false);
 	});
 });
