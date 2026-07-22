@@ -1,14 +1,13 @@
 import { describe, expect, it } from "vitest";
-import {
-	buildNationScoreTrendData,
-	formatEndReason,
-} from "./score-dashboard";
+import { buildNationScoreTrendData, formatEndReason } from "./score-dashboard";
 
 describe("formatEndReason", () => {
 	it("maps known win and lose reasons to player-facing labels", () => {
 		expect(formatEndReason("extinction")).toBe("Nation extinct");
 		expect(formatEndReason("mass_exodus")).toBe("Mass exodus");
-		expect(formatEndReason("prosperity_sustained")).toBe("Prosperity sustained");
+		expect(formatEndReason("prosperity_sustained")).toBe(
+			"Prosperity sustained",
+		);
 		expect(formatEndReason("long_reign")).toBe("Long reign completed");
 	});
 
