@@ -210,4 +210,96 @@ describe("evaluateWinLose", () => {
 		expect(result.status).toBe("won");
 		expect(result.reason).toBe("long_reign");
 	});
+
+	it("loses after sustained mass exodus streak", () => {
+		const thresholds = gameSettings.progression.lose;
+		const populationAfter = 1000;
+		const emigrations = Math.ceil(
+			populationAfter * thresholds.massExodusRate + 1,
+		);
+		let streaks = emptyStreaks();
+
+		for (let year = 1; year < thresholds.massExodusYears; year++) {
+			const step = evaluateWinLose(
+				winLoseContext({
+					year,
+					populationAfter,
+					emigrations,
+					streaks,
+				}),
+			);
+			expect(step.status).toBe("active");
+			streaks = step.streaks;
+		}
+
+		const final = evaluateWinLose(
+			winLoseContext({
+				year: thresholds.massExodusYears,
+				populationAfter,
+				emigrations,
+				streaks,
+			}),
+		);
+		expect(final.status).toBe("lost");
+		expect(final.reason).toBe("mass_exodus");
+	});
+
+	it("wins on sustained growth milestone", () => {
+		const thresholds = gameSettings.progression.win;
+		let streaks = emptyStreaks();
+
+		for (let year = 1; year < thresholds.growthYears; year++) {
+			const step = evaluateWinLose(
+				winLoseContext({
+					year,
+					populationAfter: 2100,
+					startingPopulation: 1000,
+					averageQualityOfLife: thresholds.growthQol,
+					streaks,
+				}),
+			);
+			expect(step.status).toBe("active");
+			streaks = step.streaks;
+		}
+
+		const final = evaluateWinLose(
+			winLoseContext({
+				year: thresholds.growthYears,
+				populationAfter: 2100,
+				startingPopulation: 1000,
+				averageQualityOfLife: thresholds.growthQol,
+				streaks,
+			}),
+		);
+		expect(final.status).toBe("won");
+		expect(final.reason).toBe("growth_milestone");
+	});
+
+	it("wins on sustained high nation score", () => {
+		const thresholds = gameSettings.progression.win;
+		let streaks = emptyStreaks();
+		const highScore = baseScore({ total: thresholds.highScoreThreshold });
+
+		for (let year = 1; year < thresholds.highScoreYears; year++) {
+			const step = evaluateWinLose(
+				winLoseContext({
+					year,
+					score: highScore,
+					streaks,
+				}),
+			);
+			expect(step.status).toBe("active");
+			streaks = step.streaks;
+		}
+
+		const final = evaluateWinLose(
+			winLoseContext({
+				year: thresholds.highScoreYears,
+				score: highScore,
+				streaks,
+			}),
+		);
+		expect(final.status).toBe("won");
+		expect(final.reason).toBe("high_score_sustained");
+	});
 });
