@@ -4,11 +4,22 @@ import { buildNationScoreTrendData, formatEndReason } from "./score-dashboard";
 describe("formatEndReason", () => {
 	it("maps known win and lose reasons to player-facing labels", () => {
 		expect(formatEndReason("extinction")).toBe("Nation extinct");
+		expect(formatEndReason("population_collapse")).toBe("Population collapse");
 		expect(formatEndReason("mass_exodus")).toBe("Mass exodus");
+		expect(formatEndReason("qol_crisis")).toBe("Quality-of-life crisis");
+		expect(formatEndReason("resource_famine")).toBe("Resource famine");
+		expect(formatEndReason("environmental_ruin")).toBe("Environmental ruin");
 		expect(formatEndReason("prosperity_sustained")).toBe(
 			"Prosperity sustained",
 		);
+		expect(formatEndReason("growth_milestone")).toBe(
+			"Growth milestone reached",
+		);
+		expect(formatEndReason("high_score_sustained")).toBe(
+			"High score sustained",
+		);
 		expect(formatEndReason("long_reign")).toBe("Long reign completed");
+		expect(formatEndReason("abandoned")).toBe("Nation abandoned");
 	});
 
 	it("falls back for unknown reasons and empty input", () => {

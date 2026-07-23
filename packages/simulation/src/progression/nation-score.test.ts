@@ -211,6 +211,94 @@ describe("evaluateWinLose", () => {
 		expect(result.reason).toBe("long_reign");
 	});
 
+	it("loses after sustained quality-of-life crisis streak", () => {
+		const thresholds = gameSettings.progression.lose;
+		let streaks = emptyStreaks();
+		const crisisQol = thresholds.qolCrisisThreshold - 1;
+
+		for (let year = 1; year < thresholds.qolCrisisYears; year++) {
+			const step = evaluateWinLose(
+				winLoseContext({
+					year,
+					averageQualityOfLife: crisisQol,
+					streaks,
+				}),
+			);
+			expect(step.status).toBe("active");
+			streaks = step.streaks;
+		}
+
+		const final = evaluateWinLose(
+			winLoseContext({
+				year: thresholds.qolCrisisYears,
+				averageQualityOfLife: crisisQol,
+				streaks,
+			}),
+		);
+		expect(final.status).toBe("lost");
+		expect(final.reason).toBe("qol_crisis");
+	});
+
+	it("loses after sustained resource famine streak", () => {
+		const thresholds = gameSettings.progression.lose;
+		let streaks = emptyStreaks();
+		const famineScore = baseScore({
+			resourceSufficiency: thresholds.resourceFamineSufficiency - 1,
+		});
+
+		for (let year = 1; year < thresholds.resourceFamineYears; year++) {
+			const step = evaluateWinLose(
+				winLoseContext({
+					year,
+					score: famineScore,
+					streaks,
+				}),
+			);
+			expect(step.status).toBe("active");
+			streaks = step.streaks;
+		}
+
+		const final = evaluateWinLose(
+			winLoseContext({
+				year: thresholds.resourceFamineYears,
+				score: famineScore,
+				streaks,
+			}),
+		);
+		expect(final.status).toBe("lost");
+		expect(final.reason).toBe("resource_famine");
+	});
+
+	it("loses after sustained environmental ruin streak", () => {
+		const thresholds = gameSettings.progression.lose;
+		let streaks = emptyStreaks();
+		const ruinScore = baseScore({
+			environmentHealth: thresholds.environmentRuinThreshold - 1,
+		});
+
+		for (let year = 1; year < thresholds.environmentRuinYears; year++) {
+			const step = evaluateWinLose(
+				winLoseContext({
+					year,
+					score: ruinScore,
+					streaks,
+				}),
+			);
+			expect(step.status).toBe("active");
+			streaks = step.streaks;
+		}
+
+		const final = evaluateWinLose(
+			winLoseContext({
+				year: thresholds.environmentRuinYears,
+				score: ruinScore,
+				streaks,
+			}),
+		);
+		expect(final.status).toBe("lost");
+		expect(final.reason).toBe("environmental_ruin");
+	});
+
 	it("loses after sustained mass exodus streak", () => {
 		const thresholds = gameSettings.progression.lose;
 		const populationAfter = 1000;
